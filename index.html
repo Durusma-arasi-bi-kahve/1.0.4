@@ -1,494 +1,3 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Duruşma Arası">
-<meta name="theme-color" content="#0F0A04">
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%230F0A04'/%3E%3Ctext x='90' y='115' font-size='80' text-anchor='middle'%3E%E2%98%95%3C/text%3E%3C/svg%3E">
-<title>Duruşma Arası</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<style>
-:root {
-  --bg: #0F0A04;
-  --bg2: #1A1208;
-  --bg3: #231808;
-  --card: #2A1E0A;
-  --border: #3D2B0E;
-  --border2: #5A3F18;
-  --gold: #C8892A;
-  --gold-light: #E8C97A;
-  --gold-pale: #F5E4B0;
-  --text: #F0DFB8;
-  --muted: #9A7A50;
-  --muted2: #6A5030;
-  --green: #5AAF5A;
-  --red: #C05050;
-  --yellow: #D4A030;
-  --blue: #4A90C8;
-}
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html { height: -webkit-fill-available; }
-body {
-  font-family: 'DM Sans', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  min-height: -webkit-fill-available;
-  overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
-  overscroll-behavior: none;
-}
-.serif { font-family: 'Playfair Display', serif; }
-.screen { display: none; min-height: 100vh; min-height: -webkit-fill-available; }
-.screen.active { display: flex; flex-direction: column; }
-
-/* LANDING */
-#s-landing {
-  align-items: center; justify-content: center;
-  position: relative; overflow: hidden;
-  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-}
-.landing-bg { position: absolute; inset: 0; background: radial-gradient(ellipse 60% 50% at 50% 40%, #3D2B0E 0%, transparent 70%); pointer-events: none; }
-.landing-rings { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; }
-.ring { position: absolute; border-radius: 50%; border: 1px solid var(--border); opacity: 0.3; animation: pulse-ring 4s ease-in-out infinite; }
-.ring:nth-child(1) { width: 300px; height: 300px; animation-delay: 0s; }
-.ring:nth-child(2) { width: 450px; height: 450px; animation-delay: 0.8s; }
-.ring:nth-child(3) { width: 600px; height: 600px; animation-delay: 1.6s; }
-@keyframes pulse-ring { 0%,100%{opacity:.15;transform:scale(1)} 50%{opacity:.35;transform:scale(1.02)} }
-.landing-content { position: relative; z-index: 2; text-align: center; animation: fade-up 0.8s ease both; }
-@keyframes fade-up { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
-.app-logo { font-family:'Playfair Display',serif; font-size:42px; font-weight:500; color:var(--gold); letter-spacing:-0.5px; margin-bottom:8px; }
-.app-tagline { font-size:14px; color:var(--muted); margin-bottom:48px; letter-spacing:.05em; }
-.login-box { background:var(--bg2); border:0.5px solid var(--border); border-radius:20px; padding:32px; width:340px; text-align:left; }
-.login-box h2 { font-family:'Playfair Display',serif; font-size:20px; font-weight:500; color:var(--gold-light); margin-bottom:6px; }
-.login-box p { font-size:13px; color:var(--muted); margin-bottom:24px; line-height:1.6; }
-.field-label { font-size:11px; color:var(--muted); letter-spacing:.06em; text-transform:uppercase; margin-bottom:6px; }
-.field-input { width:100%; background:var(--bg3); border:0.5px solid var(--border); border-radius:10px; padding:11px 14px; font-family:'DM Sans',sans-serif; font-size:16px; color:var(--text); outline:none; transition:border-color .2s; margin-bottom:16px; -webkit-appearance:none; }
-.field-input:focus { border-color:var(--gold); }
-.field-input::placeholder { color:var(--muted2); }
-.btn-primary { width:100%; background:var(--gold); border:none; border-radius:10px; padding:13px; font-family:'DM Sans',sans-serif; font-size:14px; font-weight:500; color:var(--bg); cursor:pointer; transition:opacity .2s,transform .1s; -webkit-appearance:none; touch-action:manipulation; }
-.btn-primary:hover{opacity:.9} .btn-primary:active{transform:scale(.98);opacity:.85}
-.login-note { font-size:11px; color:var(--muted2); text-align:center; margin-top:14px; line-height:1.5; }
-
-/* APP SHELL */
-#s-app { flex-direction:column; max-width:480px; margin:0 auto; width:100%; }
-.app-header { display:flex; align-items:center; justify-content:space-between; padding:16px 20px 12px; padding-top:calc(16px + env(safe-area-inset-top)); border-bottom:0.5px solid var(--border); background:var(--bg); position:sticky; top:0; z-index:100; }
-.header-logo { font-family:'Playfair Display',serif; font-size:18px; color:var(--gold); }
-.header-greeting { font-size:11px; color:var(--muted); margin-top:1px; }
-.header-right { display:flex; gap:10px; align-items:center; }
-.icon-btn { width:34px; height:34px; border-radius:50%; background:var(--bg3); border:0.5px solid var(--border); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:14px; transition:border-color .2s; color:var(--muted); }
-.icon-btn:hover{border-color:var(--gold);color:var(--gold)}
-.avatar-sm { width:34px; height:34px; border-radius:50%; background:var(--card); border:1.5px solid var(--gold); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:500; color:var(--gold-light); cursor:pointer; }
-.bottom-nav { display:flex; border-top:0.5px solid var(--border); background:var(--bg); position:sticky; bottom:0; padding-bottom:env(safe-area-inset-bottom); }
-.nav-tab { flex:1; padding:10px 4px 12px; text-align:center; cursor:pointer; transition:color .2s; border:none; background:none; color:var(--muted2); touch-action:manipulation; }
-.nav-tab.active{color:var(--gold)}
-.nav-icon{font-size:18px;display:block;margin-bottom:2px} .nav-label{font-size:10px;letter-spacing:.03em}
-.page{display:none;flex:1;flex-direction:column;overflow-y:auto;-webkit-overflow-scrolling:touch}
-.page.active{display:flex}
-
-/* HOME */
-.home-content{flex:1;display:flex;flex-direction:column;align-items:center;padding:24px 20px 20px}
-.checkin-status{width:100%;background:var(--bg3);border:0.5px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:28px;display:flex;align-items:center;gap:12px}
-.status-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-.status-dot.off{background:var(--muted2)} .status-dot.on{background:var(--green);box-shadow:0 0 8px var(--green);animation:blink 2s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
-.status-text{font-size:13px;color:var(--muted);flex:1} .status-text strong{color:var(--gold-light)}
-.status-exit{font-size:11px;color:var(--red);cursor:pointer;padding:4px 8px;border:0.5px solid var(--red);border-radius:6px;white-space:nowrap}
-.status-exit:hover{background:rgba(192,80,80,.1)}
-.big-btn-wrap{position:relative;margin:10px 0 32px}
-.big-btn-ring{position:absolute;border-radius:50%;border:1px solid var(--gold);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;opacity:0;animation:none}
-.big-btn-ring.r1{width:200px;height:200px} .big-btn-ring.r2{width:240px;height:240px;animation-delay:.3s}
-.big-btn{width:170px;height:170px;border-radius:50%;background:var(--gold);border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;transition:transform .15s,opacity .2s;position:relative;z-index:2;touch-action:manipulation;-webkit-appearance:none}
-.big-btn:hover{transform:scale(1.03)} .big-btn:active{transform:scale(.96)}
-.big-btn.checked-in{background:var(--bg3);border:2px solid var(--green)}
-.big-btn-icon{font-size:32px}
-.big-btn-text{font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;color:var(--bg);text-align:center;line-height:1.4;max-width:110px}
-.big-btn.checked-in .big-btn-text{color:var(--green)}
-.big-btn-detecting{font-size:11px;color:var(--muted);text-align:center;margin-top:-16px;margin-bottom:16px;min-height:18px}
-.mood-section{width:100%;margin-bottom:24px}
-.section-title{font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px}
-.mood-row{display:flex;gap:8px}
-.mood-chip{flex:1;padding:9px 8px;border-radius:10px;border:0.5px solid var(--border);background:var(--bg3);font-family:'DM Sans',sans-serif;font-size:12px;color:var(--muted);cursor:pointer;text-align:center;transition:all .2s}
-.mood-chip:hover{border-color:var(--border2);color:var(--text)}
-.mood-chip.selected{border-color:var(--gold);color:var(--gold-light);background:rgba(200,137,42,.08)}
-.mood-icon{font-size:16px;display:block;margin-bottom:3px}
-.nearby-section{width:100%} .nearby-list{display:flex;flex-direction:column;gap:8px}
-.nearby-person{display:flex;align-items:center;gap:12px;padding:11px 14px;background:var(--bg3);border:0.5px solid var(--border);border-radius:12px;transition:border-color .2s}
-.nearby-person:hover{border-color:var(--border2)}
-.person-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0;background:var(--card);color:var(--gold);border:1px solid var(--gold)}
-.person-info{flex:1} .person-name{font-size:13px;color:var(--text);font-weight:500} .person-role{font-size:11px;color:var(--muted);margin-top:1px}
-.person-badge{font-size:10px;padding:3px 8px;border-radius:20px}
-.badge-green{background:rgba(90,175,90,.12);color:var(--green);border:0.5px solid rgba(90,175,90,.3)}
-.badge-red{background:rgba(192,80,80,.12);color:var(--red);border:0.5px solid rgba(192,80,80,.3)}
-.badge-yellow{background:rgba(212,160,48,.12);color:var(--yellow);border:0.5px solid rgba(212,160,48,.3)}
-.empty-state{text-align:center;padding:32px 20px;color:var(--muted2);font-size:13px;line-height:1.7}
-.empty-icon{font-size:32px;display:block;margin-bottom:10px;opacity:.5}
-
-/* KAFETERYA */
-.page-content{padding:20px;flex:1}
-.court-selector{display:flex;align-items:center;gap:10px;margin-bottom:20px}
-.court-selector select{flex:1;background:var(--bg3);border:0.5px solid var(--border);border-radius:10px;padding:10px 14px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);outline:none;cursor:pointer;-webkit-appearance:none}
-.cafe-card{background:var(--bg3);border:0.5px solid var(--border);border-radius:16px;padding:18px;margin-bottom:14px;transition:border-color .2s}
-.cafe-card:hover{border-color:var(--border2)}
-.cafe-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
-.cafe-name{font-family:'Playfair Display',serif;font-size:16px;color:var(--gold-light)}
-.cafe-rating{display:flex;gap:2px} .star{font-size:14px;color:var(--gold)} .star.empty{color:var(--muted2)}
-.cafe-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
-.ctag{font-size:11px;padding:3px 9px;border-radius:20px;cursor:pointer;transition:all .15s}
-.ctag-good{background:rgba(90,175,90,.1);color:var(--green);border:0.5px solid rgba(90,175,90,.25)}
-.ctag-bad{background:rgba(192,80,80,.1);color:var(--red);border:0.5px solid rgba(192,80,80,.25)}
-.ctag-mid{background:rgba(212,160,48,.1);color:var(--yellow);border:0.5px solid rgba(212,160,48,.25)}
-.ctag:hover{opacity:.75}
-.cafe-review{font-size:12px;color:var(--muted);font-style:italic;line-height:1.6;border-top:0.5px solid var(--border);padding-top:10px}
-.cafe-review span{color:var(--muted2)}
-.cafe-here{display:flex;align-items:center;gap:8px;margin-top:10px}
-.here-label{font-size:11px;color:var(--muted2)}
-.add-rating-btn{width:100%;padding:12px;background:transparent;border:0.5px dashed var(--border2);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted);cursor:pointer;transition:all .2s}
-.add-rating-btn:hover{border-color:var(--gold);color:var(--gold);background:rgba(200,137,42,.04)}
-
-/* PROFİL */
-.profile-header{display:flex;flex-direction:column;align-items:center;padding:28px 20px 20px;border-bottom:0.5px solid var(--border)}
-.profile-avatar{width:72px;height:72px;border-radius:50%;background:var(--card);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:26px;color:var(--gold-light);margin-bottom:12px}
-.profile-name{font-family:'Playfair Display',serif;font-size:20px;color:var(--gold-light)}
-.profile-baro{font-size:12px;color:var(--muted);margin-top:4px}
-.verified-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--green);background:rgba(90,175,90,.08);border:0.5px solid rgba(90,175,90,.2);border-radius:20px;padding:3px 9px;margin-top:8px}
-.settings-section{padding:16px 20px}
-.settings-group{background:var(--bg3);border:0.5px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:14px}
-.settings-row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:0.5px solid var(--border);cursor:pointer;transition:background .15s}
-.settings-row:last-child{border-bottom:none} .settings-row:hover{background:rgba(200,137,42,.04)}
-.settings-row-left{display:flex;align-items:center;gap:12px}
-.settings-icon{font-size:16px;width:20px;text-align:center} .settings-label{font-size:13px;color:var(--text)} .settings-value{font-size:12px;color:var(--muted)}
-.toggle{width:40px;height:22px;border-radius:11px;background:var(--muted2);position:relative;cursor:pointer;transition:background .2s;border:none;flex-shrink:0}
-.toggle::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:white;top:3px;left:3px;transition:transform .2s}
-.toggle.on{background:var(--gold)} .toggle.on::after{transform:translateX(18px)}
-
-/* MODAL */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;align-items:center;justify-content:center;padding:20px}
-.modal-overlay.open{display:flex}
-.modal{background:var(--bg2);border:0.5px solid var(--border2);border-radius:20px;padding:28px;width:100%;max-width:360px;animation:modal-in .25s ease}
-@keyframes modal-in{from{opacity:0;transform:scale(.95) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
-.modal-title{font-family:'Playfair Display',serif;font-size:20px;color:var(--gold-light);margin-bottom:8px}
-.modal-sub{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6}
-.adliye-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px}
-.adliye-btn{padding:12px 10px;background:var(--bg3);border:0.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--text);cursor:pointer;text-align:center;transition:all .15s}
-.adliye-btn:hover{border-color:var(--gold);color:var(--gold-light)}
-.adliye-btn.selected{border-color:var(--gold);background:rgba(200,137,42,.1);color:var(--gold-light)}
-.modal-btn-row{display:flex;gap:10px}
-.btn-secondary{flex:1;padding:12px;background:transparent;border:0.5px solid var(--border2);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted);cursor:pointer;transition:all .2s}
-.btn-secondary:hover{border-color:var(--text);color:var(--text)}
-.btn-confirm{flex:2;padding:12px;background:var(--gold);border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--bg);cursor:pointer;transition:opacity .2s}
-.btn-confirm:hover{opacity:.88}
-
-/* TOAST */
-.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--bg2);border:0.5px solid var(--gold);border-radius:12px;padding:12px 18px;font-size:13px;color:var(--gold-light);z-index:999;transition:transform .35s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;max-width:90vw}
-.toast.show{transform:translateX(-50%) translateY(0)}
-
-/* iOS BANNER */
-.ios-banner{display:none;position:fixed;bottom:calc(16px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:var(--bg2);border:0.5px solid var(--border2);border-radius:16px;padding:14px 18px;z-index:900;width:calc(100% - 32px);max-width:420px}
-.ios-banner.visible{display:flex;align-items:center;gap:12px}
-.ios-banner-icon{font-size:28px;flex-shrink:0}
-.ios-banner-text{flex:1}
-.ios-banner-title{font-size:13px;font-weight:500;color:var(--gold-light);margin-bottom:2px}
-.ios-banner-desc{font-size:11px;color:var(--muted);line-height:1.5}
-.ios-banner-close{font-size:18px;color:var(--muted2);cursor:pointer;padding:4px;flex-shrink:0}
-
-@media(min-width:600px){
-  #s-app{max-width:480px;margin:0 auto;border-left:0.5px solid var(--border);border-right:0.5px solid var(--border);min-height:100vh}
-  body{background:#070503}
-}
-</style>
-</head>
-<body>
-
-<div class="screen active" id="s-landing">
-  <div class="landing-bg"></div>
-  <div class="landing-rings"><div class="ring"></div><div class="ring"></div><div class="ring"></div></div>
-  <div class="landing-content">
-    <div class="app-logo serif">Duruşma Arası</div>
-    <div class="app-tagline">Adliyedeyken meslektaşınla buluş</div>
-    <div class="login-box">
-      <h2>Giriş Yap</h2>
-      <p>Sadece baro üyeleri katılabilir. Baro kartınızla kimliğinizi doğrulayın.</p>
-      <div class="field-label">Ad Soyad</div>
-      <input class="field-input" type="text" id="inp-name" placeholder="Avukat Adı ve Soyadı" value="">
-      <div class="field-label">Baro Sicil No</div>
-      <input class="field-input" type="text" id="inp-sicil" placeholder="" value="">
-      <div class="field-label">Telefon</div>
-      <input class="field-input" type="tel" id="inp-tel" placeholder="05** *** ** **" value="">
-      <button class="btn-primary" onclick="doLogin()">Giriş Yap →</button>
-      <div class="login-note">Baro kartı doğrulaması için hesabınız 24 saat içinde onaylanır.</div>
-    </div>
-  </div>
-</div>
-
-<div class="screen" id="s-app">
-  <div class="app-header">
-    <div>
-      <div class="header-logo serif">Duruşma Arası</div>
-      <div class="header-greeting" id="greeting">Merhaba, Av. Enes</div>
-    </div>
-    <div class="header-right">
-      <div class="icon-btn" onclick="showToast('Bildirimler yakında aktif olacak')">🔔</div>
-      <div class="avatar-sm" onclick="goProfile()">EE</div>
-    </div>
-  </div>
-
-  <div class="page active" id="page-home">
-    <div class="home-content">
-      <div class="checkin-status" id="checkin-status" style="display:none;">
-        <div class="status-dot on"></div>
-        <div class="status-text" id="status-text">Aktif değil</div>
-        <div class="status-exit" onclick="doCheckOut()">Çıkış Yap</div>
-      </div>
-      <div class="big-btn-wrap">
-        <div class="big-btn-ring r1" id="ring1"></div>
-        <div class="big-btn-ring r2" id="ring2"></div>
-        <button class="big-btn" id="big-btn" onclick="handleBigBtn()">
-          <span class="big-btn-icon">☕</span>
-          <span class="big-btn-text" id="big-btn-text">Adliyedeyim<br>Kahveye Beklerim</span>
-        </button>
-      </div>
-      <div class="big-btn-detecting" id="detecting-text"></div>
-      <div class="mood-section" id="mood-section" style="display:none;">
-        <div class="section-title">Durumunu seç</div>
-        <div class="mood-row">
-          <div class="mood-chip selected" onclick="setMood(this,'Müsaitim')"><span class="mood-icon">🟢</span>Müsaitim</div>
-          <div class="mood-chip" onclick="setMood(this,'Duruşmada')"><span class="mood-icon">🔴</span>Duruşmada</div>
-          <div class="mood-chip" onclick="setMood(this,'Kalemde')"><span class="mood-icon">🟡</span>Kalemde</div>
-        </div>
-      </div>
-      <div class="nearby-section" id="nearby-section" style="display:none;">
-        <div class="section-title" id="nearby-title">Aynı adliyedekiler</div>
-        <div class="nearby-list" id="nearby-list">
-          <div class="empty-state"><span class="empty-icon">📍</span>Şu an bu adliyede<br>başka meslektaşınız görünmüyor.</div>
-        </div>
-      </div>
-      <div id="pre-checkin-hint" style="text-align:center;margin-top:16px;">
-        <div style="font-size:12px;color:var(--muted2);line-height:1.7;">Butona basınca sistem sizi en yakın<br>adliyeye otomatik olarak check-in yapar.</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="page" id="page-cafe">
-    <div class="page-content">
-      <div class="court-selector">
-        <select id="cafe-court-select" onchange="renderCafe()">
-          <option value="caglayan">Çağlayan Adliyesi</option>
-          <option value="kartal">İstanbul Anadolu Adliyesi (Kartal)</option>
-          <option value="bakirkoy">Bakırköy Adliyesi (Ana Bina)</option>
-          <option value="bakirkoyEk">Bakırköy Adliyesi Ek Bina</option>
-          <option value="kucukcekmece">Küçükçekmece Adliyesi</option>
-          <option value="gop">GOP Adliyesi</option>
-        </select>
-      </div>
-      <div id="cafe-content"></div>
-      <button class="add-rating-btn" onclick="showToast('Puanlama özelliği yakında aktif olacak!')">+ Kafeteryayı sen de puanla</button>
-    </div>
-  </div>
-
-  <div class="page" id="page-profile">
-    <div class="profile-header">
-      <div class="profile-avatar">EE</div>
-      <div class="profile-name" id="p-name">Av. Enes Emre</div>
-      <div class="profile-baro" id="p-baro">İstanbul Barosu · Sicil: 34/82741</div>
-      <div class="verified-badge">✓ Doğrulanmış Üye</div>
-    </div>
-    <div class="settings-section">
-      <div class="section-title" style="margin-bottom:10px;">Gizlilik</div>
-      <div class="settings-group">
-        <div class="settings-row" onclick="toggleSetting(this)">
-          <div class="settings-row-left"><span class="settings-icon">👁</span><span class="settings-label">Konumumu göster</span></div>
-          <button class="toggle on" tabindex="-1"></button>
-        </div>
-        <div class="settings-row" onclick="toggleSetting(this)">
-          <div class="settings-row-left"><span class="settings-icon">👥</span><span class="settings-label">Sadece rehberimdekiler görsün</span></div>
-          <button class="toggle" tabindex="-1"></button>
-        </div>
-        <div class="settings-row" onclick="toggleSetting(this)">
-          <div class="settings-row-left"><span class="settings-icon">🔔</span><span class="settings-label">Bildirimler</span></div>
-          <button class="toggle on" tabindex="-1"></button>
-        </div>
-      </div>
-      <div class="section-title" style="margin-bottom:10px;">Hesap</div>
-      <div class="settings-group">
-        <div class="settings-row">
-          <div class="settings-row-left"><span class="settings-icon">🏛</span><span class="settings-label">Baro</span></div>
-          <span class="settings-value">İstanbul</span>
-        </div>
-        <div class="settings-row">
-          <div class="settings-row-left"><span class="settings-icon">📋</span><span class="settings-label">Sicil No</span></div>
-          <span class="settings-value">34 / 82741</span>
-        </div>
-        <div class="settings-row" onclick="doLogout()">
-          <div class="settings-row-left"><span class="settings-icon">🚪</span><span class="settings-label" style="color:var(--red);">Çıkış Yap</span></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="bottom-nav">
-    <button class="nav-tab active" onclick="goPage('home',this)"><span class="nav-icon">🏠</span><span class="nav-label">Ana Ekran</span></button>
-    <button class="nav-tab" onclick="goPage('cafe',this)"><span class="nav-icon">☕</span><span class="nav-label">Kafeterya</span></button>
-    <button class="nav-tab" onclick="goPage('profile',this)"><span class="nav-icon">👤</span><span class="nav-label">Profil</span></button>
-  </div>
-</div>
-
-<div class="modal-overlay" id="adliye-modal">
-  <div class="modal">
-    <div class="modal-title">Hangi adliyedesin?</div>
-    <div class="modal-sub">GPS konumunuz adliyeye yakın. Doğru adliyeyi seçin ya da listeden bulun.</div>
-    <div class="adliye-grid" id="adliye-grid"></div>
-    <div class="modal-btn-row">
-      <button class="btn-secondary" onclick="closeModal()">İptal</button>
-      <button class="btn-confirm" onclick="confirmCheckin()">Check-in Yap ✓</button>
-    </div>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
-
-<div class="ios-banner" id="ios-banner">
-  <div class="ios-banner-icon">☕</div>
-  <div class="ios-banner-text">
-    <div class="ios-banner-title">Ana Ekrana Ekle</div>
-    <div class="ios-banner-desc">Safari'de <strong style="color:var(--gold)">Paylaş</strong> → <strong style="color:var(--gold)">Ana Ekrana Ekle</strong> ile uygulama gibi kullan</div>
-  </div>
-  <div class="ios-banner-close" onclick="closeBanner()">✕</div>
-</div>
-
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-
-<script>
-// ─── FIREBASE YAPILANDIRMA ───
-const firebaseConfig = {
-  apiKey: "AIzaSyCmoN0WvhAOz3xGMPvpwstT8XsSuwwC-QQ",
-  authDomain: "durusma-arasi-210bb.firebaseapp.com",
-  databaseURL: "https://durusma-arasi-210bb-default-rtdb.firebaseio.com",
-  projectId: "durusma-arasi-210bb",
-  storageBucket: "durusma-arasi-210bb.firebasestorage.app",
-  messagingSenderId: "954201469428",
-  appId: "1:954201469428:web:dbe2eccf83c97fce5509a1",
-  measurementId: "G-VBX7SQWESG"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-
-// Her cihaza özgü ID (localStorage'da saklanır)
-let userId = localStorage.getItem('durusma_uid');
-if (!userId) {
-  userId = 'user_' + Math.random().toString(36).substr(2, 9);
-  localStorage.setItem('durusma_uid', userId);
-}
-
-// ─── SABİTLER ───
-const ADLIYELER = [
-  'Çağlayan Adliyesi',
-  'İstanbul Anadolu Adliyesi (Kartal)',
-  'Bakırköy Adliyesi (Ana Bina)',
-  'Bakırköy Adliyesi Ek Bina',
-  'Küçükçekmece Adliyesi',
-  'GOP Adliyesi'
-];
-
-const CAFES = {
-  caglayan: [
-    { name:'B Blok Kafeteryası', rating:4, tags:[{t:'Çayı güzel',c:'good'},{t:'Tostu efsane',c:'good'},{t:'Kahve berbat',c:'bad'},{t:'Fiyatlar makul',c:'mid'}], review:'"Çay için gidilir, Nescafe içmeyin derim."', reviewer:'Av. K.D.' },
-    { name:'A Blok Çay Ocağı', rating:3, tags:[{t:'Ucuz',c:'good'},{t:'Kalabalık',c:'bad'},{t:'Hızlı servis',c:'mid'}], review:'"Sabahın köründe sıra bekliyorsunuz ama başka seçenek yok."', reviewer:'Av. S.T.' }
-  ],
-  kartal: [
-    { name:'Zemin Kat Kafeteryası', rating:5, tags:[{t:'Kahvesi iyi',c:'good'},{t:'Sessiz köşe var',c:'good'},{t:'Temiz',c:'good'},{t:'Fiyatlar makul',c:'mid'}], review:'"Anadolu yakasının en iyi adliye kahvesi!"', reviewer:'Av. M.A.' },
-    { name:'Üst Kat Çay Ocağı', rating:3, tags:[{t:'Hızlı',c:'good'},{t:'Kalabalık',c:'bad'},{t:'Sadece çay',c:'mid'}], review:'"Sadece çay var, kahve arıyorsanız zemine inin."', reviewer:'Av. R.T.' }
-  ],
-  bakirkoy: [
-    { name:'Ana Bina Kafeteryası', rating:3, tags:[{t:'Geniş',c:'mid'},{t:'Kalabalık',c:'bad'},{t:'Çayı orta',c:'mid'},{t:'Tost var',c:'good'}], review:'"Duruşma arasında yetiştiremiyorsunuz, çok kalabalık."', reviewer:'Av. B.K.' }
-  ],
-  bakirkoyEk: [
-    { name:'Ek Bina Çay Ocağı', rating:4, tags:[{t:'Sessiz',c:'good'},{t:'Çayı güzel',c:'good'},{t:'Az kalabalık',c:'good'},{t:'Küçük',c:'mid'}], review:'"Ana binaya göre çok daha sakin, kahve molamı burada yapıyorum."', reviewer:'Av. D.Y.' }
-  ],
-  kucukcekmece: [
-    { name:'Zemin Kat Kafeteryası', rating:4, tags:[{t:'Çayı güzel',c:'good'},{t:'Tostu iyi',c:'good'},{t:'Fiyatlar uygun',c:'good'},{t:'Biraz kalabalık',c:'mid'}], review:'"Batı yakasının sürprizi. Beklenenden iyiydi."', reviewer:'Av. C.D.' }
-  ],
-  gop: [
-    { name:'Kafeterya', rating:4, tags:[{t:'Kahvesi iyi',c:'good'},{t:'Sessiz',c:'good'},{t:'Temiz',c:'good'},{t:'Pahalıca',c:'bad'}], review:'"Küçük ama kaliteli. Öğleden sonra boş kalıyor."', reviewer:'Av. F.Y.' }
-  ]
-};
-
-let state = {
-  checkedIn: false,
-  currentAdliye: '',
-  selectedMood: 'Müsaitim',
-  selectedAdliye: '',
-  userName: 'Av. Enes Emre',
-  userSicil: '34/82741'
-};
-
-// ─── GİRİŞ ───
-function doLogin() {
-  const name = document.getElementById('inp-name').value.trim() || 'Av. Enes Emre';
-  const sicil = document.getElementById('inp-sicil').value.trim() || '34/82741';
-  state.userName = name;
-  state.userSicil = sicil;
-  const initials = name.replace('Av.','').trim().split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
-  document.getElementById('greeting').textContent = 'Merhaba, ' + (name.split(' ')[1] || name);
-  document.getElementById('p-name').textContent = name;
-  document.getElementById('p-baro').textContent = 'İstanbul Barosu · Sicil: ' + sicil;
-  document.querySelector('.profile-avatar').textContent = initials;
-  document.querySelector('.avatar-sm').textContent = initials;
-  document.getElementById('s-landing').classList.remove('active');
-  document.getElementById('s-app').classList.add('active');
-  renderCafe();
-}
-
-// ─── SAYFA GEÇİŞİ ───
-function goPage(page, tab) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('page-' + page).classList.add('active');
-  if (tab) tab.classList.add('active');
-}
-function goProfile() {
-  goPage('profile');
-  document.querySelectorAll('.nav-tab').forEach((t,i) => { if(i===2) t.classList.add('active'); else t.classList.remove('active'); });
-}
-
-// ─── BÜYÜK BUTON ───
-function handleBigBtn() {
-  if (state.checkedIn) { doCheckOut(); return; }
-  const det = document.getElementById('detecting-text');
-  det.textContent = '📍 Konumunuz tespit ediliyor...';
-  setTimeout(() => { det.textContent = ''; openAdliyeModal(); }, 1200);
-}
-
-function openAdliyeModal() {
-  const grid = document.getElementById('adliye-grid');
-  grid.innerHTML = '';
-  ADLIYELER.forEach(a => {
-    const btn = document.createElement('div');
-    btn.className = 'adliye-btn' + (a === 'Çağlayan Adliyesi' ? ' selected' : '');
-    btn.textContent = a;
-    btn.onclick = () => {
-      grid.querySelectorAll('.adliye-btn').forEach(b => b.classList.remove('selected'));
-      btn.classList.add('selected');
-      state.selectedAdliye = a;
-    };
-    grid.appendChild(btn);
-  });
-  state.selectedAdliye = 'Çağlayan Adliyesi';
-  document.getElementById('adliye-modal').classList.add('open');
-}
-
-function closeModal() {
-  document.getElementById('adliye-modal').classList.remove('open');
-  document.getElementById('detecting-text').textContent = '';
-}
-
-// ─── FIREBASE: CHECK-IN ───
 function confirmCheckin() {
   closeModal();
   state.checkedIn = true;
@@ -513,45 +22,10 @@ function confirmCheckin() {
     status: state.selectedMood,
     timestamp: firebase.database.ServerValue.TIMESTAMP
   });
-  ref.onDisconnect().remove(); // Bağlantı kesilirse otomatik sil
+  ref.onDisconnect().remove(); 
 
-  function listenNearbyAvukats(adliyeName) {
-  const list = document.getElementById('adliye-listesi');
-  db.ref('adliyeler/' + adliyeName).on('value', snapshot => {
-    const data = snapshot.val();
-    list.innerHTML = '';
-    let hasOthers = false;
-    if (data) {
-      Object.keys(data).forEach(key => {
-        if (key === userId) return;
-        hasOthers = true;
-        const p = data[key];
-        let badge = '';
-        if (p.status === 'Müsaitim') badge = '<span class="person-badge badge-green">Müsait</span>';
-        else if (p.status === 'Duruşmada') badge = '<span class="person-badge badge-red">Duruşmada</span>';
-        else badge = '<span class="person-badge badge-yellow">Kalemde</span>';
-
-        const row = document.createElement('div');
-        row.style.cssText = "background:var(--bg3); border:0.5px solid var(--border); border-radius:12px; padding:14px; margin-bottom:8px;";
-        row.innerHTML = `
-          <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
-            <div class="person-av">${p.initials}</div>
-            <div class="person-info"><div class="person-name">${p.name}</div><div class="person-role">⚖️ Meslektaş</div></div>
-            ${badge}
-          </div>
-          <div style="display:flex; gap:8px;">
-            <button class="action-btn btn-add" onclick="showToast('İstek gönderildi!')">Ekle</button>
-            <button class="action-btn btn-msg" onclick="openChat('${p.name}')">Mesaj Gönder</button>
-          </div>
-        `;
-        list.appendChild(row);
-      });
-    }
-    if (!hasOthers) {
-      list.innerHTML = '<div class="empty-state"><span class="empty-icon">📍</span>Şu an bu adliyede<br>başka meslektaşınız görünmüyor.</div>';
-    }
-  });
-}
+  // EKSİK OLAN KOMUT BURASIYDI: Kişileri getiren fonksiyonu çalıştırıyoruz
+  listenNearbyAvukats(state.currentAdliye);
 }
 
 // ─── FIREBASE: ÇIKIŞ ───
@@ -600,10 +74,20 @@ function listenNearbyAvukats(adliyeName) {
         if (p.status === 'Müsaitim') badge = '<span class="person-badge badge-green">Müsait</span>';
         else if (p.status === 'Duruşmada') badge = '<span class="person-badge badge-red">Duruşmada</span>';
         else badge = '<span class="person-badge badge-yellow">Kalemde</span>';
+
         const row = document.createElement('div');
-        row.className = 'nearby-person';
-        row.innerHTML = `<div class="person-av">${p.initials}</div><div class="person-info"><div class="person-name">${p.name}</div><div class="person-role">⚖️ Meslektaş</div></div>${badge}`;
-        row.querySelector('.btn-msg').onclick = () => openChat(p.name);
+        row.style.cssText = "background:var(--bg3); border:0.5px solid var(--border); border-radius:12px; padding:14px; margin-bottom:8px;";
+        row.innerHTML = `
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+            <div class="person-av">${p.initials}</div>
+            <div class="person-info"><div class="person-name">${p.name}</div><div class="person-role">⚖️ Meslektaş</div></div>
+            ${badge}
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button class="action-btn btn-add" onclick="showToast('İstek gönderildi!')">Ekle</button>
+            <button class="action-btn btn-msg" onclick="openChat('${p.name}')">Mesaj Gönder</button>
+          </div>
+        `;
         list.appendChild(row);
       });
     }
@@ -641,6 +125,17 @@ function doLogout() { if (state.checkedIn) doCheckOut(); document.getElementById
 function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000); }
 function closeBanner() { document.getElementById('ios-banner').classList.remove('visible'); sessionStorage.setItem('ios-banner-dismissed','1'); }
 
+// ─── MESAJLAŞMA SİSTEMİ ───
+function openChat(name) {
+  document.getElementById('chat-user-name').textContent = name;
+  document.getElementById('chat-panel').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+function closeChat() {
+  document.getElementById('chat-panel').style.display = 'none';
+  document.body.style.overflow = 'auto';
+}
+
 // ─── iOS BANNER ───
 (function() {
   const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
@@ -652,7 +147,7 @@ function closeBanner() { document.getElementById('ios-banner').classList.remove(
 
 renderCafe();
 </script>
-</body>
+
 <div id="chat-panel" style="display:none; position:fixed; inset:0; background:var(--bg); z-index:1000; flex-direction:column; animation: slide-up 0.3s ease-out;">
   <div class="app-header">
     <div style="display:flex; align-items:center; gap:12px;">
@@ -677,16 +172,7 @@ renderCafe();
 .action-btn { flex:1; padding:8px; border-radius:8px; font-size:12px; font-weight:500; cursor:pointer; text-align:center; transition: 0.2s; }
 .btn-add { background: var(--bg2); border: 0.5px solid var(--gold); color: var(--gold); }
 .btn-msg { background: var(--gold); border: none; color: var(--bg); }
-function openChat(name) {
-  document.getElementById('chat-user-name').textContent = name;
-  document.getElementById('chat-panel').style.display = 'flex';
-  // Arka plandaki kaydırmayı durdurmak için
-  document.body.style.overflow = 'hidden';
-}
-
-function closeChat() {
-  document.getElementById('chat-panel').style.display = 'none';
-  document.body.style.overflow = 'auto';
-}
 </style>
+
+</body>
 </html>
