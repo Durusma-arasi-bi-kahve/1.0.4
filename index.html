@@ -516,7 +516,7 @@ function confirmCheckin() {
   ref.onDisconnect().remove(); // Bağlantı kesilirse otomatik sil
 
   function listenNearbyAvukats(adliyeName) {
-  const list = document.getElementById('nearby-list');
+  const list = document.getElementById('adliye-listesi');
   db.ref('adliyeler/' + adliyeName).on('value', snapshot => {
     const data = snapshot.val();
     list.innerHTML = '';
@@ -603,7 +603,7 @@ function listenNearbyAvukats(adliyeName) {
         const row = document.createElement('div');
         row.className = 'nearby-person';
         row.innerHTML = `<div class="person-av">${p.initials}</div><div class="person-info"><div class="person-name">${p.name}</div><div class="person-role">⚖️ Meslektaş</div></div>${badge}`;
-        row.onclick = () => showToast(p.name + ' ile mesajlaşma yakında!');
+        row.querySelector('.btn-msg').onclick = () => openChat(p.name);
         list.appendChild(row);
       });
     }
