@@ -551,7 +551,7 @@ function setMood(el, mood) {
 
 // ─── FIREBASE: CANLI LİSTE ───
 function listenNearbyAvukats(adliyeName) {
-  const list = document.getElementById('nearby-list');
+  const list = document.getElementById('adliye-listesi');
   db.ref('adliyeler/' + adliyeName).on('value', snapshot => {
     const data = snapshot.val();
     list.innerHTML = '';
