@@ -361,8 +361,8 @@ body {
   <div class="ios-banner-close" onclick="closeBanner()">✕</div>
 </div>
 
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
 <script>
 // ─── FIREBASE YAPILANDIRMA ───
@@ -374,7 +374,7 @@ const firebaseConfig = {
   storageBucket: "durusma-arasi-210bb.firebasestorage.app",
   messagingSenderId: "954201469428",
   appId: "1:954201469428:web:dbe2eccf83c97fce5509a1",
-  measurementId: "G-VBX7SQWESG"
+  measurementId: "G-VBX7SOWESG"
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
@@ -551,7 +551,8 @@ function setMood(el, mood) {
 
 // ─── FIREBASE: CANLI LİSTE ───
 function listenNearbyAvukats(adliyeName) {
-  const list = document.getElementById('adliye-listesi');
+  const list = document.getElementById('nearby-list');
+  list.innerHTML = '<div class="empty-state"><span class="empty-icon">⏳</span>Bağlanıyor...</div>';
   db.ref('adliyeler/' + adliyeName).on('value', snapshot => {
     const data = snapshot.val();
     list.innerHTML = '';
@@ -585,6 +586,8 @@ function listenNearbyAvukats(adliyeName) {
     if (!hasOthers) {
       list.innerHTML = '<div class="empty-state"><span class="empty-icon">📍</span>Şu an bu adliyede<br>başka meslektaşınız görünmüyor.</div>';
     }
+  }, error => {
+    list.innerHTML = '<div class="empty-state"><span class="empty-icon">❌</span>Bağlantı hatası:<br>' + error.message + '</div>';
   });
 }
 
