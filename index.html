@@ -42,6 +42,12 @@ body {
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   overscroll-behavior: none;
+  overscroll-behavior-y: contain;
+  touch-action: pan-x pan-y;
+}
+html {
+  overscroll-behavior: none;
+  overscroll-behavior-y: contain;
 }
 .serif { font-family: 'Playfair Display', serif; }
 .screen { display: none; min-height: 100vh; min-height: -webkit-fill-available; }
@@ -379,11 +385,13 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// Her cihaza özgü ID (localStorage'da saklanır)
-let userId = localStorage.getItem('durusma_uid');
+// Her cihaza özgü ID (localStorage + cookie)
+function _get(k) { try { const v=localStorage.getItem(k); if(v) return v; } catch(e){} try { const m=document.cookie.match('(?:^|; )'+k+'=([^;]*)'); if(m) return decodeURIComponent(m[1]); } catch(e){} return null; }
+function _set(k,v) { try{localStorage.setItem(k,v);}catch(e){} try{const d=new Date();d.setFullYear(d.getFullYear()+1);document.cookie=k+'='+encodeURIComponent(v)+'; expires='+d.toUTCString()+'; path=/; SameSite=Lax';}catch(e){} }
+let userId = _get('durusma_uid');
 if (!userId) {
   userId = 'user_' + Math.random().toString(36).substr(2, 9);
-  localStorage.setItem('durusma_uid', userId);
+  _set('durusma_uid', userId);
 }
 
 // ─── SABİTLER ───
@@ -449,10 +457,10 @@ function doLogin() {
   const sicil = document.getElementById('inp-sicil').value.trim() || '34/82741';
   const tel = document.getElementById('inp-tel').value.trim();
   // Bilgileri kalıcı olarak sakla
-  localStorage.setItem('durusma_name', name);
-  localStorage.setItem('durusma_sicil', sicil);
-  localStorage.setItem('durusma_tel', tel);
-  localStorage.setItem('durusma_loggedin', '1');
+  saveToStorage('durusma_name', name);
+  saveToStorage('durusma_sicil', sicil);
+  saveToStorage('durusma_tel', tel);
+  saveToStorage('durusma_loggedin', '1');
   applyLogin(name, sicil, tel);
 }
 
@@ -636,7 +644,7 @@ function renderCafe() {
 function toggleSetting(row) { const t = row.querySelector('.toggle'); if (t) t.classList.toggle('on'); }
 function doLogout() {
   if (state.checkedIn) doCheckOut();
-  localStorage.removeItem('durusma_loggedin');
+  removeFromStorage('durusma_loggedin');
   document.getElementById('s-app').classList.remove('active');
   document.getElementById('s-landing').classList.add('active');
 }
@@ -646,13 +654,16 @@ function closeBanner() { document.getElementById('ios-banner').classList.remove(
 // ─── MESAJLAŞMA SİSTEMİ ───
 // ─── MESAJLAŞMA ───
 let currentChatTargetId = null;
-let currentChatListener = null;
+let currentChatRef = null;
 
 function getChatId(uid1, uid2) {
   return [uid1, uid2].sort().join('__');
 }
 
 function openChat(targetId, targetName, targetInitials) {
+  // Önceki listener'ı tamamen kapat
+  if (currentChatRef) { currentChatRef.off(); currentChatRef = null; }
+
   currentChatTargetId = targetId;
   document.getElementById('chat-user-name').textContent = targetName;
   document.getElementById('chat-panel').style.display = 'flex';
@@ -661,24 +672,24 @@ function openChat(targetId, targetName, targetInitials) {
   const messagesEl = document.getElementById('chat-messages');
   messagesEl.innerHTML = '<div style="align-self:center; background:var(--bg3); padding:6px 12px; border-radius:12px; font-size:11px; color:var(--muted2);">Sohbet Başlatıldı</div>';
 
-  // Önceki listener'ı kapat
-  if (currentChatListener) {
-    db.ref('chats/' + getChatId(userId, currentChatTargetId)).off('child_added', currentChatListener);
-  }
+  const chatId = getChatId(userId, targetId);
+  currentChatRef = db.ref('chats/' + chatId);
 
-  const chatRef = db.ref('chats/' + getChatId(userId, targetId));
-  currentChatListener = chatRef.on('child_added', snap => {
+  currentChatRef.on('child_added', snap => {
     const msg = snap.val();
+    if (!msg || !msg.text) return;
     const isMine = msg.senderId === userId;
     const bubble = document.createElement('div');
-    bubble.style.cssText = `
-      max-width:75%; padding:10px 14px; border-radius:${isMine ? '16px 16px 4px 16px' : '16px 16px 16px 4px'};
-      background:${isMine ? 'var(--gold)' : 'var(--bg3)'};
-      color:${isMine ? 'var(--bg)' : 'var(--text)'};
-      font-size:13px; align-self:${isMine ? 'flex-end' : 'flex-start'};
-      border:${isMine ? 'none' : '0.5px solid var(--border)'};
-      line-height:1.5;
-    `;
+    bubble.style.cssText = [
+      'max-width:75%', 'padding:10px 14px',
+      'border-radius:' + (isMine ? '16px 16px 4px 16px' : '16px 16px 16px 4px'),
+      'background:' + (isMine ? 'var(--gold)' : 'var(--bg3)'),
+      'color:' + (isMine ? 'var(--bg)' : 'var(--text)'),
+      'font-size:13px',
+      'align-self:' + (isMine ? 'flex-end' : 'flex-start'),
+      'border:' + (isMine ? 'none' : '0.5px solid var(--border)'),
+      'line-height:1.5', 'word-break:break-word'
+    ].join(';');
     bubble.textContent = msg.text;
     messagesEl.appendChild(bubble);
     messagesEl.scrollTop = messagesEl.scrollHeight;
@@ -701,11 +712,12 @@ function sendMessage() {
   db.ref('chats/' + chatId).push(msg);
 
   // Karşı tarafa bildirim gönder
+  const myInitialsNow = document.querySelector('.profile-avatar').textContent || '?';
   db.ref('notifications/' + currentChatTargetId).push({
     type: 'message',
     fromId: userId,
     fromName: state.userName,
-    fromInitials: document.querySelector('.profile-avatar').textContent,
+    fromInitials: myInitialsNow,
     chatId: chatId,
     preview: text.substring(0, 60),
     timestamp: firebase.database.ServerValue.TIMESTAMP,
@@ -714,8 +726,10 @@ function sendMessage() {
 }
 
 function closeChat() {
+  if (currentChatRef) { currentChatRef.off(); currentChatRef = null; }
+  currentChatTargetId = null;
   document.getElementById('chat-panel').style.display = 'none';
-  document.body.style.overflow = 'auto';
+  document.body.style.overflow = '';
 }
 
 // ─── ARKADAŞLIK İSTEKLERİ ───
@@ -874,6 +888,19 @@ function listenNotifications() {
   });
 }
 
+// ─── PULL-TO-REFRESH ENGELLEYİCİ ───
+(function() {
+  let startY = 0;
+  document.addEventListener('touchstart', e => { startY = e.touches[0].clientY; }, { passive: true });
+  document.addEventListener('touchmove', e => {
+    const el = e.target.closest('.page, #chat-messages, #friend-requests-list');
+    if (!el) { if (window.scrollY === 0) e.preventDefault(); return; }
+    const atTop = el.scrollTop === 0;
+    const pullDown = e.touches[0].clientY > startY;
+    if (atTop && pullDown) e.preventDefault();
+  }, { passive: false });
+})();
+
 // ─── iOS BANNER ───
 (function() {
   const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
@@ -885,20 +912,42 @@ function listenNotifications() {
 
 renderCafe();
 
+// ─── STORAGE YARDIMCISI (localStorage + cookie çift güvence) ───
+function saveToStorage(key, val) {
+  try { localStorage.setItem(key, val); } catch(e) {}
+  try {
+    const d = new Date(); d.setFullYear(d.getFullYear() + 1);
+    document.cookie = key + '=' + encodeURIComponent(val) + '; expires=' + d.toUTCString() + '; path=/; SameSite=Lax';
+  } catch(e) {}
+}
+function getFromStorage(key) {
+  try {
+    const ls = localStorage.getItem(key);
+    if (ls !== null) return ls;
+  } catch(e) {}
+  try {
+    const match = document.cookie.match('(?:^|; )' + key + '=([^;]*)');
+    if (match) return decodeURIComponent(match[1]);
+  } catch(e) {}
+  return null;
+}
+function removeFromStorage(key) {
+  try { localStorage.removeItem(key); } catch(e) {}
+  try { document.cookie = key + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax'; } catch(e) {}
+}
+
 // ─── SAYFA YÜKLENİNCE: OTOMATİK GİRİŞ & FORM DOLDUR ───
 (function() {
-  const savedName   = localStorage.getItem('durusma_name');
-  const savedSicil  = localStorage.getItem('durusma_sicil');
-  const savedTel    = localStorage.getItem('durusma_tel');
-  const loggedIn    = localStorage.getItem('durusma_loggedin');
+  const savedName  = getFromStorage('durusma_name');
+  const savedSicil = getFromStorage('durusma_sicil');
+  const savedTel   = getFromStorage('durusma_tel');
+  const loggedIn   = getFromStorage('durusma_loggedin');
 
-  // Form alanlarını doldur (her zaman)
   if (savedName)  document.getElementById('inp-name').value  = savedName;
   if (savedSicil) document.getElementById('inp-sicil').value = savedSicil;
   if (savedTel)   document.getElementById('inp-tel').value   = savedTel;
 
-  // Oturum açıksa direkt uygulamaya geç
-  if (loggedIn && savedName) {
+  if (loggedIn === '1' && savedName) {
     applyLogin(savedName, savedSicil || '', savedTel || '');
   }
 })();
