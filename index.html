@@ -233,7 +233,7 @@ body {
       <div class="header-greeting" id="greeting">Merhaba, Av. Enes</div>
     </div>
     <div class="header-right">
-      <div class="icon-btn" onclick="showToast('Bildirimler yakında aktif olacak')">🔔</div>
+      <div class="icon-btn" onclick="openFriendRequests()" style="position:relative;">🔔<span id="notif-count" style="display:none; position:absolute; top:-4px; right:-4px; background:var(--red); color:white; border-radius:50%; width:16px; height:16px; font-size:9px; display:none; align-items:center; justify-content:center;"></span></div>
       <div class="avatar-sm" onclick="goProfile()">EE</div>
     </div>
   </div>
@@ -441,6 +441,7 @@ function applyLogin(name, sicil, tel) {
   document.getElementById('s-landing').classList.remove('active');
   document.getElementById('s-app').classList.add('active');
   renderCafe();
+  listenNotifications();
 }
 
 function doLogin() {
@@ -579,17 +580,25 @@ function listenNearbyAvukats(adliyeName) {
 
         const row = document.createElement('div');
         row.style.cssText = "background:var(--bg3); border:0.5px solid var(--border); border-radius:12px; padding:14px; margin-bottom:8px;";
-        row.innerHTML = `
-          <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
-            <div class="person-av">${p.initials}</div>
-            <div class="person-info"><div class="person-name">${p.name}</div><div class="person-role">⚖️ Meslektaş</div></div>
-            ${badge}
-          </div>
-          <div style="display:flex; gap:8px;">
-            <button class="action-btn btn-add" onclick="showToast('İstek gönderildi!')">Ekle</button>
-            <button class="action-btn btn-msg" onclick="openChat('${p.name}')">Mesaj Gönder</button>
-          </div>
-        `;
+        // Arkadaşlık durumunu kontrol et
+        db.ref('friends/' + userId + '/' + key).once('value', fsnap => {
+          const isFriend = fsnap.exists();
+          row.innerHTML = `
+            <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+              <div class="person-av">${p.initials}</div>
+              <div class="person-info"><div class="person-name">${p.name}</div>
+              <div class="person-role">${isFriend ? '🤝 Arkadaş' : '⚖️ Meslektaş'}</div></div>
+              ${badge}
+            </div>
+            <div style="display:flex; gap:8px;">
+              ${isFriend
+                ? `<button class="action-btn btn-msg" style="flex:2;" onclick="openChat('${key}','${p.name}','${p.initials}')">💬 Mesaj Gönder</button>`
+                : `<button class="action-btn btn-add" onclick="sendFriendRequest('${key}','${p.name}','${p.initials}',this)">➕ Ekle</button>
+                   <button class="action-btn btn-msg" style="opacity:0.4; cursor:not-allowed;" disabled title="Önce arkadaş olun">💬 Mesaj</button>`
+              }
+            </div>
+          `;
+        });
         list.appendChild(row);
       });
     }
@@ -635,14 +644,234 @@ function showToast(msg) { const t = document.getElementById('toast'); t.textCont
 function closeBanner() { document.getElementById('ios-banner').classList.remove('visible'); sessionStorage.setItem('ios-banner-dismissed','1'); }
 
 // ─── MESAJLAŞMA SİSTEMİ ───
-function openChat(name) {
-  document.getElementById('chat-user-name').textContent = name;
+// ─── MESAJLAŞMA ───
+let currentChatTargetId = null;
+let currentChatListener = null;
+
+function getChatId(uid1, uid2) {
+  return [uid1, uid2].sort().join('__');
+}
+
+function openChat(targetId, targetName, targetInitials) {
+  currentChatTargetId = targetId;
+  document.getElementById('chat-user-name').textContent = targetName;
   document.getElementById('chat-panel').style.display = 'flex';
   document.body.style.overflow = 'hidden';
+
+  const messagesEl = document.getElementById('chat-messages');
+  messagesEl.innerHTML = '<div style="align-self:center; background:var(--bg3); padding:6px 12px; border-radius:12px; font-size:11px; color:var(--muted2);">Sohbet Başlatıldı</div>';
+
+  // Önceki listener'ı kapat
+  if (currentChatListener) {
+    db.ref('chats/' + getChatId(userId, currentChatTargetId)).off('child_added', currentChatListener);
+  }
+
+  const chatRef = db.ref('chats/' + getChatId(userId, targetId));
+  currentChatListener = chatRef.on('child_added', snap => {
+    const msg = snap.val();
+    const isMine = msg.senderId === userId;
+    const bubble = document.createElement('div');
+    bubble.style.cssText = `
+      max-width:75%; padding:10px 14px; border-radius:${isMine ? '16px 16px 4px 16px' : '16px 16px 16px 4px'};
+      background:${isMine ? 'var(--gold)' : 'var(--bg3)'};
+      color:${isMine ? 'var(--bg)' : 'var(--text)'};
+      font-size:13px; align-self:${isMine ? 'flex-end' : 'flex-start'};
+      border:${isMine ? 'none' : '0.5px solid var(--border)'};
+      line-height:1.5;
+    `;
+    bubble.textContent = msg.text;
+    messagesEl.appendChild(bubble);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  });
 }
+
+function sendMessage() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text || !currentChatTargetId) return;
+  input.value = '';
+
+  const chatId = getChatId(userId, currentChatTargetId);
+  const msg = {
+    senderId: userId,
+    senderName: state.userName,
+    text: text,
+    timestamp: firebase.database.ServerValue.TIMESTAMP
+  };
+  db.ref('chats/' + chatId).push(msg);
+
+  // Karşı tarafa bildirim gönder
+  db.ref('notifications/' + currentChatTargetId).push({
+    type: 'message',
+    fromId: userId,
+    fromName: state.userName,
+    fromInitials: document.querySelector('.profile-avatar').textContent,
+    chatId: chatId,
+    preview: text.substring(0, 60),
+    timestamp: firebase.database.ServerValue.TIMESTAMP,
+    read: false
+  });
+}
+
 function closeChat() {
   document.getElementById('chat-panel').style.display = 'none';
   document.body.style.overflow = 'auto';
+}
+
+// ─── ARKADAŞLIK İSTEKLERİ ───
+function sendFriendRequest(targetId, targetName, targetInitials, btnEl) {
+  const myInitials = document.querySelector('.profile-avatar').textContent;
+  db.ref('notifications/' + targetId).push({
+    type: 'friend_request',
+    fromId: userId,
+    fromName: state.userName,
+    fromInitials: myInitials,
+    timestamp: firebase.database.ServerValue.TIMESTAMP,
+    read: false
+  });
+  if (btnEl) { btnEl.textContent = '✓ İstek Gönderildi'; btnEl.disabled = true; btnEl.style.opacity = '0.5'; }
+  showToast('Arkadaşlık isteği gönderildi ✓');
+  sendBrowserNotif(targetName, state.userName + ' sizi arkadaş olarak eklemek istiyor.');
+}
+
+function openFriendRequests() {
+  document.getElementById('friend-requests-panel').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  renderFriendRequests();
+}
+
+function closeFriendRequests() {
+  document.getElementById('friend-requests-panel').style.display = 'none';
+  document.body.style.overflow = 'auto';
+}
+
+function renderFriendRequests() {
+  const list = document.getElementById('friend-requests-list');
+  list.innerHTML = '<div class="empty-state"><span class="empty-icon">⏳</span>Yükleniyor...</div>';
+  db.ref('notifications/' + userId).orderByChild('read').equalTo(false).once('value', snap => {
+    const data = snap.val();
+    list.innerHTML = '';
+    if (!data) {
+      list.innerHTML = '<div class="empty-state"><span class="empty-icon">🔔</span>Yeni bildirim yok.</div>';
+      return;
+    }
+    Object.entries(data).forEach(([notifId, n]) => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--bg3); border:0.5px solid var(--border); border-radius:14px; padding:16px;';
+      if (n.type === 'friend_request') {
+        card.innerHTML = `
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px;">
+            <div class="person-av">${n.fromInitials || '?'}</div>
+            <div><div style="font-size:13px; font-weight:500; color:var(--text);">${n.fromName}</div>
+            <div style="font-size:11px; color:var(--muted);">Arkadaşlık isteği gönderdi</div></div>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button class="action-btn btn-add" onclick="acceptFriend('${notifId}','${n.fromId}','${n.fromName}','${n.fromInitials}',this.closest('div[style]'))">Kabul Et</button>
+            <button class="action-btn" style="flex:1;padding:8px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;background:transparent;border:0.5px solid var(--border2);color:var(--muted);" onclick="rejectNotif('${notifId}',this.closest('div[style]'))">Reddet</button>
+          </div>`;
+      } else if (n.type === 'message') {
+        card.innerHTML = `
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px;">
+            <div class="person-av">${n.fromInitials || '?'}</div>
+            <div><div style="font-size:13px; font-weight:500; color:var(--text);">${n.fromName}</div>
+            <div style="font-size:11px; color:var(--muted); margin-top:2px;">"${n.preview}"</div></div>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button class="action-btn btn-msg" style="flex:2;" onclick="rejectNotif('${notifId}',null); closeFriendRequests(); openChat('${n.fromId}','${n.fromName}','${n.fromInitials}')">Yanıtla</button>
+            <button class="action-btn" style="flex:1;padding:8px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;background:transparent;border:0.5px solid var(--border2);color:var(--muted);" onclick="rejectNotif('${notifId}',this.closest('div[style]'))">Kapat</button>
+          </div>`;
+      } else if (n.type === 'friend_accepted') {
+        card.innerHTML = `
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px;">
+            <div class="person-av">${n.fromInitials || '?'}</div>
+            <div><div style="font-size:13px; font-weight:500; color:var(--text);">${n.fromName}</div>
+            <div style="font-size:11px; color:var(--green); margin-top:2px;">🤝 Arkadaşlık isteğinizi kabul etti!</div></div>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button class="action-btn btn-msg" style="flex:2;" onclick="rejectNotif('${notifId}',null); closeFriendRequests(); openChat('${n.fromId}','${n.fromName}','${n.fromInitials}')">Mesaj Gönder</button>
+            <button class="action-btn" style="flex:1;padding:8px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;background:transparent;border:0.5px solid var(--border2);color:var(--muted);" onclick="rejectNotif('${notifId}',this.closest('div[style]'))">Kapat</button>
+          </div>`;
+      }
+      list.appendChild(card);
+    });
+  });
+}
+
+function acceptFriend(notifId, fromId, fromName, fromInitials, cardEl) {
+  db.ref('notifications/' + userId + '/' + notifId).update({ read: true });
+  // Karşılıklı arkadaşlık kaydı
+  db.ref('friends/' + userId + '/' + fromId).set({ name: fromName, initials: fromInitials || '?', since: firebase.database.ServerValue.TIMESTAMP });
+  const myInitials = document.querySelector('.profile-avatar').textContent;
+  db.ref('friends/' + fromId + '/' + userId).set({ name: state.userName, initials: myInitials, since: firebase.database.ServerValue.TIMESTAMP });
+  // Karşı tarafa kabul bildirimi + tarayıcı bildirimi tetikle
+  db.ref('notifications/' + fromId).push({
+    type: 'friend_accepted',
+    fromId: userId,
+    fromName: state.userName,
+    fromInitials: myInitials,
+    timestamp: firebase.database.ServerValue.TIMESTAMP,
+    read: false
+  });
+  if (cardEl) cardEl.innerHTML = '<div style="text-align:center; color:var(--green); font-size:13px; padding:8px;">✓ Kabul Edildi</div>';
+  showToast(fromName + ' artık arkadaşınız!');
+}
+
+function rejectNotif(notifId, cardEl) {
+  db.ref('notifications/' + userId + '/' + notifId).update({ read: true });
+  if (cardEl) cardEl.remove();
+}
+
+// ─── TARAYICI BİLDİRİMİ ───
+function requestNotifPermission() {
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
+}
+
+function sendBrowserNotif(title, body) {
+  if ('Notification' in window && Notification.permission === 'granted') {
+    new Notification('Duruşma Arası — ' + title, {
+      body: body,
+      icon: 'data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 180 180%27%3E%3Crect width=%27180%27 height=%27180%27 rx=%2740%27 fill=%27%230F0A04%27/%3E%3Ctext x=%2790%27 y=%27115%27 font-size=%2780%27 text-anchor=%27middle%27%3E%E2%98%95%3C/text%3E%3C/svg%3E',
+      badge: 'data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 180 180%27%3E%3Crect width=%27180%27 height=%27180%27 rx=%2740%27 fill=%27%230F0A04%27/%3E%3Ctext x=%2790%27 y=%27115%27 font-size=%2780%27 text-anchor=%27middle%27%3E%E2%98%95%3C/text%3E%3C/svg%3E',
+      tag: 'durusma-arasi',
+      renotify: true
+    });
+  }
+}
+
+// ─── BİLDİRİMLERİ DİNLE (canlı) ───
+let knownNotifIds = new Set();
+
+function listenNotifications() {
+  requestNotifPermission();
+  db.ref('notifications/' + userId).orderByChild('read').equalTo(false).on('value', snap => {
+    const count = snap.numChildren();
+    const badge = document.getElementById('notif-count');
+    if (count > 0) {
+      badge.textContent = count;
+      badge.style.display = 'flex';
+    } else {
+      badge.style.display = 'none';
+    }
+    // Yeni bildirimler için tarayıcı bildirimi gönder
+    if (snap.val()) {
+      Object.entries(snap.val()).forEach(([id, n]) => {
+        if (knownNotifIds.has(id)) return;
+        knownNotifIds.add(id);
+        // Sayfa ilk yüklenince gelen eski bildirimleri atla
+        const age = Date.now() - (n.timestamp || 0);
+        if (age > 10000) return;
+        if (n.type === 'message') {
+          sendBrowserNotif(n.fromName, '"' + n.preview + '"');
+        } else if (n.type === 'friend_request') {
+          sendBrowserNotif(n.fromName, n.fromName + ' sizi arkadaş olarak eklemek istiyor.');
+        } else if (n.type === 'friend_accepted') {
+          sendBrowserNotif('Arkadaşlık Kabul Edildi', n.fromName + ' arkadaşlık isteğinizi kabul etti!');
+        }
+      });
+    }
+  });
 }
 
 // ─── iOS BANNER ───
@@ -675,22 +904,45 @@ renderCafe();
 })();
 </script>
 
+
+<!-- BİLDİRİM PANELİ -->
+<div id="notif-panel" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:2000; align-items:flex-end; justify-content:center; padding:20px;">
+  <div id="notif-card" style="background:var(--bg2); border:0.5px solid var(--border2); border-radius:20px; padding:24px; width:100%; max-width:420px; animation:modal-in .25s ease;">
+    <div id="notif-icon" style="font-size:32px; text-align:center; margin-bottom:10px;">💬</div>
+    <div id="notif-title" style="font-family:'Playfair Display',serif; font-size:17px; color:var(--gold-light); text-align:center; margin-bottom:6px;"></div>
+    <div id="notif-body" style="font-size:13px; color:var(--muted); text-align:center; margin-bottom:20px; line-height:1.6;"></div>
+    <div id="notif-actions" style="display:flex; gap:10px;"></div>
+  </div>
+</div>
+
+<!-- ARKADAŞLIK İSTEKLERİ SAYFASI -->
+<div id="friend-requests-panel" style="display:none; position:fixed; inset:0; background:var(--bg); z-index:1500; flex-direction:column;">
+  <div class="app-header">
+    <div style="display:flex; align-items:center; gap:12px;">
+      <div class="icon-btn" onclick="closeFriendRequests()">←</div>
+      <div><div class="header-logo serif">Arkadaşlık İstekleri</div></div>
+    </div>
+    <div id="friend-req-badge" style="background:var(--red); color:white; border-radius:20px; padding:3px 10px; font-size:12px; display:none;"></div>
+  </div>
+  <div id="friend-requests-list" style="flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:10px;"></div>
+</div>
+
 <div id="chat-panel" style="display:none; position:fixed; inset:0; background:var(--bg); z-index:1000; flex-direction:column; animation: slide-up 0.3s ease-out;">
   <div class="app-header">
     <div style="display:flex; align-items:center; gap:12px;">
       <div class="icon-btn" onclick="closeChat()">←</div>
       <div>
         <div class="header-logo serif" id="chat-user-name">Av. Meslektaş</div>
-        <div class="header-greeting">Çevrimiçi</div>
+        <div class="header-greeting" id="chat-user-status">Çevrimiçi</div>
       </div>
     </div>
   </div>
-  <div id="chat-messages" style="flex:1; padding:20px; overflow-y:auto; display:flex; flex-direction:column; gap:12px;">
+  <div id="chat-messages" style="flex:1; padding:16px; overflow-y:auto; display:flex; flex-direction:column; gap:8px;">
     <div style="align-self:center; background:var(--bg3); padding:6px 12px; border-radius:12px; font-size:11px; color:var(--muted2);">Sohbet Başlatıldı</div>
   </div>
-  <div style="padding:20px; border-top:0.5px solid var(--border); display:flex; gap:10px; background:var(--bg2);">
-    <input type="text" id="chat-input" placeholder="Mesajınızı yazın..." style="flex:1; background:var(--bg3); border:0.5px solid var(--border); border-radius:20px; padding:10px 16px; color:var(--text); outline:none;">
-    <button class="icon-btn" style="background:var(--gold); color:var(--bg); border:none;" onclick="showToast('Mesaj gönderildi!')">➔</button>
+  <div style="padding:12px 16px; border-top:0.5px solid var(--border); display:flex; gap:10px; background:var(--bg2); padding-bottom:calc(12px + env(safe-area-inset-bottom));">
+    <input type="text" id="chat-input" placeholder="Mesajınızı yazın..." style="flex:1; background:var(--bg3); border:0.5px solid var(--border); border-radius:20px; padding:10px 16px; color:var(--text); outline:none;" onkeydown="if(event.key==='Enter') sendMessage()">
+    <button class="icon-btn" style="background:var(--gold); color:var(--bg); border:none; width:42px; height:42px;" onclick="sendMessage()">➔</button>
   </div>
 </div>
 
