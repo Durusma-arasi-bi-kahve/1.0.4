@@ -429,9 +429,7 @@ let state = {
 };
 
 // ─── GİRİŞ ───
-function doLogin() {
-  const name = document.getElementById('inp-name').value.trim() || 'Av. Enes Emre';
-  const sicil = document.getElementById('inp-sicil').value.trim() || '34/82741';
+function applyLogin(name, sicil, tel) {
   state.userName = name;
   state.userSicil = sicil;
   const initials = name.replace('Av.','').trim().split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
@@ -443,6 +441,18 @@ function doLogin() {
   document.getElementById('s-landing').classList.remove('active');
   document.getElementById('s-app').classList.add('active');
   renderCafe();
+}
+
+function doLogin() {
+  const name = document.getElementById('inp-name').value.trim() || 'Av. Enes Emre';
+  const sicil = document.getElementById('inp-sicil').value.trim() || '34/82741';
+  const tel = document.getElementById('inp-tel').value.trim();
+  // Bilgileri kalıcı olarak sakla
+  localStorage.setItem('durusma_name', name);
+  localStorage.setItem('durusma_sicil', sicil);
+  localStorage.setItem('durusma_tel', tel);
+  localStorage.setItem('durusma_loggedin', '1');
+  applyLogin(name, sicil, tel);
 }
 
 // ─── SAYFA GEÇİŞİ ───
@@ -615,7 +625,12 @@ function renderCafe() {
 
 // ─── DİĞERLERİ ───
 function toggleSetting(row) { const t = row.querySelector('.toggle'); if (t) t.classList.toggle('on'); }
-function doLogout() { if (state.checkedIn) doCheckOut(); document.getElementById('s-app').classList.remove('active'); document.getElementById('s-landing').classList.add('active'); }
+function doLogout() {
+  if (state.checkedIn) doCheckOut();
+  localStorage.removeItem('durusma_loggedin');
+  document.getElementById('s-app').classList.remove('active');
+  document.getElementById('s-landing').classList.add('active');
+}
 function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000); }
 function closeBanner() { document.getElementById('ios-banner').classList.remove('visible'); sessionStorage.setItem('ios-banner-dismissed','1'); }
 
@@ -640,6 +655,24 @@ function closeChat() {
 })();
 
 renderCafe();
+
+// ─── SAYFA YÜKLENİNCE: OTOMATİK GİRİŞ & FORM DOLDUR ───
+(function() {
+  const savedName   = localStorage.getItem('durusma_name');
+  const savedSicil  = localStorage.getItem('durusma_sicil');
+  const savedTel    = localStorage.getItem('durusma_tel');
+  const loggedIn    = localStorage.getItem('durusma_loggedin');
+
+  // Form alanlarını doldur (her zaman)
+  if (savedName)  document.getElementById('inp-name').value  = savedName;
+  if (savedSicil) document.getElementById('inp-sicil').value = savedSicil;
+  if (savedTel)   document.getElementById('inp-tel').value   = savedTel;
+
+  // Oturum açıksa direkt uygulamaya geç
+  if (loggedIn && savedName) {
+    applyLogin(savedName, savedSicil || '', savedTel || '');
+  }
+})();
 </script>
 
 <div id="chat-panel" style="display:none; position:fixed; inset:0; background:var(--bg); z-index:1000; flex-direction:column; animation: slide-up 0.3s ease-out;">
