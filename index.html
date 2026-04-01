@@ -450,6 +450,44 @@ function applyLogin(name, sicil, tel) {
   document.getElementById('s-app').classList.add('active');
   renderCafe();
   listenNotifications();
+  // Önceki check-in'i geri yükle
+  restoreCheckin();
+}
+
+function restoreCheckin() {
+  const savedAdliye = getFromStorage('durusma_checkin_adliye');
+  const checkinActive = getFromStorage('durusma_checkin_active');
+  if (!savedAdliye || checkinActive !== '1') return;
+
+  state.checkedIn = true;
+  state.currentAdliye = savedAdliye;
+  state.selectedAdliye = savedAdliye;
+
+  const myName = state.userName || getFromStorage('durusma_name') || 'Avukat';
+  const myInitials = document.querySelector('.profile-avatar').textContent || '?';
+
+  document.getElementById('big-btn').classList.add('checked-in');
+  document.getElementById('big-btn-text').textContent = 'Check-in Aktif\nGüncelle';
+  document.getElementById('ring1').style.cssText = 'animation:pulse-ring 2s ease-in-out infinite;opacity:0.4;';
+  document.getElementById('ring2').style.cssText = 'animation:pulse-ring 2s ease-in-out 0.5s infinite;opacity:0.2;';
+  document.getElementById('checkin-status').style.display = 'flex';
+  document.getElementById('status-text').innerHTML = '<strong>' + savedAdliye + '</strong> · Check-in aktif';
+  document.getElementById('mood-section').style.display = 'block';
+  document.getElementById('nearby-section').style.display = 'block';
+  document.getElementById('pre-checkin-hint').style.display = 'none';
+  document.getElementById('nearby-title').textContent = savedAdliye + ' — Buradakiler';
+
+  // Firebase'e tekrar kaydet (onDisconnect ile silinmiş olabilir)
+  const ref = db.ref('adliyeler/' + savedAdliye + '/' + userId);
+  ref.set({
+    name: myName,
+    initials: myInitials,
+    status: state.selectedMood,
+    timestamp: firebase.database.ServerValue.TIMESTAMP
+  });
+  ref.onDisconnect().remove();
+
+  listenNearbyAvukats(savedAdliye);
 }
 
 function doLogin() {
@@ -524,22 +562,31 @@ function confirmCheckin() {
   document.getElementById('pre-checkin-hint').style.display = 'none';
   document.getElementById('nearby-title').textContent = state.currentAdliye + ' — Buradakiler';
 
+  // Kullanıcı adını güvenli şekilde al
+  const myName = state.userName || getFromStorage('durusma_name') || 'Avukat';
+  const myInitials = document.querySelector('.profile-avatar').textContent || myName.replace('Av.','').trim().split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+
   // Firebase'e kaydet
   const ref = db.ref('adliyeler/' + state.currentAdliye + '/' + userId);
   ref.set({
-    name: state.userName,
-    initials: document.querySelector('.profile-avatar').textContent,
+    name: myName,
+    initials: myInitials,
     status: state.selectedMood,
     timestamp: firebase.database.ServerValue.TIMESTAMP
   });
-  ref.onDisconnect().remove(); 
+  ref.onDisconnect().remove();
 
-  // EKSİK OLAN KOMUT BURASIYDI: Kişileri getiren fonksiyonu çalıştırıyoruz
+  // Check-in durumunu localStorage'a kaydet (sayfa yenilenince geri dönmek için)
+  saveToStorage('durusma_checkin_adliye', state.currentAdliye);
+  saveToStorage('durusma_checkin_active', '1');
+
   listenNearbyAvukats(state.currentAdliye);
 }
 
 // ─── FIREBASE: ÇIKIŞ ───
 function doCheckOut() {
+  removeFromStorage('durusma_checkin_adliye');
+  removeFromStorage('durusma_checkin_active');
   if (state.currentAdliye) {
     db.ref('adliyeler/' + state.currentAdliye + '/' + userId).remove();
     db.ref('adliyeler/' + state.currentAdliye).off();
