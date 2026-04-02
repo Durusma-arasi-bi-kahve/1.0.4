@@ -6,154 +6,99 @@
     <title>Duruşma Arası Bi Kahve</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        body { background-color: #0d0b07; color: #f2e9d0; -webkit-tap-highlight-color: transparent; }
         .hidden { display: none; }
-        body { -webkit-tap-highlight-color: transparent; background-color: #f9fafb; }
-        .notification-anim { animation: slideIn 0.5s ease-out; }
-        @keyframes slideIn { from { transform: translateY(-100%); } to { transform: translateY(0); } }
+        .modal-bg { background-color: #1a160f; border: 1px solid #332b1d; }
+        .adliye-btn { background-color: #1a160f; border: 1px solid #4a3f2c; color: #d4a373; transition: all 0.3s; }
+        .adliye-btn.selected { border-color: #d4a373; background-color: #2a2419; color: #f2e9d0; box-shadow: 0 0 15px rgba(212, 163, 115, 0.2); }
+        .checkin-btn { background-color: #d4a373; color: #1a160f; font-weight: 700; }
+        .checkin-btn:disabled { background-color: #4a3f2c; color: #888; cursor: not-allowed; }
+        
+        /* Bildirim Barı Tasarımı */
+        #alert-popup { animation: slideDown 0.5s ease-out; background: linear-gradient(to right, #d4a373, #b08254); color: #1a160f; }
+        @keyframes slideDown { from { transform: translateY(-100%); } to { transform: translateY(0); } }
     </style>
 </head>
-<body class="font-sans">
+<body class="font-sans antialiased">
 
     <audio id="notif-sound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
 
-    <div id="alert-popup" class="hidden fixed top-4 left-0 right-0 z-[100] px-4">
-        <div class="max-w-md mx-auto bg-blue-600 text-white p-4 rounded-2xl shadow-2xl flex items-center gap-4 notification-anim">
-            <div class="text-3xl">☕</div>
-            <div class="flex-1">
-                <p id="alert-msg" class="font-bold text-sm">Av. Selin şu an Çağlayan Adliyesi'ne giriş yaptı!</p>
+    <div id="alert-popup" class="hidden fixed top-0 left-0 right-0 z-[100] p-4 shadow-2xl">
+        <div class="max-w-md mx-auto flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <span class="text-2xl">🔔</span>
+                <p id="alert-msg" class="text-sm font-bold"></p>
             </div>
-            <button onclick="closeAlert()" class="bg-blue-700 px-3 py-1 rounded-lg text-xs">Kapat</button>
+            <button onclick="closeAlert()" class="text-xs border border-black/20 px-2 py-1 rounded">Kapat</button>
         </div>
     </div>
 
-    <div id="main-screen" class="max-w-md mx-auto bg-white min-h-screen shadow-lg pb-20">
-        <header class="p-4 flex justify-between items-center border-b">
-            <h1 class="text-xl font-bold text-blue-600">Duruşma Arası</h1>
-            <button class="relative p-2">🔔<span class="absolute top-0 right-0 bg-red-500 w-2 h-2 rounded-full"></span></button>
-        </header>
-
-        <main class="p-6">
-            <div class="bg-blue-50 p-8 rounded-3xl mb-8 text-center">
-                <button onclick="konumlaVeBaslat()" class="bg-blue-600 text-white w-24 h-24 rounded-full text-4xl shadow-xl hover:scale-105 transition-transform mb-4">☕</button>
-                <h2 class="text-xl font-bold">Adliyedeyim</h2>
-                <p class="text-gray-600 text-sm">Kahveye Beklerim</p>
-            </div>
-
-            <div class="mt-8">
-                <h3 class="font-bold mb-4 text-gray-700 flex justify-between">
-                    <span>Adliyedeki Meslektaşlar</span>
-                    <span id="current-court-name" class="text-blue-600 text-xs font-normal"></span>
-                </h3>
-                
-                <div id="lawyer-list" class="space-y-4">
-                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                        <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center font-bold text-blue-600">AS</div>
-                            <div>
-                                <p class="font-bold text-sm">Av. Selin Yılmaz</p>
-                                <p class="text-xs text-green-600">● Müsait</p>
-                            </div>
-                        </div>
-                        <button onclick="mesajGonder(true, 'Av. Selin Yılmaz')" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-bold">Mesaj At</button>
-                    </div>
-
-                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                        <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center font-bold text-gray-500">MK</div>
-                            <div>
-                                <p class="font-bold text-sm">Av. Mert Kaya</p>
-                                <p class="text-xs text-gray-400">● Adliyede</p>
-                            </div>
-                        </div>
-                        <button onclick="mesajGonder(false, 'Av. Mert Kaya')" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-xl text-xs font-bold">İstek Gönder</button>
-                    </div>
-                </div>
-            </div>
-        </main>
+    <div id="main-screen" class="max-w-md mx-auto min-h-screen flex flex-col items-center justify-center p-6">
+        <div class="relative mb-8">
+            <button onclick="konumlaVeBaslat()" class="w-32 h-32 rounded-full bg-[#d4a373]/10 border border-[#d4a373]/30 flex items-center justify-center shadow-[0_0_50px_rgba(212,163,115,0.1)] hover:scale-105 transition-transform">
+                <span class="text-5xl">☕</span>
+            </button>
+            <div class="absolute -bottom-2 -right-2 bg-[#d4a373] text-[#1a160f] text-[10px] font-bold px-2 py-1 rounded-full">AKTİF</div>
+        </div>
+        <h2 class="text-2xl font-serif text-[#d4a373]">Adliyedeyim</h2>
+        <p class="text-gray-500 text-sm mt-2 italic">Meslektaşınla kahveye bekleniyorsun</p>
     </div>
 
-    <div id="selection-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center z-50 p-4">
-        <div class="bg-white w-full max-w-md rounded-[2.5rem] p-6 shadow-2xl">
-            <h3 class="text-xl font-bold mb-1">Adliyeyi Onayla</h3>
-            <p id="status-text" class="text-sm text-gray-500 mb-6 font-medium font-medium">Konumunuz sorgulanıyor...</p>
-            <ul id="adliye-list" class="space-y-3 max-h-60 overflow-y-auto mb-6 pr-2"></ul>
+    <div id="selection-modal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <div class="modal-bg w-full max-w-sm rounded-[2.5rem] p-8 shadow-2xl">
+            
+            <h3 class="text-2xl font-serif text-[#d4a373] mb-2 text-center">Hangi adliyedesin?</h3>
+            <p id="status-text" class="text-xs text-gray-500 mb-6 text-center leading-relaxed">
+                GPS konumunuz adliyeye yakın. Doğru adliyeyi seçin ya da listeden bulun.
+            </p>
+            
+            <div id="adliye-grid" class="grid grid-cols-2 gap-3 mb-8">
+                </div>
+
             <div class="flex gap-3">
-                <button onclick="closeModal()" class="flex-1 py-4 bg-gray-100 text-gray-600 rounded-2xl font-bold">İptal</button>
-                <button id="confirm-btn" onclick="checkInYap()" class="flex-1 py-4 bg-blue-600 text-white rounded-2xl font-bold opacity-50" disabled>Check-in Yap ✓</button>
+                <button onclick="closeModal()" class="flex-1 py-4 rounded-2xl border border-[#332b1d] text-gray-500 font-medium active:scale-95 transition">İptal</button>
+                <button id="confirm-btn" onclick="checkInYap()" disabled class="checkin-btn flex-1 py-4 rounded-2xl active:scale-95 transition shadow-lg">Check-in Yap ✓</button>
             </div>
         </div>
     </div>
 
     <script>
         const adliyeler = [
-            { id: 1, ad: "Çağlayan Adliyesi", lat: 41.0692, lng: 28.9803 },
-            { id: 2, ad: "İstanbul Anadolu (Kartal)", lat: 40.9133, lng: 29.1760 },
-            { id: 3, ad: "Bakırköy (Ana Bina)", lat: 40.9959, lng: 28.8789 },
-            { id: 4, ad: "Bakırköy Ek Bina", lat: 40.9950, lng: 28.8330 },
-            { id: 5, ad: "Küçükçekmece Adliyesi", lat: 41.0006, lng: 28.8101 },
-            { id: 6, ad: "GOP Adliyesi", lat: 41.0682, lng: 28.9145 },
-            { id: 7, ad: "İstanbul İcra (Ek Bina)", lat: 41.0682, lng: 28.9887 }
+            { id: 1, ad: "Çağlayan Adliyesi", lat: 41.06927, lng: 28.98036 },
+            { id: 2, ad: "İstanbul Anadolu (Kartal)", lat: 40.91332, lng: 29.17601 },
+            { id: 3, ad: "Bakırköy (Ana Bina)", lat: 40.99596, lng: 28.87891 },
+            { id: 4, ad: "Bakırköy Ek Bina", lat: 40.99500, lng: 28.83305 },
+            { id: 5, ad: "Küçükçekmece Adliyesi", lat: 41.00064, lng: 28.81013 },
+            { id: 6, ad: "GOP Adliyesi", lat: 41.06821, lng: 28.91456 },
+            { id: 7, ad: "İcra Başkanlığı (Ek Bina)", lat: 41.06826, lng: 28.98878 }
         ];
 
         let selectedId = null;
 
-        // MESAJ GÖNDERME MANTIĞI
-        function mesajGonder(ekliMi, isim) {
-            if(ekliMi) {
-                alert(isim + " ile sohbet açılıyor...");
-                // window.location.href = "/chat/" + isim; (Gerçek sistemde)
-            } else {
-                alert(isim + " arkadaşınız değil. Mesaj isteği gönderildi!");
-            }
-        }
-
-        // SESLİ VE GÖRÜNTÜLÜ UYARI SİMÜLASYONU
-        function arkadasGeldiUyarisi(isim, adliyeAd) {
-            document.getElementById('notif-sound').play();
-            document.getElementById('alert-msg').innerText = `${isim} şu an ${adliyeAd} konumuna giriş yaptı!`;
-            document.getElementById('alert-popup').classList.remove('hidden');
+        function renderGrid(autoId = null) {
+            const grid = document.getElementById('adliye-grid');
+            grid.innerHTML = '';
             
-            // 5 saniye sonra otomatik kapat
-            setTimeout(closeAlert, 6000);
-        }
-
-        function closeAlert() {
-            document.getElementById('alert-popup').classList.add('hidden');
-        }
-
-        function checkInYap() {
-            const adliye = adliyeler.find(a => a.id === selectedId);
-            alert(`${adliye.ad} konumuna check-in yapıldı!`);
-            document.getElementById('current-court-name').innerText = "📍 " + adliye.ad;
-            closeModal();
-            
-            // TEST İÇİN: Check-in yaptıktan 2 saniye sonra bir arkadaşın geldiğini simüle et
-            setTimeout(() => {
-                arkadasGeldiUyarisi("Av. Selin Yılmaz", adliye.ad);
-            }, 2000);
-        }
-
-        // --- KONUM FONKSİYONLARI (2KM KURALI DAHİL) ---
-        function renderList(autoId = null) {
-            const list = document.getElementById('adliye-list');
-            list.innerHTML = '';
-            adliyeler.forEach(a => {
+            adliyeler.forEach((a, index) => {
                 const isSelected = a.id === autoId;
-                list.innerHTML += `
-                    <li onclick="selectAdliye(${a.id})" id="item-${a.id}" class="p-4 border-2 rounded-2xl cursor-pointer flex justify-between items-center transition-all ${isSelected ? 'border-blue-600 bg-blue-50' : 'border-gray-100'}">
-                        <span class="font-bold text-sm">${a.ad}</span>
-                        ${isSelected ? '<span class="text-[10px] bg-blue-600 text-white px-2 py-1 rounded-lg">YAKIN</span>' : ''}
-                    </li>`;
+                const isLast = index === 6; // 7. adliye tam genişlik
+                const gridClass = isLast ? 'col-span-2' : 'col-span-1';
+
+                grid.innerHTML += `
+                    <button onclick="selectAdliye(${a.id})" id="btn-${a.id}" 
+                        class="adliye-btn ${gridClass} p-3 rounded-2xl text-[11px] font-bold h-16 flex items-center justify-center text-center ${isSelected ? 'selected' : ''}">
+                        ${a.ad}
+                    </button>
+                `;
             });
             if(autoId) selectAdliye(autoId);
         }
 
         function selectAdliye(id) {
             selectedId = id;
-            document.querySelectorAll('#adliye-list li').forEach(el => el.classList.remove('border-blue-600', 'bg-blue-50'));
-            document.getElementById('item-'+id).classList.add('border-blue-600', 'bg-blue-50');
-            const btn = document.getElementById('confirm-btn');
-            btn.disabled = false; btn.classList.remove('opacity-50');
+            document.querySelectorAll('.adliye-btn').forEach(b => b.classList.remove('selected'));
+            document.getElementById(`btn-${id}`).classList.add('selected');
+            document.getElementById('confirm-btn').disabled = false;
         }
 
         function mesafe(lat1, lon1, lat2, lon2) {
@@ -166,7 +111,7 @@
 
         function konumlaVeBaslat() {
             document.getElementById('selection-modal').classList.remove('hidden');
-            renderList();
+            renderGrid();
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(pos => {
                     let enYakin = null; let minD = Infinity;
@@ -175,14 +120,16 @@
                         if(d < minD) { minD = d; enYakin = a; }
                     });
                     if(minD <= 2.0) {
-                        document.getElementById('status-text').innerText = "✨ Yakın adliye bulundu!";
-                        renderList(enYakin.id);
+                        document.getElementById('status-text').innerText = "✨ " + enYakin.ad + " yakınında tespit edildiniz.";
+                        renderGrid(enYakin.id);
                     }
                 }, null, {enableHighAccuracy: true});
             }
         }
 
-        function closeModal() { document.getElementById('selection-modal').classList.add('hidden'); }
-    </script>
-</body>
-</html>
+        function checkInYap() {
+            const ad = adliyeler.find(x => x.id === selectedId).ad;
+            closeModal();
+            // Simülasyon: Check-in sonrası arkadaş bildirimi
+            setTimeout(() => {
+                document
