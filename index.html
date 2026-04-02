@@ -8,9 +8,6 @@
     <style>
         .hidden { display: none; }
         body { -webkit-tap-highlight-color: transparent; }
-        /* Kaydırma çubuğunu daha zarif hale getirelim */
-        #adliye-list::-webkit-scrollbar { width: 5px; }
-        #adliye-list::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 10px; }
     </style>
 </head>
 <body class="bg-gray-100 font-sans">
@@ -46,7 +43,7 @@
             <h3 class="text-xl font-bold mb-1">Hangi adliyedesin?</h3>
             <p id="status-text" class="text-sm text-gray-500 mb-6 font-medium">Konumunuz sorgulanıyor...</p>
             
-            <ul id="adliye-list" class="space-y-3 max-h-[400px] overflow-y-auto mb-6 pr-2">
+            <ul id="adliye-list" class="space-y-3 max-h-80 overflow-y-auto mb-6 pr-2">
                 </ul>
 
             <div class="flex gap-3">
@@ -91,11 +88,7 @@
                 el.classList.remove('border-blue-600', 'bg-blue-50', 'ring-2', 'ring-blue-100');
             });
             const selectedItem = document.getElementById(`adliye-${id}`);
-            if (selectedItem) {
-                selectedItem.classList.add('border-blue-600', 'bg-blue-50', 'ring-2', 'ring-blue-100');
-                // Otomatik seçilen öğeyi görünür alana kaydır
-                selectedItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }
+            selectedItem.classList.add('border-blue-600', 'bg-blue-50', 'ring-2', 'ring-blue-100');
             
             const btn = document.getElementById('confirm-btn');
             btn.disabled = false;
@@ -135,7 +128,7 @@
                             }
                         });
 
-                        // 2.0 km sınırı
+                        // 2.0 km içinde herhangi bir adliye varsa otomatik seç
                         if (minMesafe <= 2.0) {
                             document.getElementById('status-text').innerText = `✨ ${enYakinAdliye.ad} yakınındasınız.`;
                             renderList(enYakinAdliye.id);
@@ -144,7 +137,7 @@
                         }
                     },
                     (err) => {
-                        document.getElementById('status-text').innerText = "Konum izni alınamadı. Manuel seçim yapabilirsiniz.";
+                        document.getElementById('status-text').innerText = "Konum izni reddedildi. Manuel seçim yapabilirsiniz.";
                     },
                     { enableHighAccuracy: true }
                 );
