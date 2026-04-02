@@ -404,6 +404,35 @@ const ADLIYELER = [
   'GOP Adliyesi'
 ];
 
+// Adliye koordinatları (enlem, boylam)
+const ADLIYE_COORDS = {
+  'Çağlayan Adliyesi':                   { lat: 41.0689, lng: 28.9809 },
+  'İstanbul Anadolu Adliyesi (Kartal)':  { lat: 40.9105, lng: 29.1865 },
+  'Bakırköy Adliyesi (Ana Bina)':        { lat: 40.9793, lng: 28.8726 },
+  'Bakırköy Adliyesi Ek Bina':           { lat: 40.9801, lng: 28.8692 },
+  'Küçükçekmece Adliyesi':               { lat: 40.9987, lng: 28.7850 },
+  'GOP Adliyesi':                        { lat: 41.0631, lng: 28.9108 }
+};
+
+// İki koordinat arası mesafe (km) - Haversine formülü
+function calcDistance(lat1, lng1, lat2, lng2) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+// En yakın adliyeyi bul
+function findNearestAdliye(userLat, userLng) {
+  let nearest = null, minDist = Infinity;
+  Object.entries(ADLIYE_COORDS).forEach(([name, coord]) => {
+    const d = calcDistance(userLat, userLng, coord.lat, coord.lng);
+    if (d < minDist) { minDist = d; nearest = name; }
+  });
+  return { name: nearest, distKm: minDist };
+}
+
 const CAFES = {
   caglayan: [
     { name:'B Blok Kafeteryası', rating:4, tags:[{t:'Çayı güzel',c:'good'},{t:'Tostu efsane',c:'good'},{t:'Kahve berbat',c:'bad'},{t:'Fiyatlar makul',c:'mid'}], review:'"Çay için gidilir, Nescafe içmeyin derim."', reviewer:'Av. K.D.' },
@@ -518,17 +547,72 @@ function goProfile() {
 function handleBigBtn() {
   if (state.checkedIn) { doCheckOut(); return; }
   const det = document.getElementById('detecting-text');
+
+  if (!navigator.geolocation) {
+    // GPS desteklenmiyorsa direkt modal aç
+    openAdliyeModal(null);
+    return;
+  }
+
   det.textContent = '📍 Konumunuz tespit ediliyor...';
-  setTimeout(() => { det.textContent = ''; openAdliyeModal(); }, 1200);
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      det.textContent = '';
+      const { latitude, longitude } = pos.coords;
+      const result = findNearestAdliye(latitude, longitude);
+      result.userLat = latitude;
+      result.userLng = longitude;
+      openAdliyeModal(result);
+    },
+    (err) => {
+      // Konum alınamazsa (izin reddedildi vb.) manuel seçim aç
+      det.textContent = '';
+      openAdliyeModal(null);
+    },
+    { timeout: 8000, maximumAge: 60000, enableHighAccuracy: true }
+  );
 }
 
-function openAdliyeModal() {
+function openAdliyeModal(gpsResult) {
   const grid = document.getElementById('adliye-grid');
   grid.innerHTML = '';
+
+  // En yakın adliye: GPS varsa onu kullan, yoksa ilki
+  const autoSelect = gpsResult ? gpsResult.name : null;
+  const defaultSelect = autoSelect || ADLIYELER[0];
+  state.selectedAdliye = defaultSelect;
+
+  // Modal alt yazısını güncelle
+  const sub = document.querySelector('#adliye-modal .modal-sub');
+  if (gpsResult) {
+    const km = gpsResult.distKm.toFixed(1);
+    sub.innerHTML = '📍 Konumunuza en yakın adliye otomatik seçildi. <strong style="color:var(--gold-light)">(' + km + ' km uzakta)</strong> Farklı bir adliyedeyseniz değiştirebilirsiniz.';
+  } else {
+    sub.textContent = 'Lütfen bulunduğunuz adliyeyi listeden seçin.';
+  }
+
+  // Kullanıcının konumu varsa her adliyenin mesafesini hesapla
+  let userLat = null, userLng = null;
+  if (gpsResult) {
+    // Nearest adliye'nin koordinatından kullanıcı konumunu tersine hesaplayamayız
+    // Bu yüzden mesafeyi direkt GPS callback'ten alıyoruz
+    // Her adliyenin mesafesini gpsResult'daki userLat/lng ile hesapla
+    userLat = gpsResult.userLat;
+    userLng = gpsResult.userLng;
+  }
+
   ADLIYELER.forEach(a => {
     const btn = document.createElement('div');
-    btn.className = 'adliye-btn' + (a === 'Çağlayan Adliyesi' ? ' selected' : '');
-    btn.textContent = a;
+    const isSelected = a === defaultSelect;
+    btn.className = 'adliye-btn' + (isSelected ? ' selected' : '');
+
+    let distLabel = '';
+    if (userLat !== null && ADLIYE_COORDS[a]) {
+      const d = calcDistance(userLat, userLng, ADLIYE_COORDS[a].lat, ADLIYE_COORDS[a].lng);
+      distLabel = '<br><span style="font-size:10px;color:' + (isSelected ? 'var(--green)' : 'var(--muted2)') + ';">' + (isSelected ? '📍 ' : '') + d.toFixed(1) + ' km</span>';
+    }
+
+    btn.innerHTML = a + distLabel;
     btn.onclick = () => {
       grid.querySelectorAll('.adliye-btn').forEach(b => b.classList.remove('selected'));
       btn.classList.add('selected');
@@ -536,7 +620,7 @@ function openAdliyeModal() {
     };
     grid.appendChild(btn);
   });
-  state.selectedAdliye = 'Çağlayan Adliyesi';
+
   document.getElementById('adliye-modal').classList.add('open');
 }
 
