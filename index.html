@@ -6,49 +6,39 @@
     <title>Duruşma Arası Bi Kahve</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        body { background-color: #0d0b07; color: #f2e9d0; }
         .hidden { display: none; }
-        body { -webkit-tap-highlight-color: transparent; }
+        .modal-bg { background-color: #1a160f; border: 1px solid #332b1d; }
+        .adliye-btn { background-color: #1a160f; border: 1px solid #4a3f2c; color: #d4a373; transition: all 0.3s; }
+        .adliye-btn.selected { border-color: #d4a373; background-color: #2a2419; color: #f2e9d0; }
+        .checkin-btn { background-color: #d4a373; color: #1a160f; }
+        .checkin-btn:disabled { background-color: #4a3f2c; color: #888; }
     </style>
 </head>
-<body class="bg-gray-100 font-sans">
+<body class="font-sans antialiased">
 
-    <div id="main-screen" class="max-w-md mx-auto bg-white min-h-screen shadow-lg pb-20">
-        <header class="p-4 flex justify-between items-center border-b">
-            <h1 class="text-xl font-bold text-blue-600">Duruşma Arası</h1>
-            <div class="flex items-center gap-2">
-                <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded">Av. Meslektaş</span>
-            </div>
-        </header>
-
-        <main class="p-6 text-center">
-            <div class="bg-blue-50 p-8 rounded-3xl mb-6">
-                <button onclick="konumlaVeBaslat()" class="bg-blue-600 text-white w-24 h-24 rounded-full text-4xl shadow-xl hover:scale-105 transition-transform mb-4">☕</button>
-                <h2 class="text-xl font-bold">Adliyedeyim</h2>
-                <p class="text-gray-600 text-sm">Kahveye Beklerim</p>
-            </div>
-
-            <div class="mt-8 text-left">
-                <h3 class="font-bold mb-4 text-gray-700">Aynı adliyedekiler</h3>
-                <div id="no-lawyer-msg" class="text-center py-10 text-gray-400 border-2 border-dashed border-gray-100 rounded-xl">
-                    📍 Şu an bu adliyede kimse görünmüyor.
-                </div>
-            </div>
-        </main>
+    <div id="main-screen" class="max-w-md mx-auto min-h-screen p-6 flex flex-col items-center justify-center">
+        <button onclick="konumlaVeBaslat()" class="w-32 h-32 rounded-full bg-[#d4a373]/20 flex items-center justify-center shadow-2xl border border-[#d4a373]/30 mb-4">
+            <span class="text-4xl">☕</span>
+        </button>
+        <h2 class="text-xl font-semibold">Adliyedeyim</h2>
+        <p class="text-gray-500 text-sm">Kahveye Beklerim</p>
     </div>
 
-    <div id="selection-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center z-50">
-        <div class="bg-white w-full max-w-md rounded-t-[2.5rem] sm:rounded-3xl p-6 shadow-2xl transition-all">
-            <div class="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-6 sm:hidden"></div>
+    <div id="selection-modal" class="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
+        <div class="modal-bg w-full max-w-sm rounded-[2.5rem] p-8 shadow-2xl">
             
-            <h3 class="text-xl font-bold mb-1">Hangi adliyedesin?</h3>
-            <p id="status-text" class="text-sm text-gray-500 mb-6 font-medium">Konumunuz sorgulanıyor...</p>
+            <h3 class="text-2xl font-serif text-[#d4a373] mb-2">Hangi adliyedesin?</h3>
+            <p id="status-text" class="text-sm text-gray-400 mb-6 leading-relaxed">
+                GPS konumunuz adliyeye yakın. Doğru adliyeyi seçin ya da listeden bulun.
+            </p>
             
-            <ul id="adliye-list" class="space-y-3 max-h-80 overflow-y-auto mb-6 pr-2">
-                </ul>
+            <div id="adliye-grid" class="grid grid-cols-2 gap-3 mb-8">
+                </div>
 
             <div class="flex gap-3">
-                <button onclick="closeModal()" class="flex-1 py-4 bg-gray-100 text-gray-600 rounded-2xl font-bold active:scale-95 transition">İptal</button>
-                <button id="confirm-btn" class="flex-1 py-4 bg-blue-600 text-white rounded-2xl font-bold opacity-50 cursor-not-allowed active:scale-95 transition" disabled>Check-in Yap ✓</button>
+                <button onclick="closeModal()" class="flex-1 py-4 rounded-2xl border border-[#332b1d] text-gray-500 font-medium active:scale-95 transition">İptal</button>
+                <button id="confirm-btn" disabled class="checkin-btn flex-1 py-4 rounded-2xl font-bold active:scale-95 transition">Check-in Yap ✓</button>
             </div>
         </div>
     </div>
@@ -57,4 +47,77 @@
         const adliyeler = [
             { id: 1, ad: "Çağlayan Adliyesi", lat: 41.06927899893783, lng: 28.98036156972052 },
             { id: 2, ad: "İstanbul Anadolu Adliyesi (Kartal)", lat: 40.91332562944301, lng: 29.176010493362906 },
-            { id: 3, ad: "Bakırköy Adliyesi (Ana Bina)", lat: 40.99596382224838, lng: 28.8
+            { id: 3, ad: "Bakırköy Adliyesi (Ana Bina)", lat: 40.99596382224838, lng: 28.878911642752712 },
+            { id: 4, ad: "Bakırköy Adliyesi Ek Bina", lat: 40.9950038841365, lng: 28.833059949320866 },
+            { id: 5, ad: "Küçükçekmece Adliyesi", lat: 41.00064778158206, lng: 28.810135666393002 },
+            { id: 6, ad: "GOP Adliyesi", lat: 41.068212, lng: 28.914567 },
+            { id: 7, ad: "İstanbul Adliyesi Ek Hizmet Binası (İcra Başkanlığı)", lat: 41.068264347803186, lng: 28.98878795439217 }
+        ];
+
+        let selectedId = null;
+
+        function renderGrid(autoId = null) {
+            const grid = document.getElementById('adliye-grid');
+            grid.innerHTML = '';
+            
+            adliyeler.forEach((a, index) => {
+                const isSelected = a.id === autoId;
+                // 7. elemanı (İcra binası) tam genişlik yapmak için:
+                const isLast = index === 6; 
+                const gridClass = isLast ? 'col-span-2' : 'col-span-1';
+
+                grid.innerHTML += `
+                    <button onclick="selectAdliye(${a.id})" id="btn-${a.id}" 
+                        class="adliye-btn ${gridClass} p-3 rounded-xl text-xs sm:text-sm font-medium h-16 flex items-center justify-center text-center ${isSelected ? 'selected' : ''}">
+                        ${a.ad}
+                    </button>
+                `;
+            });
+            if(autoId) selectAdliye(autoId);
+        }
+
+        function selectAdliye(id) {
+            selectedId = id;
+            document.querySelectorAll('.adliye-btn').forEach(b => b.classList.remove('selected'));
+            document.getElementById(`btn-${id}`).classList.add('selected');
+            
+            const btn = document.getElementById('confirm-btn');
+            btn.disabled = false;
+        }
+
+        function mesafeHesapla(lat1, lon1, lat2, lon2) {
+            const R = 6371; 
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        }
+
+        function konumlaVeBaslat() {
+            document.getElementById('selection-modal').classList.remove('hidden');
+            renderGrid();
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((pos) => {
+                    let enYakin = null;
+                    let minMesafe = Infinity;
+
+                    adliyeler.forEach(a => {
+                        const d = mesafeHesapla(pos.coords.latitude, pos.coords.longitude, a.lat, a.lng);
+                        if (d < minMesafe) { minMesafe = d; enYakin = a; }
+                    });
+
+                    if (minMesafe <= 2.0) {
+                        document.getElementById('status-text').innerText = `📍 ${enYakin.ad} yakınındasınız.`;
+                        renderGrid(enYakin.id);
+                    }
+                }, null, { enableHighAccuracy: true });
+            }
+        }
+
+        function closeModal() { document.getElementById('selection-modal').classList.add('hidden'); }
+    </script>
+</body>
+</html>
