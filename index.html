@@ -157,6 +157,31 @@ html {
 .add-rating-btn{width:100%;padding:12px;background:transparent;border:0.5px dashed var(--border2);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted);cursor:pointer;transition:all .2s}
 .add-rating-btn:hover{border-color:var(--gold);color:var(--gold);background:rgba(200,137,42,.04)}
 
+/* KAHVEYE AÇIĞIM */
+.mood-chip.kahve-active{border-color:var(--green)!important;color:#fff!important;background:rgba(90,175,90,.15)!important;position:relative;}
+.kahve-timer{font-size:10px;color:var(--green);text-align:center;margin-top:4px;font-weight:600;letter-spacing:.04em;}
+
+/* YEŞİL AURA (profil avatarı etrafında) */
+.avatar-sm.kahve-aura{border-color:var(--green)!important;box-shadow:0 0 0 3px rgba(90,175,90,.35),0 0 14px rgba(90,175,90,.5);animation:aura-pulse 2s ease-in-out infinite;}
+@keyframes aura-pulse{0%,100%{box-shadow:0 0 0 3px rgba(90,175,90,.35),0 0 14px rgba(90,175,90,.5);}50%{box-shadow:0 0 0 6px rgba(90,175,90,.2),0 0 24px rgba(90,175,90,.7);}}
+
+/* NEARBY: kahveye açık rozeti */
+.badge-coffee{background:rgba(90,175,90,.12);color:var(--green);border:0.5px solid rgba(90,175,90,.4);animation:aura-pulse 2s infinite;}
+
+/* HARİTA SAYFASI */
+.map-page{flex:1;display:flex;flex-direction:column;overflow-y:auto;padding:16px 20px 20px;}
+.map-adliye-card{background:var(--bg3);border:0.5px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:border-color .2s;}
+.map-adliye-card:hover{border-color:var(--border2);}
+.map-adliye-card.has-friends{border-color:rgba(90,175,90,.4);background:rgba(90,175,90,.04);}
+.map-adliye-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.map-adliye-name{font-family:'Playfair Display',serif;font-size:15px;color:var(--gold-light);}
+.map-adliye-count{font-size:11px;padding:3px 9px;border-radius:20px;background:rgba(90,175,90,.12);color:var(--green);border:0.5px solid rgba(90,175,90,.3);}
+.map-friend-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:0.5px solid var(--border);}
+.map-friend-av{width:30px;height:30px;border-radius:50%;background:var(--card);border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--gold);flex-shrink:0;}
+.map-friend-info{flex:1;font-size:12px;color:var(--text);}
+.map-friend-status{font-size:10px;color:var(--muted);margin-top:1px;}
+.map-empty{text-align:center;padding:40px 20px;color:var(--muted2);font-size:13px;line-height:1.8;}
+
 /* PROFİL */
 .profile-header{display:flex;flex-direction:column;align-items:center;padding:28px 20px 20px;border-bottom:0.5px solid var(--border)}
 .profile-avatar{width:72px;height:72px;border-radius:50%;background:var(--card);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:26px;color:var(--gold-light);margin-bottom:12px}
@@ -266,6 +291,7 @@ html {
           <div class="mood-chip selected" onclick="setMood(this,'Müsaitim')"><span class="mood-icon">🟢</span>Müsaitim</div>
           <div class="mood-chip" onclick="setMood(this,'Duruşmada')"><span class="mood-icon">🔴</span>Duruşmada</div>
           <div class="mood-chip" onclick="setMood(this,'Kalemde')"><span class="mood-icon">🟡</span>Kalemde</div>
+          <div class="mood-chip" id="kahve-chip" onclick="setMood(this,'Kahveye Açığım')"><span class="mood-icon">☕</span>Kahveye Açığım<div class="kahve-timer" id="kahve-timer" style="display:none;"></div></div>
         </div>
       </div>
       <div class="nearby-section" id="nearby-section" style="display:none;">
@@ -281,19 +307,12 @@ html {
   </div>
 
   <div class="page" id="page-cafe">
-    <div class="page-content">
-      <div class="court-selector">
-        <select id="cafe-court-select" onchange="renderCafe()">
-          <option value="caglayan">Çağlayan Adliyesi</option>
-          <option value="kartal">İstanbul Anadolu Adliyesi (Kartal)</option>
-          <option value="bakirkoy">Bakırköy Adliyesi (Ana Bina)</option>
-          <option value="bakirkoyEk">Bakırköy Adliyesi Ek Bina</option>
-          <option value="kucukcekmece">Küçükçekmece Adliyesi</option>
-          <option value="gop">GOP Adliyesi</option>
-        </select>
+    <div class="map-page">
+      <div style="font-family:'Playfair Display',serif;font-size:20px;color:var(--gold-light);margin-bottom:4px;">Kim Nerede?</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:20px;">Arkadaşlarının bulunduğu adliyeler</div>
+      <div id="friend-map-content">
+        <div class="map-empty">🗺️<br><br>Arkadaş listeniz yüklenince<br>adliye bazlı konumları burada görünür.</div>
       </div>
-      <div id="cafe-content"></div>
-      <button class="add-rating-btn" onclick="showToast('Puanlama özelliği yakında aktif olacak!')">+ Kafeteryayı sen de puanla</button>
     </div>
   </div>
 
@@ -339,7 +358,7 @@ html {
 
   <div class="bottom-nav">
     <button class="nav-tab active" onclick="goPage('home',this)"><span class="nav-icon">🏠</span><span class="nav-label">Ana Ekran</span></button>
-    <button class="nav-tab" onclick="goPage('cafe',this)"><span class="nav-icon">☕</span><span class="nav-label">Kafeterya</span></button>
+    <button class="nav-tab" onclick="goPage('cafe',this);renderFriendMap()"><span class="nav-icon">🗺️</span><span class="nav-label">Kim Nerede</span></button>
     <button class="nav-tab" onclick="goPage('profile',this)"><span class="nav-icon">👤</span><span class="nav-label">Profil</span></button>
   </div>
 </div>
@@ -477,10 +496,11 @@ function applyLogin(name, sicil, tel) {
   document.querySelector('.avatar-sm').textContent = initials;
   document.getElementById('s-landing').classList.remove('active');
   document.getElementById('s-app').classList.add('active');
-  renderCafe();
   listenNotifications();
   // Önceki check-in'i geri yükle
   restoreCheckin();
+  // Kahve sayacını geri yükle
+  restoreKahveTimer();
 }
 
 function restoreCheckin() {
@@ -665,6 +685,9 @@ function confirmCheckin() {
   saveToStorage('durusma_checkin_active', '1');
 
   listenNearbyAvukats(state.currentAdliye);
+
+  // Arkadaşlara check-in bildirimi gönder
+  notifyFriendsCheckin(state.currentAdliye, myName, myInitials);
 }
 
 // ─── FIREBASE: ÇIKIŞ ───
@@ -689,14 +712,95 @@ function doCheckOut() {
 }
 
 // ─── FIREBASE: DURUM GÜNCELLE ───
+let kahveTimerInterval = null;
+let kahveEndTime = null;
+
 function setMood(el, mood) {
   document.querySelectorAll('.mood-chip').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
   state.selectedMood = mood;
+
+  // Kahveye Açığım özel mantığı
+  if (mood === 'Kahveye Açığım') {
+    startKahveTimer();
+  } else {
+    stopKahveTimer();
+  }
+
   if (state.checkedIn && state.currentAdliye) {
-    db.ref('adliyeler/' + state.currentAdliye + '/' + userId).update({ status: mood });
+    db.ref('adliyeler/' + state.currentAdliye + '/' + userId).update({
+      status: mood,
+      kahveUntil: mood === 'Kahveye Açığım' ? (Date.now() + 45 * 60 * 1000) : null
+    });
   }
   showToast('Durumun "' + mood + '" olarak güncellendi');
+}
+
+function startKahveTimer() {
+  stopKahveTimer();
+  kahveEndTime = Date.now() + 45 * 60 * 1000;
+  saveToStorage('durusma_kahve_until', String(kahveEndTime));
+
+  // Avatar'a yeşil aura
+  document.querySelector('.avatar-sm').classList.add('kahve-aura');
+
+  // Kahve chip'e aktif stil + sayaç
+  const chip = document.getElementById('kahve-chip');
+  const timer = document.getElementById('kahve-timer');
+  if (chip) chip.classList.add('kahve-active');
+  if (timer) timer.style.display = 'block';
+
+  kahveTimerInterval = setInterval(() => {
+    const remaining = kahveEndTime - Date.now();
+    if (remaining <= 0) {
+      // Süre doldu — Müsaitim'e geç
+      stopKahveTimer();
+      const musaitChip = document.querySelector('.mood-chip');
+      if (musaitChip) setMood(musaitChip, 'Müsaitim');
+      showToast('Kahve süreniz doldu, durumunuz Müsait olarak güncellendi.');
+      return;
+    }
+    const m = Math.floor(remaining / 60000);
+    const s = Math.floor((remaining % 60000) / 1000);
+    if (timer) timer.textContent = m + ':' + String(s).padStart(2,'0');
+  }, 1000);
+}
+
+function stopKahveTimer() {
+  clearInterval(kahveTimerInterval);
+  kahveTimerInterval = null;
+  kahveEndTime = null;
+  removeFromStorage('durusma_kahve_until');
+  document.querySelector('.avatar-sm').classList.remove('kahve-aura');
+  const chip = document.getElementById('kahve-chip');
+  const timer = document.getElementById('kahve-timer');
+  if (chip) chip.classList.remove('kahve-active');
+  if (timer) { timer.style.display = 'none'; timer.textContent = ''; }
+}
+
+function restoreKahveTimer() {
+  const until = parseInt(getFromStorage('durusma_kahve_until') || '0');
+  if (until && until > Date.now()) {
+    kahveEndTime = until;
+    // Kahveye Açığım chip'i seç
+    const chips = document.querySelectorAll('.mood-chip');
+    chips.forEach(c => { if (c.id === 'kahve-chip') { c.classList.add('selected','kahve-active'); } else { c.classList.remove('selected'); } });
+    document.querySelector('.avatar-sm').classList.add('kahve-aura');
+    const timer = document.getElementById('kahve-timer');
+    if (timer) timer.style.display = 'block';
+    kahveTimerInterval = setInterval(() => {
+      const remaining = kahveEndTime - Date.now();
+      if (remaining <= 0) {
+        stopKahveTimer();
+        const musaitChip = document.querySelector('.mood-chip');
+        if (musaitChip) setMood(musaitChip, 'Müsaitim');
+        return;
+      }
+      const m = Math.floor(remaining / 60000);
+      const s = Math.floor((remaining % 60000) / 1000);
+      if (timer) timer.textContent = m + ':' + String(s).padStart(2,'0');
+    }, 1000);
+  }
 }
 
 // ─── FIREBASE: CANLI LİSTE ───
@@ -713,7 +817,10 @@ function listenNearbyAvukats(adliyeName) {
         hasOthers = true;
         const p = data[key];
         let badge = '';
-        if (p.status === 'Müsaitim') badge = '<span class="person-badge badge-green">Müsait</span>';
+        if (p.status === 'Kahveye Açığım') {
+          const remaining = p.kahveUntil ? Math.max(0, Math.floor((p.kahveUntil - Date.now()) / 60000)) : 45;
+          badge = '<span class="person-badge badge-coffee">☕ ' + remaining + 'dk</span>';
+        } else if (p.status === 'Müsaitim') badge = '<span class="person-badge badge-green">Müsait</span>';
         else if (p.status === 'Duruşmada') badge = '<span class="person-badge badge-red">Duruşmada</span>';
         else badge = '<span class="person-badge badge-yellow">Kalemde</span>';
 
@@ -936,6 +1043,17 @@ function renderFriendRequests() {
             <button class="action-btn btn-msg" style="flex:2;" onclick="rejectNotif('${notifId}',null); closeFriendRequests(); openChat('${n.fromId}','${n.fromName}','${n.fromInitials}')">Mesaj Gönder</button>
             <button class="action-btn" style="flex:1;padding:8px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;background:transparent;border:0.5px solid var(--border2);color:var(--muted);" onclick="rejectNotif('${notifId}',this.closest('div[style]'))">Kapat</button>
           </div>`;
+      } else if (n.type === 'friend_checkin') {
+        card.innerHTML = `
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px;">
+            <div class="person-av">${n.fromInitials || '?'}</div>
+            <div><div style="font-size:13px; font-weight:500; color:var(--text);">${n.fromName}</div>
+            <div style="font-size:11px; color:var(--gold); margin-top:2px;">📍 ${n.adliye || 'Adliyeye'} giriş yaptı</div></div>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button class="action-btn btn-msg" style="flex:2;" onclick="rejectNotif('${notifId}',null); closeFriendRequests(); goPage('cafe', document.querySelectorAll('.nav-tab')[1]); renderFriendMap()">Haritada Gör</button>
+            <button class="action-btn" style="flex:1;padding:8px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;background:transparent;border:0.5px solid var(--border2);color:var(--muted);" onclick="rejectNotif('${notifId}',this.closest('div[style]'))">Kapat</button>
+          </div>`;
       }
       list.appendChild(card);
     });
@@ -964,6 +1082,126 @@ function acceptFriend(notifId, fromId, fromName, fromInitials, cardEl) {
 function rejectNotif(notifId, cardEl) {
   db.ref('notifications/' + userId + '/' + notifId).update({ read: true });
   if (cardEl) cardEl.remove();
+}
+
+// ─── ARKADAŞLARA CHECK-IN BİLDİRİMİ ───
+function notifyFriendsCheckin(adliye, myName, myInitials) {
+  db.ref('friends/' + userId).once('value', snap => {
+    const friends = snap.val();
+    if (!friends) return;
+    Object.keys(friends).forEach(friendId => {
+      db.ref('notifications/' + friendId).push({
+        type: 'friend_checkin',
+        fromId: userId,
+        fromName: myName,
+        fromInitials: myInitials || '?',
+        adliye: adliye,
+        timestamp: firebase.database.ServerValue.TIMESTAMP,
+        read: false
+      });
+    });
+  });
+}
+
+// ─── HARİTA: ARKADAŞ KONUMLARI ───
+function renderFriendMap() {
+  const cont = document.getElementById('friend-map-content');
+  cont.innerHTML = '<div class="map-empty">⏳<br><br>Yükleniyor...</div>';
+
+  db.ref('friends/' + userId).once('value', snap => {
+    const friends = snap.val();
+    if (!friends) {
+      cont.innerHTML = '<div class="map-empty">👥<br><br>Henüz arkadaşınız yok.<br>Aynı adliyedeki meslektaşlarınıza<br>arkadaşlık isteği gönderin.</div>';
+      return;
+    }
+
+    // Her adliye için arkadaş listesi oluştur
+    const byAdliye = {}; // { adliyeAdi: [{ friendId, name, initials, status, kahveUntil }] }
+
+    const friendIds = Object.keys(friends);
+    let pending = friendIds.length;
+
+    friendIds.forEach(fid => {
+      // O arkadaşın check-in yaptığı adliyeyi bul
+      ADLIYELER.forEach(a => {
+        db.ref('adliyeler/' + a + '/' + fid).once('value', snap2 => {
+          if (snap2.exists()) {
+            const p = snap2.val();
+            if (!byAdliye[a]) byAdliye[a] = [];
+            byAdliye[a].push({ id: fid, name: p.name || friends[fid].name, initials: p.initials || friends[fid].initials || '?', status: p.status || 'Müsaitim', kahveUntil: p.kahveUntil });
+          }
+          pending--;
+          if (pending <= 0) renderMapCards(byAdliye, cont, friends);
+        });
+      });
+    });
+
+    // Hiç adliye yoksa timeout ile tamamla
+    if (friendIds.length === 0) renderMapCards({}, cont, friends);
+  });
+}
+
+function renderMapCards(byAdliye, cont, friends) {
+  cont.innerHTML = '';
+  const adliyeNames = Object.keys(byAdliye);
+
+  // Check-in yapan arkadaşlar
+  if (adliyeNames.length > 0) {
+    adliyeNames.forEach(adliye => {
+      const people = byAdliye[adliye];
+      const card = document.createElement('div');
+      card.className = 'map-adliye-card has-friends';
+      card.innerHTML = `
+        <div class="map-adliye-header">
+          <div class="map-adliye-name">⚖️ ${adliye}</div>
+          <div class="map-adliye-count">${people.length} arkadaş</div>
+        </div>
+        ${people.map(p => {
+          let statusBadge = p.status === 'Kahveye Açığım'
+            ? '<span style="font-size:10px;color:var(--green);">☕ Kahveye açık</span>'
+            : p.status === 'Duruşmada'
+            ? '<span style="font-size:10px;color:var(--red);">🔴 Duruşmada</span>'
+            : p.status === 'Kalemde'
+            ? '<span style="font-size:10px;color:var(--yellow);">🟡 Kalemde</span>'
+            : '<span style="font-size:10px;color:var(--green);">🟢 Müsait</span>';
+          return `<div class="map-friend-row">
+            <div class="map-friend-av">${p.initials}</div>
+            <div class="map-friend-info">
+              <div>${p.name}</div>
+              <div class="map-friend-status">${statusBadge}</div>
+            </div>
+            <button class="action-btn btn-msg" style="flex:0;padding:6px 12px;font-size:11px;" onclick="openChat('${p.id}','${p.name}','${p.initials}')">Yaz</button>
+          </div>`;
+        }).join('')}
+      `;
+      cont.appendChild(card);
+    });
+  }
+
+  // Check-in yapmamış arkadaşlar
+  const checkedInIds = new Set(adliyeNames.flatMap(a => byAdliye[a].map(p => p.id)));
+  const offlineFriends = Object.entries(friends).filter(([fid]) => !checkedInIds.has(fid));
+  if (offlineFriends.length > 0) {
+    const offCard = document.createElement('div');
+    offCard.className = 'map-adliye-card';
+    offCard.style.opacity = '0.6';
+    offCard.innerHTML = `
+      <div class="map-adliye-header">
+        <div class="map-adliye-name" style="color:var(--muted);">📴 Adliyede Değil</div>
+        <div style="font-size:11px;color:var(--muted2);">${offlineFriends.length} kişi</div>
+      </div>
+      ${offlineFriends.map(([fid, f]) => `
+        <div class="map-friend-row">
+          <div class="map-friend-av" style="border-color:var(--muted2);color:var(--muted2);">${f.initials || '?'}</div>
+          <div class="map-friend-info" style="color:var(--muted);">${f.name}</div>
+        </div>`).join('')}
+    `;
+    cont.appendChild(offCard);
+  }
+
+  if (adliyeNames.length === 0 && offlineFriends.length === 0) {
+    cont.innerHTML = '<div class="map-empty">🗺️<br><br>Tüm arkadaşlarınız<br>şu an adliyede değil.</div>';
+  }
 }
 
 // ─── TARAYICI BİLDİRİMİ ───
@@ -1013,6 +1251,8 @@ function listenNotifications() {
           sendBrowserNotif(n.fromName, n.fromName + ' sizi arkadaş olarak eklemek istiyor.');
         } else if (n.type === 'friend_accepted') {
           sendBrowserNotif('Arkadaşlık Kabul Edildi', n.fromName + ' arkadaşlık isteğinizi kabul etti!');
+        } else if (n.type === 'friend_checkin') {
+          sendBrowserNotif(n.fromName, n.fromName + ' şu an ' + n.adliye + "'e giriş yaptı! 📍");
         }
       });
     }
@@ -1041,7 +1281,6 @@ function listenNotifications() {
   }
 })();
 
-renderCafe();
 
 // ─── STORAGE YARDIMCISI (localStorage + cookie çift güvence) ───
 function saveToStorage(key, val) {
