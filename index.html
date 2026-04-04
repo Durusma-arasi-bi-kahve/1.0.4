@@ -353,6 +353,11 @@ html {
           <div class="settings-row-left"><span class="settings-icon">🚪</span><span class="settings-label" style="color:var(--red);">Çıkış Yap</span></div>
         </div>
       </div>
+
+      <div class="section-title" style="margin-bottom:10px;margin-top:20px;">Arkadaşlar</div>
+      <div class="settings-group" id="friends-list-container">
+        <div style="padding:16px;text-align:center;color:var(--muted2);font-size:13px;">⏳ Yükleniyor...</div>
+      </div>
     </div>
   </div>
 
@@ -561,6 +566,53 @@ function goPage(page, tab) {
 function goProfile() {
   goPage('profile');
   document.querySelectorAll('.nav-tab').forEach((t,i) => { if(i===2) t.classList.add('active'); else t.classList.remove('active'); });
+  renderFriendsList();
+}
+
+function renderFriendsList() {
+  const cont = document.getElementById('friends-list-container');
+  if (!cont) return;
+  cont.innerHTML = '<div style="padding:16px;text-align:center;color:var(--muted2);font-size:13px;">⏳ Yükleniyor...</div>';
+
+  db.ref('friends/' + userId).once('value', snap => {
+    const friends = snap.val();
+    if (!friends || Object.keys(friends).length === 0) {
+      cont.innerHTML = '<div style="padding:16px;text-align:center;color:var(--muted2);font-size:13px;line-height:1.7;">👥 Henüz arkadaşınız yok.<br><span style="font-size:11px;">Aynı adliyedeki meslektaşlara istek gönderin.</span></div>';
+      return;
+    }
+    cont.innerHTML = '';
+    Object.entries(friends).forEach(([fid, f]) => {
+      // O kişinin şu an check-in durumunu kontrol et
+      let checkinPromises = ADLIYELER.map(a =>
+        db.ref('adliyeler/' + a + '/' + fid).once('value').then(s => s.exists() ? { adliye: a, data: s.val() } : null)
+      );
+      Promise.all(checkinPromises).then(results => {
+        const active = results.find(r => r !== null);
+        const statusHtml = active
+          ? '<span style="font-size:11px;color:var(--green);">📍 ' + active.adliye.replace(' Adliyesi','').replace(' (Ana Bina)','').replace(' (Kartal)','') + ' · ' + (active.data.status || 'Müsait') + '</span>'
+          : '<span style="font-size:11px;color:var(--muted2);">Adliyede değil</span>';
+
+        const row = document.createElement('div');
+        row.className = 'settings-row';
+        row.style.cursor = 'pointer';
+        row.innerHTML = `
+          <div class="settings-row-left" style="gap:12px;">
+            <div style="width:34px;height:34px;border-radius:50%;background:var(--card);border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--gold);flex-shrink:0;">${f.initials || '?'}</div>
+            <div>
+              <div style="font-size:13px;color:var(--text);font-weight:500;">${f.name || 'Avukat'}</div>
+              <div style="margin-top:2px;">${statusHtml}</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            ${active ? `<button class="action-btn btn-msg" style="padding:6px 12px;font-size:11px;flex:0;" onclick="event.stopPropagation();openChat('${fid}','${(f.name||'').replace(/'/g,'')}','${f.initials||'?'}')">Yaz</button>` : ''}
+            <span style="color:var(--muted2);font-size:16px;">›</span>
+          </div>
+        `;
+        row.onclick = () => openChat(fid, f.name || 'Avukat', f.initials || '?');
+        cont.appendChild(row);
+      });
+    });
+  });
 }
 
 // ─── BÜYÜK BUTON ───
