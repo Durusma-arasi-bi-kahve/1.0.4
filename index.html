@@ -291,6 +291,7 @@ html {
           <div class="mood-chip selected" onclick="setMood(this,'Müsaitim')"><span class="mood-icon">🟢</span>Müsaitim</div>
           <div class="mood-chip" onclick="setMood(this,'Duruşmada')"><span class="mood-icon">🔴</span>Duruşmada</div>
           <div class="mood-chip" onclick="setMood(this,'Kalemde')"><span class="mood-icon">🟡</span>Kalemde</div>
+          <div class="mood-chip" id="kahve-chip" onclick="setMood(this,'Kahveye Açığım')"><span class="mood-icon">☕</span>Kahveye Açığım<div class="kahve-timer" id="kahve-timer" style="display:none;"></div></div>
         </div>
       </div>
       <div class="nearby-section" id="nearby-section" style="display:none;">
@@ -352,11 +353,6 @@ html {
           <div class="settings-row-left"><span class="settings-icon">🚪</span><span class="settings-label" style="color:var(--red);">Çıkış Yap</span></div>
         </div>
       </div>
-
-      <div class="section-title" style="margin-bottom:10px;margin-top:22px;">Arkadaşlar</div>
-      <div class="settings-group" id="friends-list-container">
-        <div style="padding:16px;text-align:center;color:var(--muted2);font-size:13px;">⏳ Yükleniyor...</div>
-      </div>
     </div>
   </div>
 
@@ -394,30 +390,6 @@ html {
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
 <script>
-// ─── STORAGE YARDIMCISI (localStorage + cookie çift güvence) ───
-function saveToStorage(key, val) {
-  try { localStorage.setItem(key, val); } catch(e) {}
-  try {
-    const d = new Date(); d.setFullYear(d.getFullYear() + 1);
-    document.cookie = key + '=' + encodeURIComponent(val) + '; expires=' + d.toUTCString() + '; path=/; SameSite=Lax';
-  } catch(e) {}
-}
-function getFromStorage(key) {
-  try {
-    const ls = localStorage.getItem(key);
-    if (ls !== null) return ls;
-  } catch(e) {}
-  try {
-    const match = document.cookie.match('(?:^|; )' + key + '=([^;]*)');
-    if (match) return decodeURIComponent(match[1]);
-  } catch(e) {}
-  return null;
-}
-function removeFromStorage(key) {
-  try { localStorage.removeItem(key); } catch(e) {}
-  try { document.cookie = key + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax'; } catch(e) {}
-}
-
 // ─── FIREBASE YAPILANDIRMA ───
 const firebaseConfig = {
   apiKey: "AIzaSyCmoN0WvhAOz3xGMPvpwstT8XsSuwwC-QQ",
@@ -589,69 +561,6 @@ function goPage(page, tab) {
 function goProfile() {
   goPage('profile');
   document.querySelectorAll('.nav-tab').forEach((t,i) => { if(i===2) t.classList.add('active'); else t.classList.remove('active'); });
-  renderFriendsList();
-}
-
-function renderFriendsList() {
-  const cont = document.getElementById('friends-list-container');
-  if (!cont) return;
-  cont.innerHTML = '<div style="padding:16px;text-align:center;color:var(--muted2);font-size:13px;">⏳ Yükleniyor...</div>';
-
-  db.ref('friends/' + userId).once('value', snap => {
-    const friends = snap.val();
-    if (!friends || Object.keys(friends).length === 0) {
-      cont.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted2);font-size:13px;line-height:1.8;">👥 Henüz arkadaşınız yok.<br><span style="font-size:11px;">Aynı adliyedeki meslektaşlara<br>arkadaşlık isteği gönderin.</span></div>';
-      return;
-    }
-
-    cont.innerHTML = '';
-    const entries = Object.entries(friends);
-    let done = 0;
-    const rows = [];
-
-    entries.forEach(([fid, f], idx) => {
-      rows[idx] = null;
-      // Her adliyede bu kişiyi ara
-      const checks = ADLIYELER.map(a =>
-        db.ref('adliyeler/' + a + '/' + fid).once('value').then(s => s.exists() ? { adliye: a, data: s.val() } : null)
-      );
-      Promise.all(checks).then(results => {
-        const active = results.find(r => r !== null);
-        const shortAdliye = active ? active.adliye.replace(' Adliyesi','').replace(' (Ana Bina)','').replace(' (Kartal)','') : null;
-        const status = active ? (active.data.status || 'Müsait') : null;
-
-        const statusHtml = active
-          ? '<span style="font-size:11px;color:var(--green);">📍 ' + shortAdliye + ' · ' + status + '</span>'
-          : '<span style="font-size:11px;color:var(--muted2);">Adliyede değil</span>';
-
-        const row = document.createElement('div');
-        row.className = 'settings-row';
-        row.style.cursor = 'pointer';
-        const safeName = (f.name || 'Avukat').replace(/'/g, '');
-        const safeInitials = (f.initials || '?').replace(/'/g, '');
-        row.innerHTML =
-          '<div class="settings-row-left" style="gap:12px;">' +
-            '<div style="width:36px;height:36px;border-radius:50%;background:var(--card);border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--gold);flex-shrink:0;">' + safeInitials + '</div>' +
-            '<div>' +
-              '<div style="font-size:13px;color:var(--text);font-weight:500;">' + safeName + '</div>' +
-              '<div style="margin-top:2px;">' + statusHtml + '</div>' +
-            '</div>' +
-          '</div>' +
-          '<div style="display:flex;gap:8px;align-items:center;">' +
-            (active ? '<button class="action-btn btn-msg" style="padding:6px 12px;font-size:11px;flex:0;border-radius:8px;" onclick="event.stopPropagation();openChat('' + fid + '','' + safeName + '','' + safeInitials + '')">Yaz</button>' : '') +
-            '<span style="color:var(--muted2);font-size:18px;">›</span>' +
-          '</div>';
-
-        row.onclick = function() { openChat(fid, safeName, safeInitials); };
-        rows[idx] = row;
-        done++;
-        if (done === entries.length) {
-          cont.innerHTML = '';
-          rows.forEach(r => { if (r) cont.appendChild(r); });
-        }
-      });
-    });
-  });
 }
 
 // ─── BÜYÜK BUTON ───
@@ -1372,6 +1281,30 @@ function listenNotifications() {
   }
 })();
 
+
+// ─── STORAGE YARDIMCISI (localStorage + cookie çift güvence) ───
+function saveToStorage(key, val) {
+  try { localStorage.setItem(key, val); } catch(e) {}
+  try {
+    const d = new Date(); d.setFullYear(d.getFullYear() + 1);
+    document.cookie = key + '=' + encodeURIComponent(val) + '; expires=' + d.toUTCString() + '; path=/; SameSite=Lax';
+  } catch(e) {}
+}
+function getFromStorage(key) {
+  try {
+    const ls = localStorage.getItem(key);
+    if (ls !== null) return ls;
+  } catch(e) {}
+  try {
+    const match = document.cookie.match('(?:^|; )' + key + '=([^;]*)');
+    if (match) return decodeURIComponent(match[1]);
+  } catch(e) {}
+  return null;
+}
+function removeFromStorage(key) {
+  try { localStorage.removeItem(key); } catch(e) {}
+  try { document.cookie = key + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax'; } catch(e) {}
+}
 
 // ─── SAYFA YÜKLENİNCE: OTOMATİK GİRİŞ & FORM DOLDUR ───
 (function() {
