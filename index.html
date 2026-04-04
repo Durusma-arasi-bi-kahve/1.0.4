@@ -198,6 +198,17 @@ html {
 .toggle::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:white;top:3px;left:3px;transition:transform .2s}
 .toggle.on{background:var(--gold)} .toggle.on::after{transform:translateX(18px)}
 
+/* PROFİL: ARKADAŞLAR */
+.profile-friend-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:0.5px solid var(--border);cursor:pointer;transition:background .15s;}
+.profile-friend-row:last-child{border-bottom:none;}
+.profile-friend-row:hover{background:rgba(200,137,42,.04);}
+.profile-friend-av{width:36px;height:36px;border-radius:50%;background:var(--card);border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--gold-light);flex-shrink:0;}
+.profile-friend-info{flex:1;}
+.profile-friend-name{font-size:13px;color:var(--text);font-weight:500;}
+.profile-friend-status{font-size:11px;color:var(--muted);margin-top:2px;}
+.profile-friend-yaz{padding:6px 14px;border-radius:8px;font-size:11px;font-weight:500;background:var(--gold);border:none;color:var(--bg);cursor:pointer;white-space:nowrap;transition:opacity .2s;}
+.profile-friend-yaz:hover{opacity:.85;}
+
 /* MODAL */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;align-items:center;justify-content:center;padding:20px}
 .modal-overlay.open{display:flex}
@@ -291,7 +302,6 @@ html {
           <div class="mood-chip selected" onclick="setMood(this,'Müsaitim')"><span class="mood-icon">🟢</span>Müsaitim</div>
           <div class="mood-chip" onclick="setMood(this,'Duruşmada')"><span class="mood-icon">🔴</span>Duruşmada</div>
           <div class="mood-chip" onclick="setMood(this,'Kalemde')"><span class="mood-icon">🟡</span>Kalemde</div>
-          <div class="mood-chip" id="kahve-chip" onclick="setMood(this,'Kahveye Açığım')"><span class="mood-icon">☕</span>Kahveye Açığım<div class="kahve-timer" id="kahve-timer" style="display:none;"></div></div>
         </div>
       </div>
       <div class="nearby-section" id="nearby-section" style="display:none;">
@@ -351,6 +361,12 @@ html {
         </div>
         <div class="settings-row" onclick="doLogout()">
           <div class="settings-row-left"><span class="settings-icon">🚪</span><span class="settings-label" style="color:var(--red);">Çıkış Yap</span></div>
+        </div>
+      </div>
+      <div class="section-title" style="margin-bottom:10px;">Arkadaşlar</div>
+      <div class="settings-group" id="profile-friends-group">
+        <div class="settings-row" style="cursor:default;">
+          <div style="color:var(--muted2);font-size:12px;padding:4px 0;">⏳ Yükleniyor...</div>
         </div>
       </div>
     </div>
@@ -561,6 +577,77 @@ function goPage(page, tab) {
 function goProfile() {
   goPage('profile');
   document.querySelectorAll('.nav-tab').forEach((t,i) => { if(i===2) t.classList.add('active'); else t.classList.remove('active'); });
+  renderProfileFriends();
+}
+
+// ─── PROFİL: ARKADAŞLAR BÖLÜMÜ ───
+function renderProfileFriends() {
+  const group = document.getElementById('profile-friends-group');
+  if (!group) return;
+  group.innerHTML = '<div style="padding:14px 16px;color:var(--muted2);font-size:12px;">⏳ Yükleniyor...</div>';
+
+  db.ref('friends/' + userId).once('value', snap => {
+    const friends = snap.val();
+    if (!friends || Object.keys(friends).length === 0) {
+      group.innerHTML = '<div style="padding:14px 16px;color:var(--muted2);font-size:12px;text-align:center;">Henüz arkadaşınız yok.<br>Aynı adliyedeki meslektaşlarınıza istek gönderin.</div>';
+      return;
+    }
+
+    const friendEntries = Object.entries(friends);
+    let pending = friendEntries.length;
+    // { friendId: { name, initials, adliye?, status? } }
+    const result = {};
+
+    friendEntries.forEach(([fid, fdata]) => {
+      result[fid] = { name: fdata.name, initials: fdata.initials || '?', adliye: null, status: null };
+      let found = false;
+      let adliyeChecked = 0;
+      ADLIYELER.forEach(a => {
+        db.ref('adliyeler/' + a + '/' + fid).once('value', snap2 => {
+          adliyeChecked++;
+          if (snap2.exists() && !found) {
+            found = true;
+            const p = snap2.val();
+            result[fid].adliye = a;
+            result[fid].status = p.status || 'Müsaitim';
+          }
+          if (adliyeChecked === ADLIYELER.length) {
+            pending--;
+            if (pending <= 0) _buildProfileFriendsList(result, group);
+          }
+        });
+      });
+    });
+  });
+}
+
+function _buildProfileFriendsList(result, group) {
+  group.innerHTML = '';
+  Object.entries(result).forEach(([fid, f]) => {
+    const row = document.createElement('div');
+    row.className = 'profile-friend-row';
+
+    const isHere = !!f.adliye;
+    // Short adliye name — strip "Adliyesi" for brevity
+    const shortAdliye = f.adliye ? f.adliye.replace(' Adliyesi','').replace('İstanbul Anadolu Adliyesi (Kartal)','Kartal') : '';
+    const statusText = isHere
+      ? `📍 ${shortAdliye} · ${f.status}`
+      : 'Adliyede değil';
+    const statusColor = isHere ? 'var(--green)' : 'var(--muted2)';
+
+    row.innerHTML = `
+      <div class="profile-friend-av">${f.initials}</div>
+      <div class="profile-friend-info">
+        <div class="profile-friend-name">${f.name}</div>
+        <div class="profile-friend-status" style="color:${statusColor};">${statusText}</div>
+      </div>
+      ${isHere ? `<button class="profile-friend-yaz" onclick="event.stopPropagation();openChat('${fid}','${f.name}','${f.initials}')">Yaz</button>` : ''}
+    `;
+    if (isHere) {
+      row.onclick = () => openChat(fid, f.name, f.initials);
+    }
+    group.appendChild(row);
+  });
 }
 
 // ─── BÜYÜK BUTON ───
