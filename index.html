@@ -394,6 +394,30 @@ html {
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
 <script>
+// ─── STORAGE YARDIMCISI (localStorage + cookie çift güvence) ───
+function saveToStorage(key, val) {
+  try { localStorage.setItem(key, val); } catch(e) {}
+  try {
+    const d = new Date(); d.setFullYear(d.getFullYear() + 1);
+    document.cookie = key + '=' + encodeURIComponent(val) + '; expires=' + d.toUTCString() + '; path=/; SameSite=Lax';
+  } catch(e) {}
+}
+function getFromStorage(key) {
+  try {
+    const ls = localStorage.getItem(key);
+    if (ls !== null) return ls;
+  } catch(e) {}
+  try {
+    const match = document.cookie.match('(?:^|; )' + key + '=([^;]*)');
+    if (match) return decodeURIComponent(match[1]);
+  } catch(e) {}
+  return null;
+}
+function removeFromStorage(key) {
+  try { localStorage.removeItem(key); } catch(e) {}
+  try { document.cookie = key + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax'; } catch(e) {}
+}
+
 // ─── FIREBASE YAPILANDIRMA ───
 const firebaseConfig = {
   apiKey: "AIzaSyCmoN0WvhAOz3xGMPvpwstT8XsSuwwC-QQ",
@@ -1348,30 +1372,6 @@ function listenNotifications() {
   }
 })();
 
-
-// ─── STORAGE YARDIMCISI (localStorage + cookie çift güvence) ───
-function saveToStorage(key, val) {
-  try { localStorage.setItem(key, val); } catch(e) {}
-  try {
-    const d = new Date(); d.setFullYear(d.getFullYear() + 1);
-    document.cookie = key + '=' + encodeURIComponent(val) + '; expires=' + d.toUTCString() + '; path=/; SameSite=Lax';
-  } catch(e) {}
-}
-function getFromStorage(key) {
-  try {
-    const ls = localStorage.getItem(key);
-    if (ls !== null) return ls;
-  } catch(e) {}
-  try {
-    const match = document.cookie.match('(?:^|; )' + key + '=([^;]*)');
-    if (match) return decodeURIComponent(match[1]);
-  } catch(e) {}
-  return null;
-}
-function removeFromStorage(key) {
-  try { localStorage.removeItem(key); } catch(e) {}
-  try { document.cookie = key + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax'; } catch(e) {}
-}
 
 // ─── SAYFA YÜKLENİNCE: OTOMATİK GİRİŞ & FORM DOLDUR ───
 (function() {
