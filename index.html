@@ -3,62 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Duruşma Arası">
-<meta name="theme-color" content="#0F0A04">
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%230F0A04'/%3E%3Ctext x='90' y='115' font-size='80' text-anchor='middle'%3E%E2%98%95%3C/text%3E%3C/svg%3E">
 <title>Duruşma Arası</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #0F0A04;
-  --bg2: #1A1208;
-  --bg3: #231808;
-  --card: #2A1E0A;
-  --border: #3D2B0E;
-  --border2: #5A3F18;
-  --gold: #C8892A;
-  --gold-light: #E8C97A;
-  --gold-pale: #F5E4B0;
-  --text: #F0DFB8;
-  --muted: #9A7A50;
-  --muted2: #6A5030;
-  --green: #5AAF5A;
-  --red: #C05050;
-  --yellow: #D4A030;
-  --blue: #4A90C8;
+  --bg: #0F0A04; --bg2: #1A1208; --bg3: #231808; --card: #2A1E0A; --border: #3D2B0E; --border2: #5A3F18;
+  --gold: #C8892A; --gold-light: #E8C97A; --gold-pale: #F5E4B0; --text: #F0DFB8; --muted: #9A7A50; --muted2: #6A5030;
+  --green: #5AAF5A; --red: #C05050; --yellow: #D4A030; --blue: #4A90C8;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html { height: -webkit-fill-available; }
+html { height: -webkit-fill-available; overscroll-behavior: none; overscroll-behavior-y: contain; }
 body {
-  font-family: 'DM Sans', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  min-height: -webkit-fill-available;
-  overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
-  overscroll-behavior: none;
-  overscroll-behavior-y: contain;
-  touch-action: pan-x pan-y;
-}
-html {
-  overscroll-behavior: none;
-  overscroll-behavior-y: contain;
+  font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text);
+  min-height: 100vh; min-height: -webkit-fill-available; overflow-x: hidden;
+  -webkit-font-smoothing: antialiased; overscroll-behavior: none; overscroll-behavior-y: contain; touch-action: pan-x pan-y;
 }
 .serif { font-family: 'Playfair Display', serif; }
 .screen { display: none; min-height: 100vh; min-height: -webkit-fill-available; }
 .screen.active { display: flex; flex-direction: column; }
 
-/* LANDING */
-#s-landing {
-  align-items: center; justify-content: center;
-  position: relative; overflow: hidden;
-  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-}
+/* LANDING VE FORMLAR */
+#s-landing { align-items: center; justify-content: center; position: relative; overflow: hidden; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
 .landing-bg { position: absolute; inset: 0; background: radial-gradient(ellipse 60% 50% at 50% 40%, #3D2B0E 0%, transparent 70%); pointer-events: none; }
 .landing-rings { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; }
 .ring { position: absolute; border-radius: 50%; border: 1px solid var(--border); opacity: 0.3; animation: pulse-ring 4s ease-in-out infinite; }
@@ -70,6 +36,7 @@ html {
 @keyframes fade-up { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
 .app-logo { font-family:'Playfair Display',serif; font-size:42px; font-weight:500; color:var(--gold); letter-spacing:-0.5px; margin-bottom:8px; }
 .app-tagline { font-size:14px; color:var(--muted); margin-bottom:48px; letter-spacing:.05em; }
+
 .login-box { background:var(--bg2); border:0.5px solid var(--border); border-radius:20px; padding:32px; width:340px; text-align:left; }
 .login-box h2 { font-family:'Playfair Display',serif; font-size:20px; font-weight:500; color:var(--gold-light); margin-bottom:6px; }
 .login-box p { font-size:13px; color:var(--muted); margin-bottom:24px; line-height:1.6; }
@@ -81,157 +48,44 @@ html {
 .btn-primary:hover{opacity:.9} .btn-primary:active{transform:scale(.98);opacity:.85}
 .login-note { font-size:11px; color:var(--muted2); text-align:center; margin-top:14px; line-height:1.5; }
 
-/* APP SHELL */
+/* DİĞER ARAYÜZ STİLLERİ (Sayfanın sorunsuz çalışması için tutuldu) */
 #s-app { flex-direction:column; max-width:480px; margin:0 auto; width:100%; }
-.app-header { display:flex; align-items:center; justify-content:space-between; padding:16px 20px 12px; padding-top:calc(16px + env(safe-area-inset-top)); border-bottom:0.5px solid var(--border); background:var(--bg); position:sticky; top:0; z-index:100; }
+.app-header { display:flex; align-items:center; justify-content:space-between; padding:16px 20px 12px; border-bottom:0.5px solid var(--border); background:var(--bg); position:sticky; top:0; z-index:100; }
 .header-logo { font-family:'Playfair Display',serif; font-size:18px; color:var(--gold); }
 .header-greeting { font-size:11px; color:var(--muted); margin-top:1px; }
 .header-right { display:flex; gap:10px; align-items:center; }
-.icon-btn { width:34px; height:34px; border-radius:50%; background:var(--bg3); border:0.5px solid var(--border); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:14px; transition:border-color .2s; color:var(--muted); }
-.icon-btn:hover{border-color:var(--gold);color:var(--gold)}
-.avatar-sm { width:34px; height:34px; border-radius:50%; background:var(--card); border:1.5px solid var(--gold); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:500; color:var(--gold-light); cursor:pointer; }
-.bottom-nav { display:flex; border-top:0.5px solid var(--border); background:var(--bg); position:sticky; bottom:0; padding-bottom:env(safe-area-inset-bottom); }
-.nav-tab { flex:1; padding:10px 4px 12px; text-align:center; cursor:pointer; transition:color .2s; border:none; background:none; color:var(--muted2); touch-action:manipulation; }
+.icon-btn { width:34px; height:34px; border-radius:50%; background:var(--bg3); border:0.5px solid var(--border); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:14px; color:var(--muted); }
+.avatar-sm { width:34px; height:34px; border-radius:50%; background:var(--card); border:1.5px solid var(--gold); display:flex; align-items:center; justify-content:center; font-size:11px; color:var(--gold-light); cursor:pointer; }
+.bottom-nav { display:flex; border-top:0.5px solid var(--border); background:var(--bg); position:sticky; bottom:0; }
+.nav-tab { flex:1; padding:10px 4px 12px; text-align:center; cursor:pointer; color:var(--muted2); background:none; border:none; }
 .nav-tab.active{color:var(--gold)}
-.nav-icon{font-size:18px;display:block;margin-bottom:2px} .nav-label{font-size:10px;letter-spacing:.03em}
-.page{display:none;flex:1;flex-direction:column;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.page{display:none;flex:1;flex-direction:column;overflow-y:auto;}
 .page.active{display:flex}
 
-/* HOME */
 .home-content{flex:1;display:flex;flex-direction:column;align-items:center;padding:24px 20px 20px}
 .checkin-status{width:100%;background:var(--bg3);border:0.5px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:28px;display:flex;align-items:center;gap:12px}
-.status-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-.status-dot.off{background:var(--muted2)} .status-dot.on{background:var(--green);box-shadow:0 0 8px var(--green);animation:blink 2s infinite}
+.status-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0} .status-dot.off{background:var(--muted2)} .status-dot.on{background:var(--green);box-shadow:0 0 8px var(--green);animation:blink 2s infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
-.status-text{font-size:13px;color:var(--muted);flex:1} .status-text strong{color:var(--gold-light)}
-.status-exit{font-size:11px;color:var(--red);cursor:pointer;padding:4px 8px;border:0.5px solid var(--red);border-radius:6px;white-space:nowrap}
-.status-exit:hover{background:rgba(192,80,80,.1)}
+.status-text{font-size:13px;color:var(--muted);flex:1}
+.status-exit{font-size:11px;color:var(--red);cursor:pointer;padding:4px 8px;border:0.5px solid var(--red);border-radius:6px;}
 .big-btn-wrap{position:relative;margin:10px 0 32px}
 .big-btn-ring{position:absolute;border-radius:50%;border:1px solid var(--gold);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;opacity:0;animation:none}
 .big-btn-ring.r1{width:200px;height:200px} .big-btn-ring.r2{width:240px;height:240px;animation-delay:.3s}
-.big-btn{width:170px;height:170px;border-radius:50%;background:var(--gold);border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;transition:transform .15s,opacity .2s;position:relative;z-index:2;touch-action:manipulation;-webkit-appearance:none}
-.big-btn:hover{transform:scale(1.03)} .big-btn:active{transform:scale(.96)}
+.big-btn{width:170px;height:170px;border-radius:50%;background:var(--gold);border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;position:relative;z-index:2;}
 .big-btn.checked-in{background:var(--bg3);border:2px solid var(--green)}
-.big-btn-icon{font-size:32px}
-.big-btn-text{font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;color:var(--bg);text-align:center;line-height:1.4;max-width:110px}
+.big-btn-icon{font-size:32px} .big-btn-text{font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;color:var(--bg);text-align:center;line-height:1.4;}
 .big-btn.checked-in .big-btn-text{color:var(--green)}
-.big-btn-detecting{font-size:11px;color:var(--muted);text-align:center;margin-top:-16px;margin-bottom:16px;min-height:18px}
-.mood-section{width:100%;margin-bottom:24px}
-.section-title{font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px}
-.mood-row{display:flex;gap:8px}
-.mood-chip{flex:1;padding:9px 8px;border-radius:10px;border:0.5px solid var(--border);background:var(--bg3);font-family:'DM Sans',sans-serif;font-size:12px;color:var(--muted);cursor:pointer;text-align:center;transition:all .2s}
-.mood-chip:hover{border-color:var(--border2);color:var(--text)}
-.mood-chip.selected{border-color:var(--gold);color:var(--gold-light);background:rgba(200,137,42,.08)}
-.mood-icon{font-size:16px;display:block;margin-bottom:3px}
+.mood-section{width:100%;margin-bottom:24px} .section-title{font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px}
+.mood-row{display:flex;gap:8px} .mood-chip{flex:1;padding:9px 8px;border-radius:10px;border:0.5px solid var(--border);background:var(--bg3);font-size:12px;color:var(--muted);cursor:pointer;text-align:center;}
+.mood-chip.selected{border-color:var(--gold);color:var(--gold-light);background:rgba(200,137,42,.08)} .mood-icon{font-size:16px;display:block;margin-bottom:3px}
 .nearby-section{width:100%} .nearby-list{display:flex;flex-direction:column;gap:8px}
-.nearby-person{display:flex;align-items:center;gap:12px;padding:11px 14px;background:var(--bg3);border:0.5px solid var(--border);border-radius:12px;transition:border-color .2s}
-.nearby-person:hover{border-color:var(--border2)}
-.person-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0;background:var(--card);color:var(--gold);border:1px solid var(--gold)}
-.person-info{flex:1} .person-name{font-size:13px;color:var(--text);font-weight:500} .person-role{font-size:11px;color:var(--muted);margin-top:1px}
-.person-badge{font-size:10px;padding:3px 8px;border-radius:20px}
-.badge-green{background:rgba(90,175,90,.12);color:var(--green);border:0.5px solid rgba(90,175,90,.3)}
-.badge-red{background:rgba(192,80,80,.12);color:var(--red);border:0.5px solid rgba(192,80,80,.3)}
-.badge-yellow{background:rgba(212,160,48,.12);color:var(--yellow);border:0.5px solid rgba(212,160,48,.3)}
 .empty-state{text-align:center;padding:32px 20px;color:var(--muted2);font-size:13px;line-height:1.7}
-.empty-icon{font-size:32px;display:block;margin-bottom:10px;opacity:.5}
-
-/* KAFETERYA */
-.page-content{padding:20px;flex:1}
-.court-selector{display:flex;align-items:center;gap:10px;margin-bottom:20px}
-.court-selector select{flex:1;background:var(--bg3);border:0.5px solid var(--border);border-radius:10px;padding:10px 14px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);outline:none;cursor:pointer;-webkit-appearance:none}
-.cafe-card{background:var(--bg3);border:0.5px solid var(--border);border-radius:16px;padding:18px;margin-bottom:14px;transition:border-color .2s}
-.cafe-card:hover{border-color:var(--border2)}
-.cafe-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
-.cafe-name{font-family:'Playfair Display',serif;font-size:16px;color:var(--gold-light)}
-.cafe-rating{display:flex;gap:2px} .star{font-size:14px;color:var(--gold)} .star.empty{color:var(--muted2)}
-.cafe-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
-.ctag{font-size:11px;padding:3px 9px;border-radius:20px;cursor:pointer;transition:all .15s}
-.ctag-good{background:rgba(90,175,90,.1);color:var(--green);border:0.5px solid rgba(90,175,90,.25)}
-.ctag-bad{background:rgba(192,80,80,.1);color:var(--red);border:0.5px solid rgba(192,80,80,.25)}
-.ctag-mid{background:rgba(212,160,48,.1);color:var(--yellow);border:0.5px solid rgba(212,160,48,.25)}
-.ctag:hover{opacity:.75}
-.cafe-review{font-size:12px;color:var(--muted);font-style:italic;line-height:1.6;border-top:0.5px solid var(--border);padding-top:10px}
-.cafe-review span{color:var(--muted2)}
-.cafe-here{display:flex;align-items:center;gap:8px;margin-top:10px}
-.here-label{font-size:11px;color:var(--muted2)}
-.add-rating-btn{width:100%;padding:12px;background:transparent;border:0.5px dashed var(--border2);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted);cursor:pointer;transition:all .2s}
-.add-rating-btn:hover{border-color:var(--gold);color:var(--gold);background:rgba(200,137,42,.04)}
-
-/* KAHVEYE AÇIĞIM */
-.mood-chip.kahve-active{border-color:var(--green)!important;color:#fff!important;background:rgba(90,175,90,.15)!important;position:relative;}
-.kahve-timer{font-size:10px;color:var(--green);text-align:center;margin-top:4px;font-weight:600;letter-spacing:.04em;}
-
-/* YEŞİL AURA (profil avatarı etrafında) */
-.avatar-sm.kahve-aura{border-color:var(--green)!important;box-shadow:0 0 0 3px rgba(90,175,90,.35),0 0 14px rgba(90,175,90,.5);animation:aura-pulse 2s ease-in-out infinite;}
-@keyframes aura-pulse{0%,100%{box-shadow:0 0 0 3px rgba(90,175,90,.35),0 0 14px rgba(90,175,90,.5);}50%{box-shadow:0 0 0 6px rgba(90,175,90,.2),0 0 24px rgba(90,175,90,.7);}}
-
-/* NEARBY: kahveye açık rozeti */
-.badge-coffee{background:rgba(90,175,90,.12);color:var(--green);border:0.5px solid rgba(90,175,90,.4);animation:aura-pulse 2s infinite;}
-
-/* HARİTA SAYFASI */
-.map-page{flex:1;display:flex;flex-direction:column;overflow-y:auto;padding:16px 20px 20px;}
-.map-adliye-card{background:var(--bg3);border:0.5px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:border-color .2s;}
-.map-adliye-card:hover{border-color:var(--border2);}
-.map-adliye-card.has-friends{border-color:rgba(90,175,90,.4);background:rgba(90,175,90,.04);}
-.map-adliye-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
-.map-adliye-name{font-family:'Playfair Display',serif;font-size:15px;color:var(--gold-light);}
-.map-adliye-count{font-size:11px;padding:3px 9px;border-radius:20px;background:rgba(90,175,90,.12);color:var(--green);border:0.5px solid rgba(90,175,90,.3);}
-.map-friend-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:0.5px solid var(--border);}
-.map-friend-av{width:30px;height:30px;border-radius:50%;background:var(--card);border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--gold);flex-shrink:0;}
-.map-friend-info{flex:1;font-size:12px;color:var(--text);}
-.map-friend-status{font-size:10px;color:var(--muted);margin-top:1px;}
-.map-empty{text-align:center;padding:40px 20px;color:var(--muted2);font-size:13px;line-height:1.8;}
-
-/* PROFİL */
 .profile-header{display:flex;flex-direction:column;align-items:center;padding:28px 20px 20px;border-bottom:0.5px solid var(--border)}
-.profile-avatar{width:72px;height:72px;border-radius:50%;background:var(--card);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:26px;color:var(--gold-light);margin-bottom:12px}
+.profile-avatar{width:72px;height:72px;border-radius:50%;background:var(--card);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:26px;color:var(--gold-light);margin-bottom:12px}
 .profile-name{font-family:'Playfair Display',serif;font-size:20px;color:var(--gold-light)}
 .profile-baro{font-size:12px;color:var(--muted);margin-top:4px}
-.verified-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--green);background:rgba(90,175,90,.08);border:0.5px solid rgba(90,175,90,.2);border-radius:20px;padding:3px 9px;margin-top:8px}
-.settings-section{padding:16px 20px}
-.settings-group{background:var(--bg3);border:0.5px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:14px}
-.settings-row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:0.5px solid var(--border);cursor:pointer;transition:background .15s}
-.settings-row:last-child{border-bottom:none} .settings-row:hover{background:rgba(200,137,42,.04)}
-.settings-row-left{display:flex;align-items:center;gap:12px}
-.settings-icon{font-size:16px;width:20px;text-align:center} .settings-label{font-size:13px;color:var(--text)} .settings-value{font-size:12px;color:var(--muted)}
-.toggle{width:40px;height:22px;border-radius:11px;background:var(--muted2);position:relative;cursor:pointer;transition:background .2s;border:none;flex-shrink:0}
-.toggle::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:white;top:3px;left:3px;transition:transform .2s}
-.toggle.on{background:var(--gold)} .toggle.on::after{transform:translateX(18px)}
-
-/* MODAL */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;align-items:center;justify-content:center;padding:20px}
-.modal-overlay.open{display:flex}
-.modal{background:var(--bg2);border:0.5px solid var(--border2);border-radius:20px;padding:28px;width:100%;max-width:360px;animation:modal-in .25s ease}
-@keyframes modal-in{from{opacity:0;transform:scale(.95) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
-.modal-title{font-family:'Playfair Display',serif;font-size:20px;color:var(--gold-light);margin-bottom:8px}
-.modal-sub{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6}
-.adliye-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px}
-.adliye-btn{padding:12px 10px;background:var(--bg3);border:0.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--text);cursor:pointer;text-align:center;transition:all .15s}
-.adliye-btn:hover{border-color:var(--gold);color:var(--gold-light)}
-.adliye-btn.selected{border-color:var(--gold);background:rgba(200,137,42,.1);color:var(--gold-light)}
-.modal-btn-row{display:flex;gap:10px}
-.btn-secondary{flex:1;padding:12px;background:transparent;border:0.5px solid var(--border2);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted);cursor:pointer;transition:all .2s}
-.btn-secondary:hover{border-color:var(--text);color:var(--text)}
-.btn-confirm{flex:2;padding:12px;background:var(--gold);border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--bg);cursor:pointer;transition:opacity .2s}
-.btn-confirm:hover{opacity:.88}
-
-/* TOAST */
-.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--bg2);border:0.5px solid var(--gold);border-radius:12px;padding:12px 18px;font-size:13px;color:var(--gold-light);z-index:999;transition:transform .35s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;max-width:90vw}
-.toast.show{transform:translateX(-50%) translateY(0)}
-
-/* iOS BANNER */
-.ios-banner{display:none;position:fixed;bottom:calc(16px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:var(--bg2);border:0.5px solid var(--border2);border-radius:16px;padding:14px 18px;z-index:900;width:calc(100% - 32px);max-width:420px}
-.ios-banner.visible{display:flex;align-items:center;gap:12px}
-.ios-banner-icon{font-size:28px;flex-shrink:0}
-.ios-banner-text{flex:1}
-.ios-banner-title{font-size:13px;font-weight:500;color:var(--gold-light);margin-bottom:2px}
-.ios-banner-desc{font-size:11px;color:var(--muted);line-height:1.5}
-.ios-banner-close{font-size:18px;color:var(--muted2);cursor:pointer;padding:4px;flex-shrink:0}
-
-@media(min-width:600px){
-  #s-app{max-width:480px;margin:0 auto;border-left:0.5px solid var(--border);border-right:0.5px solid var(--border);min-height:100vh}
-  body{background:#070503}
-}
+.settings-section{padding:16px 20px} .settings-group{background:var(--bg3);border:0.5px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:14px}
+.settings-row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:0.5px solid var(--border);cursor:pointer;}
 </style>
 </head>
 <body>
@@ -242,17 +96,35 @@ html {
   <div class="landing-content">
     <div class="app-logo serif">Duruşma Arası</div>
     <div class="app-tagline">Adliyedeyken meslektaşınla buluş</div>
+    
     <div class="login-box">
-      <h2>Giriş Yap</h2>
-      <p>Sadece baro üyeleri katılabilir. Baro kartınızla kimliğinizi doğrulayın.</p>
-      <div class="field-label">Ad Soyad</div>
-      <input class="field-input" type="text" id="inp-name" placeholder="Avukat Adı ve Soyadı" value="">
-      <div class="field-label">Baro Sicil No</div>
-      <input class="field-input" type="text" id="inp-sicil" placeholder="" value="">
-      <div class="field-label">Telefon</div>
-      <input class="field-input" type="tel" id="inp-tel" placeholder="05** *** ** **" value="">
-      <button class="btn-primary" onclick="doLogin()">Giriş Yap →</button>
-      <div class="login-note">Baro kartı doğrulaması için hesabınız 24 saat içinde onaylanır.</div>
+      <div id="login-form">
+        <h2>Giriş Yap</h2>
+        <p>Sadece baro üyeleri katılabilir. Baro kartınızla kimliğinizi doğrulayın.</p>
+        <div class="field-label">Baro Sicil No</div>
+        <input class="field-input" type="text" id="inp-sicil" placeholder="Örn: 34/82741">
+        <div class="field-label">Telefon</div>
+        <input class="field-input" type="tel" id="inp-tel" placeholder="05** *** ** **">
+        <button class="btn-primary" onclick="doLogin()">Giriş Yap →</button>
+        <div class="login-note">
+          Hesabınız yok mu? <a href="javascript:void(0)" onclick="toggleAuthForm('signup')" style="color:var(--gold);">Kayıt Olun</a>
+        </div>
+      </div>
+
+      <div id="signup-form" style="display: none;">
+        <h2>Kayıt Ol</h2>
+        <p>Aramıza katılmak için bilgilerinizi girin.</p>
+        <div class="field-label">Ad Soyad</div>
+        <input class="field-input" type="text" id="reg-name" placeholder="Av. Adı ve Soyadı">
+        <div class="field-label">Baro Sicil No</div>
+        <input class="field-input" type="text" id="reg-sicil" placeholder="Örn: 34/82741">
+        <div class="field-label">Telefon</div>
+        <input class="field-input" type="tel" id="reg-tel" placeholder="05** *** ** **">
+        <button class="btn-primary" onclick="doRegister()">Kayıt Ol →</button>
+        <div class="login-note">
+          Zaten hesabınız var mı? <a href="javascript:void(0)" onclick="toggleAuthForm('login')" style="color:var(--gold);">Giriş Yapın</a>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -261,11 +133,11 @@ html {
   <div class="app-header">
     <div>
       <div class="header-logo serif">Duruşma Arası</div>
-      <div class="header-greeting" id="greeting">Merhaba, Av. Enes</div>
+      <div class="header-greeting" id="greeting">Merhaba, Av. ...</div>
     </div>
     <div class="header-right">
-      <div class="icon-btn" onclick="openFriendRequests()" style="position:relative;">🔔<span id="notif-count" style="display:none; position:absolute; top:-4px; right:-4px; background:var(--red); color:white; border-radius:50%; width:16px; height:16px; font-size:9px; display:none; align-items:center; justify-content:center;"></span></div>
-      <div class="avatar-sm" onclick="goProfile()">EE</div>
+      <div class="icon-btn" onclick="openFriendRequests()" style="position:relative;">🔔</div>
+      <div class="avatar-sm" onclick="goPage('profile')">👤</div>
     </div>
   </div>
 
@@ -284,14 +156,13 @@ html {
           <span class="big-btn-text" id="big-btn-text">Adliyedeyim<br>Kahveye Beklerim</span>
         </button>
       </div>
-      <div class="big-btn-detecting" id="detecting-text"></div>
       <div class="mood-section" id="mood-section" style="display:none;">
         <div class="section-title">Durumunu seç</div>
         <div class="mood-row">
           <div class="mood-chip selected" onclick="setMood(this,'Müsaitim')"><span class="mood-icon">🟢</span>Müsaitim</div>
           <div class="mood-chip" onclick="setMood(this,'Duruşmada')"><span class="mood-icon">🔴</span>Duruşmada</div>
           <div class="mood-chip" onclick="setMood(this,'Kalemde')"><span class="mood-icon">🟡</span>Kalemde</div>
-          <div class="mood-chip" id="kahve-chip" onclick="setMood(this,'Kahveye Açığım')"><span class="mood-icon">☕</span>Kahveye Açığım<div class="kahve-timer" id="kahve-timer" style="display:none;"></div></div>
+          <div class="mood-chip" id="kahve-chip" onclick="setMood(this,'Kahveye Açığım')"><span class="mood-icon">☕</span>Kahveye Açığım</div>
         </div>
       </div>
       <div class="nearby-section" id="nearby-section" style="display:none;">
@@ -300,96 +171,116 @@ html {
           <div class="empty-state"><span class="empty-icon">📍</span>Şu an bu adliyede<br>başka meslektaşınız görünmüyor.</div>
         </div>
       </div>
-      <div id="pre-checkin-hint" style="text-align:center;margin-top:16px;">
-        <div style="font-size:12px;color:var(--muted2);line-height:1.7;">Butona basınca sistem sizi en yakın<br>adliyeye otomatik olarak check-in yapar.</div>
-      </div>
     </div>
   </div>
 
   <div class="page" id="page-cafe">
-    <div class="map-page">
-      <div style="font-family:'Playfair Display',serif;font-size:20px;color:var(--gold-light);margin-bottom:4px;">Kim Nerede?</div>
-      <div style="font-size:12px;color:var(--muted);margin-bottom:20px;">Arkadaşlarının bulunduğu adliyeler</div>
-      <div id="friend-map-content">
-        <div class="map-empty">🗺️<br><br>Arkadaş listeniz yüklenince<br>adliye bazlı konumları burada görünür.</div>
-      </div>
+    <div style="padding: 16px;">
+      <div style="font-family:'Playfair Display',serif;font-size:20px;color:var(--gold-light);">Kim Nerede?</div>
+      <div id="friend-map-content"><div class="empty-state">🗺️<br>Harita yükleniyor...</div></div>
     </div>
   </div>
 
   <div class="page" id="page-profile">
     <div class="profile-header">
-      <div class="profile-avatar">EE</div>
-      <div class="profile-name" id="p-name">Av. Enes Emre</div>
-      <div class="profile-baro" id="p-baro">İstanbul Barosu · Sicil: 34/82741</div>
-      <div class="verified-badge">✓ Doğrulanmış Üye</div>
+      <div class="profile-avatar">👤</div>
+      <div class="profile-name" id="p-name">İsim Yükleniyor</div>
+      <div class="profile-baro" id="p-baro">Sicil Yükleniyor</div>
     </div>
     <div class="settings-section">
-      <div class="section-title" style="margin-bottom:10px;">Gizlilik</div>
       <div class="settings-group">
-        <div class="settings-row" onclick="toggleSetting(this)">
-          <div class="settings-row-left"><span class="settings-icon">👁</span><span class="settings-label">Konumumu göster</span></div>
-          <button class="toggle on" tabindex="-1"></button>
-        </div>
-        <div class="settings-row" onclick="toggleSetting(this)">
-          <div class="settings-row-left"><span class="settings-icon">👥</span><span class="settings-label">Sadece rehberimdekiler görsün</span></div>
-          <button class="toggle" tabindex="-1"></button>
-        </div>
-        <div class="settings-row" onclick="toggleSetting(this)">
-          <div class="settings-row-left"><span class="settings-icon">🔔</span><span class="settings-label">Bildirimler</span></div>
-          <button class="toggle on" tabindex="-1"></button>
-        </div>
-      </div>
-      <div class="section-title" style="margin-bottom:10px;">Hesap</div>
-      <div class="settings-group">
-        <div class="settings-row">
-          <div class="settings-row-left"><span class="settings-icon">🏛</span><span class="settings-label">Baro</span></div>
-          <span class="settings-value">İstanbul</span>
-        </div>
-        <div class="settings-row">
-          <div class="settings-row-left"><span class="settings-icon">📋</span><span class="settings-label">Sicil No</span></div>
-          <span class="settings-value">34 / 82741</span>
-        </div>
         <div class="settings-row" onclick="doLogout()">
-          <div class="settings-row-left"><span class="settings-icon">🚪</span><span class="settings-label" style="color:var(--red);">Çıkış Yap</span></div>
+          <div><span style="color:var(--red);">Çıkış Yap</span></div>
         </div>
       </div>
     </div>
   </div>
 
   <div class="bottom-nav">
-    <button class="nav-tab active" onclick="goPage('home',this)"><span class="nav-icon">🏠</span><span class="nav-label">Ana Ekran</span></button>
-    <button class="nav-tab" onclick="goPage('cafe',this);renderFriendMap()"><span class="nav-icon">🗺️</span><span class="nav-label">Kim Nerede</span></button>
-    <button class="nav-tab" onclick="goPage('profile',this)"><span class="nav-icon">👤</span><span class="nav-label">Profil</span></button>
+    <button class="nav-tab active" onclick="goPage('home',this)">Ana Ekran</button>
+    <button class="nav-tab" onclick="goPage('cafe',this)">Kim Nerede</button>
+    <button class="nav-tab" onclick="goPage('profile',this)">Profil</button>
   </div>
-</div>
-
-<div class="modal-overlay" id="adliye-modal">
-  <div class="modal">
-    <div class="modal-title">Hangi adliyedesin?</div>
-    <div class="modal-sub">GPS konumunuz adliyeye yakın. Doğru adliyeyi seçin ya da listeden bulun.</div>
-    <div class="adliye-grid" id="adliye-grid"></div>
-    <div class="modal-btn-row">
-      <button class="btn-secondary" onclick="closeModal()">İptal</button>
-      <button class="btn-confirm" onclick="confirmCheckin()">Check-in Yap ✓</button>
-    </div>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
-
-<div class="ios-banner" id="ios-banner">
-  <div class="ios-banner-icon">☕</div>
-  <div class="ios-banner-text">
-    <div class="ios-banner-title">Ana Ekrana Ekle</div>
-    <div class="ios-banner-desc">Safari'de <strong style="color:var(--gold)">Paylaş</strong> → <strong style="color:var(--gold)">Ana Ekrana Ekle</strong> ile uygulama gibi kullan</div>
-  </div>
-  <div class="ios-banner-close" onclick="closeBanner()">✕</div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-
 <script>
+  // FIREBASE AYARLARI
+  const firebaseConfig = {
+    apiKey: "AIzaSyCmoN0WvhAOz3xGMPvpwstT8XsSuwwC-QQ",
+    authDomain: "durusma-arasi-210bb.firebaseapp.com",
+    databaseURL: "https://durusma-arasi-210bb-default-rtdb.firebaseio.com",
+    projectId: "durusma-arasi-210bb",
+    storageBucket: "durusma-arasi-210bb.firebasestorage.app",
+    messagingSenderId: "954201469428",
+    appId: "1:954201469428:web:dbe2eccf83c97fce5509a1"
+  };
+  if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+  const db = firebase.database();
+
+  // YENİ GİRİŞ VE KAYIT SİSTEMİ
+  function toggleAuthForm(type) {
+    if (type === 'signup') {
+      document.getElementById('login-form').style.display = 'none';
+      document.getElementById('signup-form').style.display = 'block';
+    } else {
+      document.getElementById('login-form').style.display = 'block';
+      document.getElementById('signup-form').style.display = 'none';
+    }
+  }
+
+  function doRegister() {
+    const name = document.getElementById('reg-name').value.trim();
+    const sicil = document.getElementById('reg-sicil').value.trim();
+    const tel = document.getElementById('reg-tel').value.trim();
+
+    if (!name || !sicil || !tel) { alert("Lütfen tüm alanları doldurun."); return; }
+    const userIdStr = sicil.replace(/[^a-zA-Z0-9]/g, ''); 
+    
+    db.ref('users/' + userIdStr).set({
+      name: name, sicil: sicil, tel: tel,
+      status: 'onay bekliyor',
+      createdAt: firebase.database.ServerValue.TIMESTAMP
+    }).then(() => {
+      alert("Kayıt talebiniz alındı! Yönetici onayladıktan sonra giriş yapabilirsiniz.");
+      toggleAuthForm('login');
+    }).catch((error) => { alert("Kayıt Hatası: " + error.message); });
+  }
+
+  function doLogin() {
+    const sicil = document.getElementById('inp-sicil').value.trim();
+    const tel = document.getElementById('inp-tel').value.trim();
+
+    if(!sicil || !tel) { alert("Lütfen Sicil No ve Telefonunuzu girin."); return; }
+    const userIdStr = sicil.replace(/[^a-zA-Z0-9]/g, ''); 
+
+    db.ref('users/' + userIdStr).once('value').then((snapshot) => {
+      if (snapshot.exists()) {
+        const userData = snapshot.val();
+        if (userData.status === 'onaylandi') {
+          // GİRİŞ BAŞARILI İSE SİZİN ORİJİNAL FONKSİYONUNUZU ÇALIŞTIRIR
+          applyLogin(userData.name, userData.sicil, userData.tel);
+        } else if (userData.status === 'onay bekliyor') {
+          alert("Hesabınız henüz onaylanmamış. Lütfen yönetici onayını bekleyin.");
+        } else { alert("Hesabınız reddedildi veya geçersiz durumda."); }
+      } else { alert("Böyle bir kullanıcı bulunamadı. Lütfen önce kayıt olun."); }
+    });
+  }
+
+  function doLogout() {
+    document.getElementById('s-app').classList.remove('active');
+    document.getElementById('s-landing').classList.add('active');
+  }
+
+  function goPage(pageId, btn) {
+    document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+    document.getElementById('page-' + pageId).classList.add('active');
+  }
+
+
+  /* ==================================================================== */
+  / <script>
 // ─── FIREBASE YAPILANDIRMA ───
 const firebaseConfig = {
   apiKey: "AIzaSyCmoN0WvhAOz3xGMPvpwstT8XsSuwwC-QQ",
@@ -539,16 +430,84 @@ function restoreCheckin() {
   listenNearbyAvukats(savedAdliye);
 }
 
+function toggleAuthMode(mode) {
+  if (mode === 'register') {
+    document.getElementById('login-box').style.display = 'none';
+    document.getElementById('register-box').style.display = 'block';
+  } else {
+    document.getElementById('login-box').style.display = 'block';
+    document.getElementById('register-box').style.display = 'none';
+  }
+}
+
+function openKvkkModal() { document.getElementById('kvkk-modal').classList.add('open'); }
+function closeKvkkModal() { document.getElementById('kvkk-modal').classList.remove('open'); }
+function openCookiePolicy() { document.getElementById('cookie-modal').classList.add('open'); }
+function closeCookieModal() { document.getElementById('cookie-modal').classList.remove('open'); }
+
+function handleCookieConsent(acceptedAll) {
+  saveToStorage('durusma_cookie_consent', acceptedAll ? 'all' : 'essential');
+  document.getElementById('cookie-banner').style.display = 'none';
+}
+
 function doLogin() {
-  const name = document.getElementById('inp-name').value.trim() || 'Av. Enes Emre';
-  const sicil = document.getElementById('inp-sicil').value.trim() || '34/82741';
+  const sicil = document.getElementById('inp-sicil').value.trim();
   const tel = document.getElementById('inp-tel').value.trim();
-  // Bilgileri kalıcı olarak sakla
-  saveToStorage('durusma_name', name);
-  saveToStorage('durusma_sicil', sicil);
-  saveToStorage('durusma_tel', tel);
-  saveToStorage('durusma_loggedin', '1');
-  applyLogin(name, sicil, tel);
+  const kvkk = document.getElementById('kvkk-check-login').checked;
+  
+  if(!sicil || !tel) { showToast('Sicil No ve Telefon zorunludur.'); return; }
+  if(!kvkk) { showToast("Aydınlatma Metni'ni onaylamalısınız."); return; }
+
+  const safeSicil = sicil.replace(/\//g, '_');
+  
+  db.ref('users/' + safeSicil).once('value', snap => {
+    if(snap.exists() && snap.val().approved) {
+       const u = snap.val();
+       if(u.tel !== tel) {
+          showToast('Telefon numarası eşleşmedi.');
+          return;
+       }
+       saveToStorage('durusma_name', u.name);
+       saveToStorage('durusma_sicil', u.sicil);
+       saveToStorage('durusma_tel', u.tel);
+       saveToStorage('durusma_loggedin', '1');
+       applyLogin(u.name, u.sicil, u.tel);
+    } else {
+       showToast('Kullanıcı bulunamadı veya henüz yönetici onayında.');
+    }
+  });
+}
+
+function doRegister() {
+  const name = document.getElementById('reg-name').value.trim();
+  const sicil = document.getElementById('reg-sicil').value.trim();
+  const tel = document.getElementById('reg-tel').value.trim();
+  const kvkk = document.getElementById('kvkk-check-reg').checked;
+
+  if(!name || !sicil || !tel) { showToast('Lütfen tüm bilgileri girin.'); return; }
+  if(!kvkk) { showToast("Aydınlatma Metni'ni onaylamalısınız."); return; }
+  
+  const safeSicil = sicil.replace(/\//g, '_');
+  
+  db.ref('users/' + safeSicil).once('value', snap => {
+    if(snap.exists()) {
+       showToast('Bu sicil no ile onaylı bir hesap zaten var.');
+       return;
+    }
+    db.ref('registrations/' + safeSicil).set({
+        name: name,
+        sicil: sicil,
+        tel: tel,
+        timestamp: firebase.database.ServerValue.TIMESTAMP
+    }).then(() => {
+       showToast('Kayıt talebiniz alındı. Onaydan sonra giriş yapabilirsiniz.');
+       toggleAuthMode('login');
+       document.getElementById('reg-name').value = '';
+       document.getElementById('reg-sicil').value = '';
+       document.getElementById('reg-tel').value = '';
+       document.getElementById('kvkk-check-reg').checked = false;
+    });
+  });
 }
 
 // ─── SAYFA GEÇİŞİ ───
@@ -561,6 +520,77 @@ function goPage(page, tab) {
 function goProfile() {
   goPage('profile');
   document.querySelectorAll('.nav-tab').forEach((t,i) => { if(i===2) t.classList.add('active'); else t.classList.remove('active'); });
+  renderProfileFriends();
+}
+
+// ─── PROFİL: ARKADAŞLAR BÖLÜMÜ ───
+function renderProfileFriends() {
+  const group = document.getElementById('profile-friends-group');
+  if (!group) return;
+  group.innerHTML = '<div style="padding:14px 16px;color:var(--muted2);font-size:12px;">⏳ Yükleniyor...</div>';
+
+  db.ref('friends/' + userId).once('value', snap => {
+    const friends = snap.val();
+    if (!friends || Object.keys(friends).length === 0) {
+      group.innerHTML = '<div style="padding:14px 16px;color:var(--muted2);font-size:12px;text-align:center;">Henüz arkadaşınız yok.<br>Aynı adliyedeki meslektaşlarınıza istek gönderin.</div>';
+      return;
+    }
+
+    const friendEntries = Object.entries(friends);
+    let pending = friendEntries.length;
+    // { friendId: { name, initials, adliye?, status? } }
+    const result = {};
+
+    friendEntries.forEach(([fid, fdata]) => {
+      result[fid] = { name: fdata.name, initials: fdata.initials || '?', adliye: null, status: null };
+      let found = false;
+      let adliyeChecked = 0;
+      ADLIYELER.forEach(a => {
+        db.ref('adliyeler/' + a + '/' + fid).once('value', snap2 => {
+          adliyeChecked++;
+          if (snap2.exists() && !found) {
+            found = true;
+            const p = snap2.val();
+            result[fid].adliye = a;
+            result[fid].status = p.status || 'Müsaitim';
+          }
+          if (adliyeChecked === ADLIYELER.length) {
+            pending--;
+            if (pending <= 0) _buildProfileFriendsList(result, group);
+          }
+        });
+      });
+    });
+  });
+}
+
+function _buildProfileFriendsList(result, group) {
+  group.innerHTML = '';
+  Object.entries(result).forEach(([fid, f]) => {
+    const row = document.createElement('div');
+    row.className = 'profile-friend-row';
+
+    const isHere = !!f.adliye;
+    // Short adliye name — strip "Adliyesi" for brevity
+    const shortAdliye = f.adliye ? f.adliye.replace(' Adliyesi','').replace('İstanbul Anadolu Adliyesi (Kartal)','Kartal') : '';
+    const statusText = isHere
+      ? `📍 ${shortAdliye} · ${f.status}`
+      : 'Adliyede değil';
+    const statusColor = isHere ? 'var(--green)' : 'var(--muted2)';
+
+    row.innerHTML = `
+      <div class="profile-friend-av">${f.initials}</div>
+      <div class="profile-friend-info">
+        <div class="profile-friend-name">${f.name}</div>
+        <div class="profile-friend-status" style="color:${statusColor};">${statusText}</div>
+      </div>
+      ${isHere ? `<button class="profile-friend-yaz" onclick="event.stopPropagation();openChat('${fid}','${f.name}','${f.initials}')">Yaz</button>` : ''}
+    `;
+    if (isHere) {
+      row.onclick = () => openChat(fid, f.name, f.initials);
+    }
+    group.appendChild(row);
+  });
 }
 
 // ─── BÜYÜK BUTON ───
@@ -1313,64 +1343,29 @@ function removeFromStorage(key) {
   const savedTel   = getFromStorage('durusma_tel');
   const loggedIn   = getFromStorage('durusma_loggedin');
 
-  if (savedName)  document.getElementById('inp-name').value  = savedName;
+  if (savedName) {
+    const inpName = document.getElementById('inp-name');
+    if (inpName) inpName.value = savedName;
+  }
   if (savedSicil) document.getElementById('inp-sicil').value = savedSicil;
   if (savedTel)   document.getElementById('inp-tel').value   = savedTel;
 
   if (loggedIn === '1' && savedName) {
     applyLogin(savedName, savedSicil || '', savedTel || '');
   }
+
+  if (!getFromStorage('durusma_cookie_consent')) {
+    document.getElementById('cookie-banner').style.display = 'flex';
+  }
 })();
 </script>
 
+  /* ==================================================================== */
+  
+  // ÖRNEK: applyLogin() , handleBigBtn() , sendMessage() vb...
 
-<!-- BİLDİRİM PANELİ -->
-<div id="notif-panel" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:2000; align-items:flex-end; justify-content:center; padding:20px;">
-  <div id="notif-card" style="background:var(--bg2); border:0.5px solid var(--border2); border-radius:20px; padding:24px; width:100%; max-width:420px; animation:modal-in .25s ease;">
-    <div id="notif-icon" style="font-size:32px; text-align:center; margin-bottom:10px;">💬</div>
-    <div id="notif-title" style="font-family:'Playfair Display',serif; font-size:17px; color:var(--gold-light); text-align:center; margin-bottom:6px;"></div>
-    <div id="notif-body" style="font-size:13px; color:var(--muted); text-align:center; margin-bottom:20px; line-height:1.6;"></div>
-    <div id="notif-actions" style="display:flex; gap:10px;"></div>
-  </div>
-</div>
 
-<!-- ARKADAŞLIK İSTEKLERİ SAYFASI -->
-<div id="friend-requests-panel" style="display:none; position:fixed; inset:0; background:var(--bg); z-index:1500; flex-direction:column;">
-  <div class="app-header">
-    <div style="display:flex; align-items:center; gap:12px;">
-      <div class="icon-btn" onclick="closeFriendRequests()">←</div>
-      <div><div class="header-logo serif">Arkadaşlık İstekleri</div></div>
-    </div>
-    <div id="friend-req-badge" style="background:var(--red); color:white; border-radius:20px; padding:3px 10px; font-size:12px; display:none;"></div>
-  </div>
-  <div id="friend-requests-list" style="flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:10px;"></div>
-</div>
 
-<div id="chat-panel" style="display:none; position:fixed; inset:0; background:var(--bg); z-index:1000; flex-direction:column; animation: slide-up 0.3s ease-out;">
-  <div class="app-header">
-    <div style="display:flex; align-items:center; gap:12px;">
-      <div class="icon-btn" onclick="closeChat()">←</div>
-      <div>
-        <div class="header-logo serif" id="chat-user-name">Av. Meslektaş</div>
-        <div class="header-greeting" id="chat-user-status">Çevrimiçi</div>
-      </div>
-    </div>
-  </div>
-  <div id="chat-messages" style="flex:1; padding:16px; overflow-y:auto; display:flex; flex-direction:column; gap:8px;">
-    <div style="align-self:center; background:var(--bg3); padding:6px 12px; border-radius:12px; font-size:11px; color:var(--muted2);">Sohbet Başlatıldı</div>
-  </div>
-  <div style="padding:12px 16px; border-top:0.5px solid var(--border); display:flex; gap:10px; background:var(--bg2); padding-bottom:calc(12px + env(safe-area-inset-bottom));">
-    <input type="text" id="chat-input" placeholder="Mesajınızı yazın..." style="flex:1; background:var(--bg3); border:0.5px solid var(--border); border-radius:20px; padding:10px 16px; color:var(--text); outline:none;" onkeydown="if(event.key==='Enter') sendMessage()">
-    <button class="icon-btn" style="background:var(--gold); color:var(--bg); border:none; width:42px; height:42px;" onclick="sendMessage()">➔</button>
-  </div>
-</div>
-
-<style>
-@keyframes slide-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
-.action-btn { flex:1; padding:8px; border-radius:8px; font-size:12px; font-weight:500; cursor:pointer; text-align:center; transition: 0.2s; }
-.btn-add { background: var(--bg2); border: 0.5px solid var(--gold); color: var(--gold); }
-.btn-msg { background: var(--gold); border: none; color: var(--bg); }
-</style>
-
+</script>
 </body>
 </html>
