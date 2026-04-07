@@ -14,23 +14,51 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #0F0A04; --bg2: #1A1208; --bg3: #231808; --card: #2A1E0A; --border: #3D2B0E; --border2: #5A3F18;
-  --gold: #C8892A; --gold-light: #E8C97A; --gold-pale: #F5E4B0; --text: #F0DFB8; --muted: #9A7A50; --muted2: #6A5030;
-  --green: #5AAF5A; --red: #C05050; --yellow: #D4A030; --blue: #4A90C8;
+  --bg: #0F0A04;
+  --bg2: #1A1208;
+  --bg3: #231808;
+  --card: #2A1E0A;
+  --border: #3D2B0E;
+  --border2: #5A3F18;
+  --gold: #C8892A;
+  --gold-light: #E8C97A;
+  --gold-pale: #F5E4B0;
+  --text: #F0DFB8;
+  --muted: #9A7A50;
+  --muted2: #6A5030;
+  --green: #5AAF5A;
+  --red: #C05050;
+  --yellow: #D4A030;
+  --blue: #4A90C8;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html { height: -webkit-fill-available; overscroll-behavior: none; overscroll-behavior-y: contain; }
+html { height: -webkit-fill-available; }
 body {
-  font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text);
-  min-height: 100vh; min-height: -webkit-fill-available; overflow-x: hidden;
-  -webkit-font-smoothing: antialiased; overscroll-behavior: none; overscroll-behavior-y: contain; touch-action: pan-x pan-y;
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
+  overscroll-behavior-y: contain;
+  touch-action: pan-x pan-y;
+}
+html {
+  overscroll-behavior: none;
+  overscroll-behavior-y: contain;
 }
 .serif { font-family: 'Playfair Display', serif; }
 .screen { display: none; min-height: 100vh; min-height: -webkit-fill-available; }
 .screen.active { display: flex; flex-direction: column; }
 
 /* LANDING */
-#s-landing { align-items: center; justify-content: center; position: relative; overflow: hidden; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+#s-landing {
+  align-items: center; justify-content: center;
+  position: relative; overflow: hidden;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
 .landing-bg { position: absolute; inset: 0; background: radial-gradient(ellipse 60% 50% at 50% 40%, #3D2B0E 0%, transparent 70%); pointer-events: none; }
 .landing-rings { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; }
 .ring { position: absolute; border-radius: 50%; border: 1px solid var(--border); opacity: 0.3; animation: pulse-ring 4s ease-in-out infinite; }
@@ -69,38 +97,136 @@ body {
 .page{display:none;flex:1;flex-direction:column;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .page.active{display:flex}
 
-/* Kalan temel ve sayfa stilleri (HOME, KAFETERYA, MAP, vb.) aynen korunmuştur */
+/* HOME */
 .home-content{flex:1;display:flex;flex-direction:column;align-items:center;padding:24px 20px 20px}
 .checkin-status{width:100%;background:var(--bg3);border:0.5px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:28px;display:flex;align-items:center;gap:12px}
-.status-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0} .status-dot.off{background:var(--muted2)} .status-dot.on{background:var(--green);box-shadow:0 0 8px var(--green);animation:blink 2s infinite}
+.status-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.status-dot.off{background:var(--muted2)} .status-dot.on{background:var(--green);box-shadow:0 0 8px var(--green);animation:blink 2s infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
 .status-text{font-size:13px;color:var(--muted);flex:1} .status-text strong{color:var(--gold-light)}
 .status-exit{font-size:11px;color:var(--red);cursor:pointer;padding:4px 8px;border:0.5px solid var(--red);border-radius:6px;white-space:nowrap}
+.status-exit:hover{background:rgba(192,80,80,.1)}
 .big-btn-wrap{position:relative;margin:10px 0 32px}
 .big-btn-ring{position:absolute;border-radius:50%;border:1px solid var(--gold);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;opacity:0;animation:none}
 .big-btn-ring.r1{width:200px;height:200px} .big-btn-ring.r2{width:240px;height:240px;animation-delay:.3s}
 .big-btn{width:170px;height:170px;border-radius:50%;background:var(--gold);border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;transition:transform .15s,opacity .2s;position:relative;z-index:2;touch-action:manipulation;-webkit-appearance:none}
+.big-btn:hover{transform:scale(1.03)} .big-btn:active{transform:scale(.96)}
 .big-btn.checked-in{background:var(--bg3);border:2px solid var(--green)}
-.big-btn-icon{font-size:32px} .big-btn-text{font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;color:var(--bg);text-align:center;line-height:1.4;max-width:110px}
+.big-btn-icon{font-size:32px}
+.big-btn-text{font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;color:var(--bg);text-align:center;line-height:1.4;max-width:110px}
 .big-btn.checked-in .big-btn-text{color:var(--green)}
-.mood-section{width:100%;margin-bottom:24px} .section-title{font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px}
-.mood-row{display:flex;gap:8px} .mood-chip{flex:1;padding:9px 8px;border-radius:10px;border:0.5px solid var(--border);background:var(--bg3);font-size:12px;color:var(--muted);cursor:pointer;text-align:center;}
-.mood-chip.selected{border-color:var(--gold);color:var(--gold-light);background:rgba(200,137,42,.08)} .mood-icon{font-size:16px;display:block;margin-bottom:3px}
+.big-btn-detecting{font-size:11px;color:var(--muted);text-align:center;margin-top:-16px;margin-bottom:16px;min-height:18px}
+.mood-section{width:100%;margin-bottom:24px}
+.section-title{font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px}
+.mood-row{display:flex;gap:8px}
+.mood-chip{flex:1;padding:9px 8px;border-radius:10px;border:0.5px solid var(--border);background:var(--bg3);font-family:'DM Sans',sans-serif;font-size:12px;color:var(--muted);cursor:pointer;text-align:center;transition:all .2s}
+.mood-chip:hover{border-color:var(--border2);color:var(--text)}
+.mood-chip.selected{border-color:var(--gold);color:var(--gold-light);background:rgba(200,137,42,.08)}
+.mood-icon{font-size:16px;display:block;margin-bottom:3px}
 .nearby-section{width:100%} .nearby-list{display:flex;flex-direction:column;gap:8px}
+.nearby-person{display:flex;align-items:center;gap:12px;padding:11px 14px;background:var(--bg3);border:0.5px solid var(--border);border-radius:12px;transition:border-color .2s}
+.nearby-person:hover{border-color:var(--border2)}
+.person-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0;background:var(--card);color:var(--gold);border:1px solid var(--gold)}
+.person-info{flex:1} .person-name{font-size:13px;color:var(--text);font-weight:500} .person-role{font-size:11px;color:var(--muted);margin-top:1px}
+.person-badge{font-size:10px;padding:3px 8px;border-radius:20px}
+.badge-green{background:rgba(90,175,90,.12);color:var(--green);border:0.5px solid rgba(90,175,90,.3)}
+.badge-red{background:rgba(192,80,80,.12);color:var(--red);border:0.5px solid rgba(192,80,80,.3)}
+.badge-yellow{background:rgba(212,160,48,.12);color:var(--yellow);border:0.5px solid rgba(212,160,48,.3)}
 .empty-state{text-align:center;padding:32px 20px;color:var(--muted2);font-size:13px;line-height:1.7}
+.empty-icon{font-size:32px;display:block;margin-bottom:10px;opacity:.5}
+
+/* KAFETERYA */
+.page-content{padding:20px;flex:1}
+.court-selector{display:flex;align-items:center;gap:10px;margin-bottom:20px}
+.court-selector select{flex:1;background:var(--bg3);border:0.5px solid var(--border);border-radius:10px;padding:10px 14px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);outline:none;cursor:pointer;-webkit-appearance:none}
+.cafe-card{background:var(--bg3);border:0.5px solid var(--border);border-radius:16px;padding:18px;margin-bottom:14px;transition:border-color .2s}
+.cafe-card:hover{border-color:var(--border2)}
+.cafe-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.cafe-name{font-family:'Playfair Display',serif;font-size:16px;color:var(--gold-light)}
+.cafe-rating{display:flex;gap:2px} .star{font-size:14px;color:var(--gold)} .star.empty{color:var(--muted2)}
+.cafe-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.ctag{font-size:11px;padding:3px 9px;border-radius:20px;cursor:pointer;transition:all .15s}
+.ctag-good{background:rgba(90,175,90,.1);color:var(--green);border:0.5px solid rgba(90,175,90,.25)}
+.ctag-bad{background:rgba(192,80,80,.1);color:var(--red);border:0.5px solid rgba(192,80,80,.25)}
+.ctag-mid{background:rgba(212,160,48,.1);color:var(--yellow);border:0.5px solid rgba(212,160,48,.25)}
+.ctag:hover{opacity:.75}
+.cafe-review{font-size:12px;color:var(--muted);font-style:italic;line-height:1.6;border-top:0.5px solid var(--border);padding-top:10px}
+.cafe-review span{color:var(--muted2)}
+.cafe-here{display:flex;align-items:center;gap:8px;margin-top:10px}
+.here-label{font-size:11px;color:var(--muted2)}
+.add-rating-btn{width:100%;padding:12px;background:transparent;border:0.5px dashed var(--border2);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted);cursor:pointer;transition:all .2s}
+.add-rating-btn:hover{border-color:var(--gold);color:var(--gold);background:rgba(200,137,42,.04)}
+
+/* KAHVEYE AÇIĞIM */
+.mood-chip.kahve-active{border-color:var(--green)!important;color:#fff!important;background:rgba(90,175,90,.15)!important;position:relative;}
+.kahve-timer{font-size:10px;color:var(--green);text-align:center;margin-top:4px;font-weight:600;letter-spacing:.04em;}
+
+/* YEŞİL AURA (profil avatarı etrafında) */
+.avatar-sm.kahve-aura{border-color:var(--green)!important;box-shadow:0 0 0 3px rgba(90,175,90,.35),0 0 14px rgba(90,175,90,.5);animation:aura-pulse 2s ease-in-out infinite;}
+@keyframes aura-pulse{0%,100%{box-shadow:0 0 0 3px rgba(90,175,90,.35),0 0 14px rgba(90,175,90,.5);}50%{box-shadow:0 0 0 6px rgba(90,175,90,.2),0 0 24px rgba(90,175,90,.7);}}
+
+/* NEARBY: kahveye açık rozeti */
+.badge-coffee{background:rgba(90,175,90,.12);color:var(--green);border:0.5px solid rgba(90,175,90,.4);animation:aura-pulse 2s infinite;}
+
+/* HARİTA SAYFASI */
 .map-page{flex:1;display:flex;flex-direction:column;overflow-y:auto;padding:16px 20px 20px;}
+.map-adliye-card{background:var(--bg3);border:0.5px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:border-color .2s;}
+.map-adliye-card:hover{border-color:var(--border2);}
+.map-adliye-card.has-friends{border-color:rgba(90,175,90,.4);background:rgba(90,175,90,.04);}
+.map-adliye-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.map-adliye-name{font-family:'Playfair Display',serif;font-size:15px;color:var(--gold-light);}
+.map-adliye-count{font-size:11px;padding:3px 9px;border-radius:20px;background:rgba(90,175,90,.12);color:var(--green);border:0.5px solid rgba(90,175,90,.3);}
+.map-friend-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:0.5px solid var(--border);}
+.map-friend-av{width:30px;height:30px;border-radius:50%;background:var(--card);border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--gold);flex-shrink:0;}
+.map-friend-info{flex:1;font-size:12px;color:var(--text);}
+.map-friend-status{font-size:10px;color:var(--muted);margin-top:1px;}
+.map-empty{text-align:center;padding:40px 20px;color:var(--muted2);font-size:13px;line-height:1.8;}
+
+/* PROFİL */
 .profile-header{display:flex;flex-direction:column;align-items:center;padding:28px 20px 20px;border-bottom:0.5px solid var(--border)}
 .profile-avatar{width:72px;height:72px;border-radius:50%;background:var(--card);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:26px;color:var(--gold-light);margin-bottom:12px}
 .profile-name{font-family:'Playfair Display',serif;font-size:20px;color:var(--gold-light)}
 .profile-baro{font-size:12px;color:var(--muted);margin-top:4px}
-.settings-section{padding:16px 20px} .settings-group{background:var(--bg3);border:0.5px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:14px}
-.settings-row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:0.5px solid var(--border);cursor:pointer;}
-.settings-row-left{display:flex;align-items:center;gap:12px} .settings-icon{font-size:16px;width:20px;text-align:center} .settings-label{font-size:13px;color:var(--text)}
-.toggle{width:40px;height:22px;border-radius:11px;background:var(--muted2);position:relative;cursor:pointer;border:none;flex-shrink:0}
+.verified-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--green);background:rgba(90,175,90,.08);border:0.5px solid rgba(90,175,90,.2);border-radius:20px;padding:3px 9px;margin-top:8px}
+.settings-section{padding:16px 20px}
+.settings-group{background:var(--bg3);border:0.5px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:14px}
+.settings-row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:0.5px solid var(--border);cursor:pointer;transition:background .15s}
+.settings-row:last-child{border-bottom:none} .settings-row:hover{background:rgba(200,137,42,.04)}
+.settings-row-left{display:flex;align-items:center;gap:12px}
+.settings-icon{font-size:16px;width:20px;text-align:center} .settings-label{font-size:13px;color:var(--text)} .settings-value{font-size:12px;color:var(--muted)}
+.toggle{width:40px;height:22px;border-radius:11px;background:var(--muted2);position:relative;cursor:pointer;transition:background .2s;border:none;flex-shrink:0}
 .toggle::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:white;top:3px;left:3px;transition:transform .2s}
 .toggle.on{background:var(--gold)} .toggle.on::after{transform:translateX(18px)}
-.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--bg2);border:0.5px solid var(--gold);border-radius:12px;padding:12px 18px;font-size:13px;color:var(--gold-light);z-index:999;transition:transform .35s;white-space:nowrap;max-width:90vw}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg2);border:0.5px solid var(--border2);border-radius:20px;padding:28px;width:100%;max-width:360px;animation:modal-in .25s ease}
+@keyframes modal-in{from{opacity:0;transform:scale(.95) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.modal-title{font-family:'Playfair Display',serif;font-size:20px;color:var(--gold-light);margin-bottom:8px}
+.modal-sub{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6}
+.adliye-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px}
+.adliye-btn{padding:12px 10px;background:var(--bg3);border:0.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--text);cursor:pointer;text-align:center;transition:all .15s}
+.adliye-btn:hover{border-color:var(--gold);color:var(--gold-light)}
+.adliye-btn.selected{border-color:var(--gold);background:rgba(200,137,42,.1);color:var(--gold-light)}
+.modal-btn-row{display:flex;gap:10px}
+.btn-secondary{flex:1;padding:12px;background:transparent;border:0.5px solid var(--border2);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted);cursor:pointer;transition:all .2s}
+.btn-secondary:hover{border-color:var(--text);color:var(--text)}
+.btn-confirm{flex:2;padding:12px;background:var(--gold);border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--bg);cursor:pointer;transition:opacity .2s}
+.btn-confirm:hover{opacity:.88}
+
+/* TOAST */
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--bg2);border:0.5px solid var(--gold);border-radius:12px;padding:12px 18px;font-size:13px;color:var(--gold-light);z-index:999;transition:transform .35s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;max-width:90vw}
 .toast.show{transform:translateX(-50%) translateY(0)}
+
+/* iOS BANNER */
+.ios-banner{display:none;position:fixed;bottom:calc(16px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:var(--bg2);border:0.5px solid var(--border2);border-radius:16px;padding:14px 18px;z-index:900;width:calc(100% - 32px);max-width:420px}
+.ios-banner.visible{display:flex;align-items:center;gap:12px}
+.ios-banner-icon{font-size:28px;flex-shrink:0}
+.ios-banner-text{flex:1}
+.ios-banner-title{font-size:13px;font-weight:500;color:var(--gold-light);margin-bottom:2px}
+.ios-banner-desc{font-size:11px;color:var(--muted);line-height:1.5}
+.ios-banner-close{font-size:18px;color:var(--muted2);cursor:pointer;padding:4px;flex-shrink:0}
 
 @media(min-width:600px){
   #s-app{max-width:480px;margin:0 auto;border-left:0.5px solid var(--border);border-right:0.5px solid var(--border);min-height:100vh}
@@ -134,7 +260,7 @@ body {
         <h2>Kayıt Ol</h2>
         <p>Aramıza katılmak için bilgilerinizi girin.</p>
         <div class="field-label">Ad Soyad</div>
-        <input class="field-input" type="text" id="reg-name" placeholder="Avukat Adı ve Soyadı">
+        <input class="field-input" type="text" id="reg-name" placeholder="Av. Adı ve Soyadı">
         <div class="field-label">Baro Sicil No</div>
         <input class="field-input" type="text" id="reg-sicil" placeholder="Örn: 34/82741">
         <div class="field-label">Telefon</div>
@@ -145,8 +271,6 @@ body {
         </div>
       </div>
     </div>
-  </div>
-</div>
 
 <div class="screen" id="s-app">
   <div class="app-header">
@@ -155,7 +279,7 @@ body {
       <div class="header-greeting" id="greeting">Merhaba, Av. Enes</div>
     </div>
     <div class="header-right">
-      <div class="icon-btn" onclick="openFriendRequests()" style="position:relative;">🔔<span id="notif-count" style="display:none;"></span></div>
+      <div class="icon-btn" onclick="openFriendRequests()" style="position:relative;">🔔<span id="notif-count" style="display:none; position:absolute; top:-4px; right:-4px; background:var(--red); color:white; border-radius:50%; width:16px; height:16px; font-size:9px; display:none; align-items:center; justify-content:center;"></span></div>
       <div class="avatar-sm" onclick="goProfile()">EE</div>
     </div>
   </div>
@@ -175,13 +299,14 @@ body {
           <span class="big-btn-text" id="big-btn-text">Adliyedeyim<br>Kahveye Beklerim</span>
         </button>
       </div>
+      <div class="big-btn-detecting" id="detecting-text"></div>
       <div class="mood-section" id="mood-section" style="display:none;">
         <div class="section-title">Durumunu seç</div>
         <div class="mood-row">
           <div class="mood-chip selected" onclick="setMood(this,'Müsaitim')"><span class="mood-icon">🟢</span>Müsaitim</div>
           <div class="mood-chip" onclick="setMood(this,'Duruşmada')"><span class="mood-icon">🔴</span>Duruşmada</div>
           <div class="mood-chip" onclick="setMood(this,'Kalemde')"><span class="mood-icon">🟡</span>Kalemde</div>
-          <div class="mood-chip" id="kahve-chip" onclick="setMood(this,'Kahveye Açığım')"><span class="mood-icon">☕</span>Kahveye Açığım</div>
+          <div class="mood-chip" id="kahve-chip" onclick="setMood(this,'Kahveye Açığım')"><span class="mood-icon">☕</span>Kahveye Açığım<div class="kahve-timer" id="kahve-timer" style="display:none;"></div></div>
         </div>
       </div>
       <div class="nearby-section" id="nearby-section" style="display:none;">
@@ -189,6 +314,9 @@ body {
         <div class="nearby-list" id="nearby-list">
           <div class="empty-state"><span class="empty-icon">📍</span>Şu an bu adliyede<br>başka meslektaşınız görünmüyor.</div>
         </div>
+      </div>
+      <div id="pre-checkin-hint" style="text-align:center;margin-top:16px;">
+        <div style="font-size:12px;color:var(--muted2);line-height:1.7;">Butona basınca sistem sizi en yakın<br>adliyeye otomatik olarak check-in yapar.</div>
       </div>
     </div>
   </div>
@@ -213,47 +341,220 @@ body {
     <div class="settings-section">
       <div class="section-title" style="margin-bottom:10px;">Gizlilik</div>
       <div class="settings-group">
-        <div class="settings-row" onclick="toggleSetting(this)"><div class="settings-row-left"><span class="settings-icon">👁</span><span class="settings-label">Konumumu göster</span></div><button class="toggle on" tabindex="-1"></button></div>
-        <div class="settings-row" onclick="toggleSetting(this)"><div class="settings-row-left"><span class="settings-icon">👥</span><span class="settings-label">Sadece rehberimdekiler görsün</span></div><button class="toggle" tabindex="-1"></button></div>
+        <div class="settings-row" onclick="toggleSetting(this)">
+          <div class="settings-row-left"><span class="settings-icon">👁</span><span class="settings-label">Konumumu göster</span></div>
+          <button class="toggle on" tabindex="-1"></button>
+        </div>
+        <div class="settings-row" onclick="toggleSetting(this)">
+          <div class="settings-row-left"><span class="settings-icon">👥</span><span class="settings-label">Sadece rehberimdekiler görsün</span></div>
+          <button class="toggle" tabindex="-1"></button>
+        </div>
+        <div class="settings-row" onclick="toggleSetting(this)">
+          <div class="settings-row-left"><span class="settings-icon">🔔</span><span class="settings-label">Bildirimler</span></div>
+          <button class="toggle on" tabindex="-1"></button>
+        </div>
       </div>
       <div class="section-title" style="margin-bottom:10px;">Hesap</div>
       <div class="settings-group">
-        <div class="settings-row"><div class="settings-row-left"><span class="settings-icon">🏛</span><span class="settings-label">Baro</span></div><span class="settings-value">İstanbul</span></div>
-        <div class="settings-row"><div class="settings-row-left"><span class="settings-icon">📋</span><span class="settings-label">Sicil No</span></div><span class="settings-value">34 / 82741</span></div>
-        <div class="settings-row" onclick="doLogout()"><div class="settings-row-left"><span class="settings-icon">🚪</span><span class="settings-label" style="color:var(--red);">Çıkış Yap</span></div></div>
+        <div class="settings-row">
+          <div class="settings-row-left"><span class="settings-icon">🏛</span><span class="settings-label">Baro</span></div>
+          <span class="settings-value">İstanbul</span>
+        </div>
+        <div class="settings-row">
+          <div class="settings-row-left"><span class="settings-icon">📋</span><span class="settings-label">Sicil No</span></div>
+          <span class="settings-value">34 / 82741</span>
+        </div>
+        <div class="settings-row" onclick="doLogout()">
+          <div class="settings-row-left"><span class="settings-icon">🚪</span><span class="settings-label" style="color:var(--red);">Çıkış Yap</span></div>
+        </div>
       </div>
     </div>
   </div>
 
   <div class="bottom-nav">
     <button class="nav-tab active" onclick="goPage('home',this)"><span class="nav-icon">🏠</span><span class="nav-label">Ana Ekran</span></button>
-    <button class="nav-tab" onclick="goPage('cafe',this)"><span class="nav-icon">🗺️</span><span class="nav-label">Kim Nerede</span></button>
+    <button class="nav-tab" onclick="goPage('cafe',this);renderFriendMap()"><span class="nav-icon">🗺️</span><span class="nav-label">Kim Nerede</span></button>
     <button class="nav-tab" onclick="goPage('profile',this)"><span class="nav-icon">👤</span><span class="nav-label">Profil</span></button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="adliye-modal">
+  <div class="modal">
+    <div class="modal-title">Hangi adliyedesin?</div>
+    <div class="modal-sub">GPS konumunuz adliyeye yakın. Doğru adliyeyi seçin ya da listeden bulun.</div>
+    <div class="adliye-grid" id="adliye-grid"></div>
+    <div class="modal-btn-row">
+      <button class="btn-secondary" onclick="closeModal()">İptal</button>
+      <button class="btn-confirm" onclick="confirmCheckin()">Check-in Yap ✓</button>
+    </div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
+<div class="ios-banner" id="ios-banner">
+  <div class="ios-banner-icon">☕</div>
+  <div class="ios-banner-text">
+    <div class="ios-banner-title">Ana Ekrana Ekle</div>
+    <div class="ios-banner-desc">Safari'de <strong style="color:var(--gold)">Paylaş</strong> → <strong style="color:var(--gold)">Ana Ekrana Ekle</strong> ile uygulama gibi kullan</div>
+  </div>
+  <div class="ios-banner-close" onclick="closeBanner()">✕</div>
+</div>
+
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-<script>
-  // ─── FIREBASE YAPILANDIRMA ───
-  const firebaseConfig = {
-    apiKey: "AIzaSyCmoN0WvhAOz3xGMPvpwstT8XsSuwwC-QQ",
-    authDomain: "durusma-arasi-210bb.firebaseapp.com",
-    databaseURL: "https://durusma-arasi-210bb-default-rtdb.firebaseio.com",
-    projectId: "durusma-arasi-210bb",
-    storageBucket: "durusma-arasi-210bb.firebasestorage.app",
-    messagingSenderId: "954201469428",
-    appId: "1:954201469428:web:dbe2eccf83c97fce5509a1",
-    measurementId: "G-VBX7SOWESG"
-  };
-  if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-  }
-  const db = firebase.database();
 
-  // --- FORM GÖSTER/GİZLE FONKSİYONU ---
+<script>
+// ─── FIREBASE YAPILANDIRMA ───
+const firebaseConfig = {
+  apiKey: "AIzaSyCmoN0WvhAOz3xGMPvpwstT8XsSuwwC-QQ",
+  authDomain: "durusma-arasi-210bb.firebaseapp.com",
+  databaseURL: "https://durusma-arasi-210bb-default-rtdb.firebaseio.com",
+  projectId: "durusma-arasi-210bb",
+  storageBucket: "durusma-arasi-210bb.firebasestorage.app",
+  messagingSenderId: "954201469428",
+  appId: "1:954201469428:web:dbe2eccf83c97fce5509a1",
+  measurementId: "G-VBX7SOWESG"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// Her cihaza özgü ID (localStorage + cookie)
+function _get(k) { try { const v=localStorage.getItem(k); if(v) return v; } catch(e){} try { const m=document.cookie.match('(?:^|; )'+k+'=([^;]*)'); if(m) return decodeURIComponent(m[1]); } catch(e){} return null; }
+function _set(k,v) { try{localStorage.setItem(k,v);}catch(e){} try{const d=new Date();d.setFullYear(d.getFullYear()+1);document.cookie=k+'='+encodeURIComponent(v)+'; expires='+d.toUTCString()+'; path=/; SameSite=Lax';}catch(e){} }
+let userId = _get('durusma_uid');
+if (!userId) {
+  userId = 'user_' + Math.random().toString(36).substr(2, 9);
+  _set('durusma_uid', userId);
+}
+
+// ─── SABİTLER ───
+const ADLIYELER = [
+  'Çağlayan Adliyesi',
+  'İstanbul Anadolu Adliyesi (Kartal)',
+  'Bakırköy Adliyesi (Ana Bina)',
+  'Bakırköy Adliyesi Ek Bina',
+  'Küçükçekmece Adliyesi',
+  'GOP Adliyesi'
+];
+
+// Adliye koordinatları (enlem, boylam)
+const ADLIYE_COORDS = {
+  'Çağlayan Adliyesi':                   { lat: 41.0689, lng: 28.9809 },
+  'İstanbul Anadolu Adliyesi (Kartal)':  { lat: 40.9105, lng: 29.1865 },
+  'Bakırköy Adliyesi (Ana Bina)':        { lat: 40.9793, lng: 28.8726 },
+  'Bakırköy Adliyesi Ek Bina':           { lat: 40.9801, lng: 28.8692 },
+  'Küçükçekmece Adliyesi':               { lat: 40.9987, lng: 28.7850 },
+  'GOP Adliyesi':                        { lat: 41.0631, lng: 28.9108 }
+};
+
+// İki koordinat arası mesafe (km) - Haversine formülü
+function calcDistance(lat1, lng1, lat2, lng2) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+// En yakın adliyeyi bul
+function findNearestAdliye(userLat, userLng) {
+  let nearest = null, minDist = Infinity;
+  Object.entries(ADLIYE_COORDS).forEach(([name, coord]) => {
+    const d = calcDistance(userLat, userLng, coord.lat, coord.lng);
+    if (d < minDist) { minDist = d; nearest = name; }
+  });
+  return { name: nearest, distKm: minDist };
+}
+
+const CAFES = {
+  caglayan: [
+    { name:'B Blok Kafeteryası', rating:4, tags:[{t:'Çayı güzel',c:'good'},{t:'Tostu efsane',c:'good'},{t:'Kahve berbat',c:'bad'},{t:'Fiyatlar makul',c:'mid'}], review:'"Çay için gidilir, Nescafe içmeyin derim."', reviewer:'Av. K.D.' },
+    { name:'A Blok Çay Ocağı', rating:3, tags:[{t:'Ucuz',c:'good'},{t:'Kalabalık',c:'bad'},{t:'Hızlı servis',c:'mid'}], review:'"Sabahın köründe sıra bekliyorsunuz ama başka seçenek yok."', reviewer:'Av. S.T.' }
+  ],
+  kartal: [
+    { name:'Zemin Kat Kafeteryası', rating:5, tags:[{t:'Kahvesi iyi',c:'good'},{t:'Sessiz köşe var',c:'good'},{t:'Temiz',c:'good'},{t:'Fiyatlar makul',c:'mid'}], review:'"Anadolu yakasının en iyi adliye kahvesi!"', reviewer:'Av. M.A.' },
+    { name:'Üst Kat Çay Ocağı', rating:3, tags:[{t:'Hızlı',c:'good'},{t:'Kalabalık',c:'bad'},{t:'Sadece çay',c:'mid'}], review:'"Sadece çay var, kahve arıyorsanız zemine inin."', reviewer:'Av. R.T.' }
+  ],
+  bakirkoy: [
+    { name:'Ana Bina Kafeteryası', rating:3, tags:[{t:'Geniş',c:'mid'},{t:'Kalabalık',c:'bad'},{t:'Çayı orta',c:'mid'},{t:'Tost var',c:'good'}], review:'"Duruşma arasında yetiştiremiyorsunuz, çok kalabalık."', reviewer:'Av. B.K.' }
+  ],
+  bakirkoyEk: [
+    { name:'Ek Bina Çay Ocağı', rating:4, tags:[{t:'Sessiz',c:'good'},{t:'Çayı güzel',c:'good'},{t:'Az kalabalık',c:'good'},{t:'Küçük',c:'mid'}], review:'"Ana binaya göre çok daha sakin, kahve molamı burada yapıyorum."', reviewer:'Av. D.Y.' }
+  ],
+  kucukcekmece: [
+    { name:'Zemin Kat Kafeteryası', rating:4, tags:[{t:'Çayı güzel',c:'good'},{t:'Tostu iyi',c:'good'},{t:'Fiyatlar uygun',c:'good'},{t:'Biraz kalabalık',c:'mid'}], review:'"Batı yakasının sürprizi. Beklenenden iyiydi."', reviewer:'Av. C.D.' }
+  ],
+  gop: [
+    { name:'Kafeterya', rating:4, tags:[{t:'Kahvesi iyi',c:'good'},{t:'Sessiz',c:'good'},{t:'Temiz',c:'good'},{t:'Pahalıca',c:'bad'}], review:'"Küçük ama kaliteli. Öğleden sonra boş kalıyor."', reviewer:'Av. F.Y.' }
+  ]
+};
+
+let state = {
+  checkedIn: false,
+  currentAdliye: '',
+  selectedMood: 'Müsaitim',
+  selectedAdliye: '',
+  userName: 'Av. Enes Emre',
+  userSicil: '34/82741'
+};
+
+// ─── GİRİŞ ───
+function applyLogin(name, sicil, tel) {
+  state.userName = name;
+  state.userSicil = sicil;
+  const initials = name.replace('Av.','').trim().split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+  document.getElementById('greeting').textContent = 'Merhaba, ' + (name.split(' ')[1] || name);
+  document.getElementById('p-name').textContent = name;
+  document.getElementById('p-baro').textContent = 'İstanbul Barosu · Sicil: ' + sicil;
+  document.querySelector('.profile-avatar').textContent = initials;
+  document.querySelector('.avatar-sm').textContent = initials;
+  document.getElementById('s-landing').classList.remove('active');
+  document.getElementById('s-app').classList.add('active');
+  listenNotifications();
+  // Önceki check-in'i geri yükle
+  restoreCheckin();
+  // Kahve sayacını geri yükle
+  restoreKahveTimer();
+}
+
+function restoreCheckin() {
+  const savedAdliye = getFromStorage('durusma_checkin_adliye');
+  const checkinActive = getFromStorage('durusma_checkin_active');
+  if (!savedAdliye || checkinActive !== '1') return;
+
+  state.checkedIn = true;
+  state.currentAdliye = savedAdliye;
+  state.selectedAdliye = savedAdliye;
+
+  const myName = state.userName || getFromStorage('durusma_name') || 'Avukat';
+  const myInitials = document.querySelector('.profile-avatar').textContent || '?';
+
+  document.getElementById('big-btn').classList.add('checked-in');
+  document.getElementById('big-btn-text').textContent = 'Check-in Aktif\nGüncelle';
+  document.getElementById('ring1').style.cssText = 'animation:pulse-ring 2s ease-in-out infinite;opacity:0.4;';
+  document.getElementById('ring2').style.cssText = 'animation:pulse-ring 2s ease-in-out 0.5s infinite;opacity:0.2;';
+  document.getElementById('checkin-status').style.display = 'flex';
+  document.getElementById('status-text').innerHTML = '<strong>' + savedAdliye + '</strong> · Check-in aktif';
+  document.getElementById('mood-section').style.display = 'block';
+  document.getElementById('nearby-section').style.display = 'block';
+  document.getElementById('pre-checkin-hint').style.display = 'none';
+  document.getElementById('nearby-title').textContent = savedAdliye + ' — Buradakiler';
+
+  // Firebase'e tekrar kaydet (onDisconnect ile silinmiş olabilir)
+  const ref = db.ref('adliyeler/' + savedAdliye + '/' + userId);
+  ref.set({
+    name: myName,
+    initials: myInitials,
+    status: state.selectedMood,
+    timestamp: firebase.database.ServerValue.TIMESTAMP
+  });
+  ref.onDisconnect().remove();
+
+  listenNearbyAvukats(savedAdliye);
+}
+
+// --- FORM GÖSTER/GİZLE FONKSİYONU ---
   function toggleAuthForm(type) {
     if (type === 'signup') {
       document.getElementById('login-form').style.display = 'none';
@@ -271,18 +572,17 @@ body {
     const tel = document.getElementById('reg-tel').value.trim();
 
     if (!name || !sicil || !tel) {
-      alert("Lütfen tüm alanları doldurun.");
+      showToast("Lütfen tüm alanları doldurun.");
       return;
     }
 
-    // Kullanıcı ID'sini sicil nosundan oluşturuyoruz (Örn: "3482741")
-    const userId = sicil.replace(/[^a-zA-Z0-9]/g, ''); 
+    const userIdStr = sicil.replace(/[^a-zA-Z0-9]/g, ''); 
     
-    db.ref('users/' + userId).set({
+    db.ref('users/' + userIdStr).set({
       name: name,
       sicil: sicil,
       tel: tel,
-      status: 'onay bekliyor', // Durum: Yönetici onayı bekliyor
+      status: 'onay bekliyor',
       createdAt: firebase.database.ServerValue.TIMESTAMP
     }).then(() => {
       alert("Kayıt talebiniz alındı! Yönetici onayladıktan sonra giriş yapabilirsiniz.");
@@ -296,28 +596,26 @@ body {
     });
   }
 
-  // --- GİRİŞ YAPMA FONKSİYONU ---
+  // --- GİRİŞ YAPMA FONKSİYONU (GÜNCELLENMİŞ) ---
   function doLogin() {
     const sicil = document.getElementById('inp-sicil').value.trim();
     const tel = document.getElementById('inp-tel').value.trim();
 
     if(!sicil || !tel) {
-      alert("Lütfen Sicil No ve Telefonunuzu girin.");
+      showToast("Lütfen Sicil No ve Telefonunuzu girin.");
       return;
     }
 
-    const userId = sicil.replace(/[^a-zA-Z0-9]/g, ''); 
+    const userIdStr = sicil.replace(/[^a-zA-Z0-9]/g, ''); 
 
-    db.ref('users/' + userId).once('value').then((snapshot) => {
+    db.ref('users/' + userIdStr).once('value').then((snapshot) => {
       if (snapshot.exists()) {
         const userData = snapshot.val();
         if (userData.status === 'onaylandi') {
-          // Giriş Başarılı, ana ekrana geç
-          document.getElementById('s-landing').classList.remove('active');
-          document.getElementById('s-app').classList.add('active');
-          document.getElementById('greeting').innerText = "Merhaba, " + userData.name;
-          document.getElementById('p-name').innerText = userData.name;
-          document.getElementById('p-baro').innerText = "Sicil: " + userData.sicil;
+          userId = userIdStr; // Sistemin geri kalanının çalışması için ID tanımlıyoruz
+          saveToStorage('durusma_user_id', userIdStr);
+          // Sisteminizi başlatan ve butonları aktif eden kendi fonksiyonunuzu çağırıyoruz:
+          applyLogin(userData.name, userData.sicil, userData.tel);
         } else if (userData.status === 'onay bekliyor') {
           alert("Hesabınız henüz onaylanmamış. Lütfen yönetici onayını bekleyin.");
         } else {
@@ -330,34 +628,828 @@ body {
       console.error("Giriş Hatası:", error);
     });
   }
+}
 
-  // --- UYGULAMA İÇİ SAYFA GEÇİŞLERİ ---
-  function goPage(pageId, btn) {
-    document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
-    document.getElementById('page-' + pageId).classList.add('active');
-    
-    document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
-    if(btn) btn.classList.add('active');
+// ─── SAYFA GEÇİŞİ ───
+function goPage(page, tab) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  if (tab) tab.classList.add('active');
+}
+function goProfile() {
+  goPage('profile');
+  document.querySelectorAll('.nav-tab').forEach((t,i) => { if(i===2) t.classList.add('active'); else t.classList.remove('active'); });
+}
+
+// ─── BÜYÜK BUTON ───
+function handleBigBtn() {
+  if (state.checkedIn) { doCheckOut(); return; }
+  const det = document.getElementById('detecting-text');
+
+  if (!navigator.geolocation) {
+    // GPS desteklenmiyorsa direkt modal aç
+    openAdliyeModal(null);
+    return;
   }
 
-  function doLogout() {
-    document.getElementById('s-app').classList.remove('active');
-    document.getElementById('s-landing').classList.add('active');
-    document.getElementById('inp-sicil').value = '';
-    document.getElementById('inp-tel').value = '';
+  det.textContent = '📍 Konumunuz tespit ediliyor...';
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      det.textContent = '';
+      const { latitude, longitude } = pos.coords;
+      const result = findNearestAdliye(latitude, longitude);
+      result.userLat = latitude;
+      result.userLng = longitude;
+      openAdliyeModal(result);
+    },
+    (err) => {
+      // Konum alınamazsa (izin reddedildi vb.) manuel seçim aç
+      det.textContent = '';
+      openAdliyeModal(null);
+    },
+    { timeout: 8000, maximumAge: 60000, enableHighAccuracy: true }
+  );
+}
+
+function openAdliyeModal(gpsResult) {
+  const grid = document.getElementById('adliye-grid');
+  grid.innerHTML = '';
+
+  // En yakın adliye: GPS varsa onu kullan, yoksa ilki
+  const autoSelect = gpsResult ? gpsResult.name : null;
+  const defaultSelect = autoSelect || ADLIYELER[0];
+  state.selectedAdliye = defaultSelect;
+
+  // Modal alt yazısını güncelle
+  const sub = document.querySelector('#adliye-modal .modal-sub');
+  if (gpsResult) {
+    const km = gpsResult.distKm.toFixed(1);
+    sub.innerHTML = '📍 Konumunuza en yakın adliye otomatik seçildi. <strong style="color:var(--gold-light)">(' + km + ' km uzakta)</strong> Farklı bir adliyedeyseniz değiştirebilirsiniz.';
+  } else {
+    sub.textContent = 'Lütfen bulunduğunuz adliyeyi listeden seçin.';
   }
 
-  function toggleSetting(el) {
-    const toggle = el.querySelector('.toggle');
-    if(toggle) toggle.classList.toggle('on');
+  // Kullanıcının konumu varsa her adliyenin mesafesini hesapla
+  let userLat = null, userLng = null;
+  if (gpsResult) {
+    // Nearest adliye'nin koordinatından kullanıcı konumunu tersine hesaplayamayız
+    // Bu yüzden mesafeyi direkt GPS callback'ten alıyoruz
+    // Her adliyenin mesafesini gpsResult'daki userLat/lng ile hesapla
+    userLat = gpsResult.userLat;
+    userLng = gpsResult.userLng;
   }
 
-  /* ÖNEMLİ NOT:
-    Buraya check-in (handleBigBtn, doCheckOut) ve 
-    harita (renderFriendMap vb.) gibi uygulamanızın 
-    mevcut diğer tüm işlevsel JavaScript kodlarını eklemeye/tutmaya devam edebilirsiniz. 
-  */
+  ADLIYELER.forEach(a => {
+    const btn = document.createElement('div');
+    const isSelected = a === defaultSelect;
+    btn.className = 'adliye-btn' + (isSelected ? ' selected' : '');
 
+    let distLabel = '';
+    if (userLat !== null && ADLIYE_COORDS[a]) {
+      const d = calcDistance(userLat, userLng, ADLIYE_COORDS[a].lat, ADLIYE_COORDS[a].lng);
+      distLabel = '<br><span style="font-size:10px;color:' + (isSelected ? 'var(--green)' : 'var(--muted2)') + ';">' + (isSelected ? '📍 ' : '') + d.toFixed(1) + ' km</span>';
+    }
+
+    btn.innerHTML = a + distLabel;
+    btn.onclick = () => {
+      grid.querySelectorAll('.adliye-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      state.selectedAdliye = a;
+    };
+    grid.appendChild(btn);
+  });
+
+  document.getElementById('adliye-modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('adliye-modal').classList.remove('open');
+  document.getElementById('detecting-text').textContent = '';
+}
+
+// ─── FIREBASE: CHECK-IN ───
+function confirmCheckin() {
+  closeModal();
+  state.checkedIn = true;
+  state.currentAdliye = state.selectedAdliye;
+
+  document.getElementById('big-btn').classList.add('checked-in');
+  document.getElementById('big-btn-text').textContent = 'Check-in Aktif\nGüncelle';
+  document.getElementById('ring1').style.cssText = 'animation:pulse-ring 2s ease-in-out infinite;opacity:0.4;';
+  document.getElementById('ring2').style.cssText = 'animation:pulse-ring 2s ease-in-out 0.5s infinite;opacity:0.2;';
+  document.getElementById('checkin-status').style.display = 'flex';
+  document.getElementById('status-text').innerHTML = '<strong>' + state.currentAdliye + '</strong> · Check-in aktif';
+  document.getElementById('mood-section').style.display = 'block';
+  document.getElementById('nearby-section').style.display = 'block';
+  document.getElementById('pre-checkin-hint').style.display = 'none';
+  document.getElementById('nearby-title').textContent = state.currentAdliye + ' — Buradakiler';
+
+  // Kullanıcı adını güvenli şekilde al
+  const myName = state.userName || getFromStorage('durusma_name') || 'Avukat';
+  const myInitials = document.querySelector('.profile-avatar').textContent || myName.replace('Av.','').trim().split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+
+  // Firebase'e kaydet
+  const ref = db.ref('adliyeler/' + state.currentAdliye + '/' + userId);
+  ref.set({
+    name: myName,
+    initials: myInitials,
+    status: state.selectedMood,
+    timestamp: firebase.database.ServerValue.TIMESTAMP
+  });
+  ref.onDisconnect().remove();
+
+  // Check-in durumunu localStorage'a kaydet (sayfa yenilenince geri dönmek için)
+  saveToStorage('durusma_checkin_adliye', state.currentAdliye);
+  saveToStorage('durusma_checkin_active', '1');
+
+  listenNearbyAvukats(state.currentAdliye);
+
+  // Arkadaşlara check-in bildirimi gönder
+  notifyFriendsCheckin(state.currentAdliye, myName, myInitials);
+}
+
+// ─── FIREBASE: ÇIKIŞ ───
+function doCheckOut() {
+  removeFromStorage('durusma_checkin_adliye');
+  removeFromStorage('durusma_checkin_active');
+  if (state.currentAdliye) {
+    db.ref('adliyeler/' + state.currentAdliye + '/' + userId).remove();
+    db.ref('adliyeler/' + state.currentAdliye).off();
+  }
+  state.checkedIn = false;
+  state.currentAdliye = '';
+  document.getElementById('big-btn').classList.remove('checked-in');
+  document.getElementById('big-btn-text').innerHTML = 'Adliyedeyim<br>Kahveye Beklerim';
+  document.getElementById('ring1').style.cssText = 'animation:none;opacity:0;';
+  document.getElementById('ring2').style.cssText = 'animation:none;opacity:0;';
+  document.getElementById('checkin-status').style.display = 'none';
+  document.getElementById('mood-section').style.display = 'none';
+  document.getElementById('nearby-section').style.display = 'none';
+  document.getElementById('pre-checkin-hint').style.display = 'block';
+  showToast('Adliyeden çıkış yapıldı.');
+}
+
+// ─── FIREBASE: DURUM GÜNCELLE ───
+let kahveTimerInterval = null;
+let kahveEndTime = null;
+
+function setMood(el, mood) {
+  document.querySelectorAll('.mood-chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  state.selectedMood = mood;
+
+  // Kahveye Açığım özel mantığı
+  if (mood === 'Kahveye Açığım') {
+    startKahveTimer();
+  } else {
+    stopKahveTimer();
+  }
+
+  if (state.checkedIn && state.currentAdliye) {
+    db.ref('adliyeler/' + state.currentAdliye + '/' + userId).update({
+      status: mood,
+      kahveUntil: mood === 'Kahveye Açığım' ? (Date.now() + 45 * 60 * 1000) : null
+    });
+  }
+  showToast('Durumun "' + mood + '" olarak güncellendi');
+}
+
+function startKahveTimer() {
+  stopKahveTimer();
+  kahveEndTime = Date.now() + 45 * 60 * 1000;
+  saveToStorage('durusma_kahve_until', String(kahveEndTime));
+
+  // Avatar'a yeşil aura
+  document.querySelector('.avatar-sm').classList.add('kahve-aura');
+
+  // Kahve chip'e aktif stil + sayaç
+  const chip = document.getElementById('kahve-chip');
+  const timer = document.getElementById('kahve-timer');
+  if (chip) chip.classList.add('kahve-active');
+  if (timer) timer.style.display = 'block';
+
+  kahveTimerInterval = setInterval(() => {
+    const remaining = kahveEndTime - Date.now();
+    if (remaining <= 0) {
+      // Süre doldu — Müsaitim'e geç
+      stopKahveTimer();
+      const musaitChip = document.querySelector('.mood-chip');
+      if (musaitChip) setMood(musaitChip, 'Müsaitim');
+      showToast('Kahve süreniz doldu, durumunuz Müsait olarak güncellendi.');
+      return;
+    }
+    const m = Math.floor(remaining / 60000);
+    const s = Math.floor((remaining % 60000) / 1000);
+    if (timer) timer.textContent = m + ':' + String(s).padStart(2,'0');
+  }, 1000);
+}
+
+function stopKahveTimer() {
+  clearInterval(kahveTimerInterval);
+  kahveTimerInterval = null;
+  kahveEndTime = null;
+  removeFromStorage('durusma_kahve_until');
+  document.querySelector('.avatar-sm').classList.remove('kahve-aura');
+  const chip = document.getElementById('kahve-chip');
+  const timer = document.getElementById('kahve-timer');
+  if (chip) chip.classList.remove('kahve-active');
+  if (timer) { timer.style.display = 'none'; timer.textContent = ''; }
+}
+
+function restoreKahveTimer() {
+  const until = parseInt(getFromStorage('durusma_kahve_until') || '0');
+  if (until && until > Date.now()) {
+    kahveEndTime = until;
+    // Kahveye Açığım chip'i seç
+    const chips = document.querySelectorAll('.mood-chip');
+    chips.forEach(c => { if (c.id === 'kahve-chip') { c.classList.add('selected','kahve-active'); } else { c.classList.remove('selected'); } });
+    document.querySelector('.avatar-sm').classList.add('kahve-aura');
+    const timer = document.getElementById('kahve-timer');
+    if (timer) timer.style.display = 'block';
+    kahveTimerInterval = setInterval(() => {
+      const remaining = kahveEndTime - Date.now();
+      if (remaining <= 0) {
+        stopKahveTimer();
+        const musaitChip = document.querySelector('.mood-chip');
+        if (musaitChip) setMood(musaitChip, 'Müsaitim');
+        return;
+      }
+      const m = Math.floor(remaining / 60000);
+      const s = Math.floor((remaining % 60000) / 1000);
+      if (timer) timer.textContent = m + ':' + String(s).padStart(2,'0');
+    }, 1000);
+  }
+}
+
+// ─── FIREBASE: CANLI LİSTE ───
+function listenNearbyAvukats(adliyeName) {
+  const list = document.getElementById('nearby-list');
+  list.innerHTML = '<div class="empty-state"><span class="empty-icon">⏳</span>Bağlanıyor...</div>';
+  db.ref('adliyeler/' + adliyeName).on('value', snapshot => {
+    const data = snapshot.val();
+    list.innerHTML = '';
+    let hasOthers = false;
+    if (data) {
+      Object.keys(data).forEach(key => {
+        if (key === userId) return;
+        hasOthers = true;
+        const p = data[key];
+        let badge = '';
+        if (p.status === 'Kahveye Açığım') {
+          const remaining = p.kahveUntil ? Math.max(0, Math.floor((p.kahveUntil - Date.now()) / 60000)) : 45;
+          badge = '<span class="person-badge badge-coffee">☕ ' + remaining + 'dk</span>';
+        } else if (p.status === 'Müsaitim') badge = '<span class="person-badge badge-green">Müsait</span>';
+        else if (p.status === 'Duruşmada') badge = '<span class="person-badge badge-red">Duruşmada</span>';
+        else badge = '<span class="person-badge badge-yellow">Kalemde</span>';
+
+        const row = document.createElement('div');
+        row.style.cssText = "background:var(--bg3); border:0.5px solid var(--border); border-radius:12px; padding:14px; margin-bottom:8px;";
+        // Arkadaşlık durumunu kontrol et
+        db.ref('friends/' + userId + '/' + key).once('value', fsnap => {
+          const isFriend = fsnap.exists();
+          row.innerHTML = `
+            <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+              <div class="person-av">${p.initials}</div>
+              <div class="person-info"><div class="person-name">${p.name}</div>
+              <div class="person-role">${isFriend ? '🤝 Arkadaş' : '⚖️ Meslektaş'}</div></div>
+              ${badge}
+            </div>
+            <div style="display:flex; gap:8px;">
+              ${isFriend
+                ? `<button class="action-btn btn-msg" style="flex:2;" onclick="openChat('${key}','${p.name}','${p.initials}')">💬 Mesaj Gönder</button>`
+                : `<button class="action-btn btn-add" onclick="sendFriendRequest('${key}','${p.name}','${p.initials}',this)">➕ Ekle</button>
+                   <button class="action-btn btn-msg" style="opacity:0.4; cursor:not-allowed;" disabled title="Önce arkadaş olun">💬 Mesaj</button>`
+              }
+            </div>
+          `;
+        });
+        list.appendChild(row);
+      });
+    }
+    if (!hasOthers) {
+      list.innerHTML = '<div class="empty-state"><span class="empty-icon">📍</span>Şu an bu adliyede<br>başka meslektaşınız görünmüyor.</div>';
+    }
+  }, error => {
+    list.innerHTML = '<div class="empty-state"><span class="empty-icon">❌</span>Bağlantı hatası:<br>' + error.message + '</div>';
+  });
+}
+
+// ─── KAFETERYA ───
+function renderCafe() {
+  const key = document.getElementById('cafe-court-select').value;
+  const cafes = CAFES[key] || [];
+  const cont = document.getElementById('cafe-content');
+  cont.innerHTML = '';
+  const stars = n => Array.from({length:5},(_,i) => `<span class="star${i<n?'':' empty'}">★</span>`).join('');
+  cafes.forEach(c => {
+    const card = document.createElement('div');
+    card.className = 'cafe-card';
+    card.innerHTML = `
+      <div class="cafe-header"><div class="cafe-name">${c.name}</div><div class="cafe-rating">${stars(c.rating)}</div></div>
+      <div class="cafe-tags">${c.tags.map(t=>`<div class="ctag ctag-${t.c}">${t.t}</div>`).join('')}</div>
+      <div class="cafe-review">${c.review} <span>— ${c.reviewer}</span></div>
+      <div class="cafe-here" style="margin-top:10px;border-top:0.5px solid var(--border);padding-top:10px;">
+        <span class="here-label">Şu an burada:</span>
+        <span style="font-size:11px;color:var(--muted2);margin-left:6px">Check-in yapanlar burada görünecek</span>
+      </div>`;
+    cont.appendChild(card);
+  });
+}
+
+// ─── DİĞERLERİ ───
+function toggleSetting(row) { const t = row.querySelector('.toggle'); if (t) t.classList.toggle('on'); }
+function doLogout() {
+  if (state.checkedIn) doCheckOut();
+  removeFromStorage('durusma_loggedin');
+  document.getElementById('s-app').classList.remove('active');
+  document.getElementById('s-landing').classList.add('active');
+}
+function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000); }
+function closeBanner() { document.getElementById('ios-banner').classList.remove('visible'); sessionStorage.setItem('ios-banner-dismissed','1'); }
+
+// ─── MESAJLAŞMA SİSTEMİ ───
+// ─── MESAJLAŞMA ───
+let currentChatTargetId = null;
+let currentChatRef = null;
+
+function getChatId(uid1, uid2) {
+  return [uid1, uid2].sort().join('__');
+}
+
+function openChat(targetId, targetName, targetInitials) {
+  // Önceki listener'ı tamamen kapat
+  if (currentChatRef) { currentChatRef.off(); currentChatRef = null; }
+
+  currentChatTargetId = targetId;
+  document.getElementById('chat-user-name').textContent = targetName;
+  document.getElementById('chat-panel').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+
+  const messagesEl = document.getElementById('chat-messages');
+  messagesEl.innerHTML = '<div style="align-self:center; background:var(--bg3); padding:6px 12px; border-radius:12px; font-size:11px; color:var(--muted2);">Sohbet Başlatıldı</div>';
+
+  const chatId = getChatId(userId, targetId);
+  currentChatRef = db.ref('chats/' + chatId);
+
+  currentChatRef.on('child_added', snap => {
+    const msg = snap.val();
+    if (!msg || !msg.text) return;
+    const isMine = msg.senderId === userId;
+    const bubble = document.createElement('div');
+    bubble.style.cssText = [
+      'max-width:75%', 'padding:10px 14px',
+      'border-radius:' + (isMine ? '16px 16px 4px 16px' : '16px 16px 16px 4px'),
+      'background:' + (isMine ? 'var(--gold)' : 'var(--bg3)'),
+      'color:' + (isMine ? 'var(--bg)' : 'var(--text)'),
+      'font-size:13px',
+      'align-self:' + (isMine ? 'flex-end' : 'flex-start'),
+      'border:' + (isMine ? 'none' : '0.5px solid var(--border)'),
+      'line-height:1.5', 'word-break:break-word'
+    ].join(';');
+    bubble.textContent = msg.text;
+    messagesEl.appendChild(bubble);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  });
+}
+
+function sendMessage() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text || !currentChatTargetId) return;
+  input.value = '';
+
+  const chatId = getChatId(userId, currentChatTargetId);
+  const msg = {
+    senderId: userId,
+    senderName: state.userName,
+    text: text,
+    timestamp: firebase.database.ServerValue.TIMESTAMP
+  };
+  db.ref('chats/' + chatId).push(msg);
+
+  // Karşı tarafa bildirim gönder
+  const myInitialsNow = document.querySelector('.profile-avatar').textContent || '?';
+  db.ref('notifications/' + currentChatTargetId).push({
+    type: 'message',
+    fromId: userId,
+    fromName: state.userName,
+    fromInitials: myInitialsNow,
+    chatId: chatId,
+    preview: text.substring(0, 60),
+    timestamp: firebase.database.ServerValue.TIMESTAMP,
+    read: false
+  });
+}
+
+function closeChat() {
+  if (currentChatRef) { currentChatRef.off(); currentChatRef = null; }
+  currentChatTargetId = null;
+  document.getElementById('chat-panel').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+// ─── ARKADAŞLIK İSTEKLERİ ───
+function sendFriendRequest(targetId, targetName, targetInitials, btnEl) {
+  const myInitials = document.querySelector('.profile-avatar').textContent;
+  db.ref('notifications/' + targetId).push({
+    type: 'friend_request',
+    fromId: userId,
+    fromName: state.userName,
+    fromInitials: myInitials,
+    timestamp: firebase.database.ServerValue.TIMESTAMP,
+    read: false
+  });
+  if (btnEl) { btnEl.textContent = '✓ İstek Gönderildi'; btnEl.disabled = true; btnEl.style.opacity = '0.5'; }
+  showToast('Arkadaşlık isteği gönderildi ✓');
+  sendBrowserNotif(targetName, state.userName + ' sizi arkadaş olarak eklemek istiyor.');
+}
+
+function openFriendRequests() {
+  document.getElementById('friend-requests-panel').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  renderFriendRequests();
+}
+
+function closeFriendRequests() {
+  document.getElementById('friend-requests-panel').style.display = 'none';
+  document.body.style.overflow = 'auto';
+}
+
+function renderFriendRequests() {
+  const list = document.getElementById('friend-requests-list');
+  list.innerHTML = '<div class="empty-state"><span class="empty-icon">⏳</span>Yükleniyor...</div>';
+  db.ref('notifications/' + userId).orderByChild('read').equalTo(false).once('value', snap => {
+    const data = snap.val();
+    list.innerHTML = '';
+    if (!data) {
+      list.innerHTML = '<div class="empty-state"><span class="empty-icon">🔔</span>Yeni bildirim yok.</div>';
+      return;
+    }
+    Object.entries(data).forEach(([notifId, n]) => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--bg3); border:0.5px solid var(--border); border-radius:14px; padding:16px;';
+      if (n.type === 'friend_request') {
+        card.innerHTML = `
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px;">
+            <div class="person-av">${n.fromInitials || '?'}</div>
+            <div><div style="font-size:13px; font-weight:500; color:var(--text);">${n.fromName}</div>
+            <div style="font-size:11px; color:var(--muted);">Arkadaşlık isteği gönderdi</div></div>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button class="action-btn btn-add" onclick="acceptFriend('${notifId}','${n.fromId}','${n.fromName}','${n.fromInitials}',this.closest('div[style]'))">Kabul Et</button>
+            <button class="action-btn" style="flex:1;padding:8px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;background:transparent;border:0.5px solid var(--border2);color:var(--muted);" onclick="rejectNotif('${notifId}',this.closest('div[style]'))">Reddet</button>
+          </div>`;
+      } else if (n.type === 'message') {
+        card.innerHTML = `
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px;">
+            <div class="person-av">${n.fromInitials || '?'}</div>
+            <div><div style="font-size:13px; font-weight:500; color:var(--text);">${n.fromName}</div>
+            <div style="font-size:11px; color:var(--muted); margin-top:2px;">"${n.preview}"</div></div>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button class="action-btn btn-msg" style="flex:2;" onclick="rejectNotif('${notifId}',null); closeFriendRequests(); openChat('${n.fromId}','${n.fromName}','${n.fromInitials}')">Yanıtla</button>
+            <button class="action-btn" style="flex:1;padding:8px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;background:transparent;border:0.5px solid var(--border2);color:var(--muted);" onclick="rejectNotif('${notifId}',this.closest('div[style]'))">Kapat</button>
+          </div>`;
+      } else if (n.type === 'friend_accepted') {
+        card.innerHTML = `
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px;">
+            <div class="person-av">${n.fromInitials || '?'}</div>
+            <div><div style="font-size:13px; font-weight:500; color:var(--text);">${n.fromName}</div>
+            <div style="font-size:11px; color:var(--green); margin-top:2px;">🤝 Arkadaşlık isteğinizi kabul etti!</div></div>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button class="action-btn btn-msg" style="flex:2;" onclick="rejectNotif('${notifId}',null); closeFriendRequests(); openChat('${n.fromId}','${n.fromName}','${n.fromInitials}')">Mesaj Gönder</button>
+            <button class="action-btn" style="flex:1;padding:8px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;background:transparent;border:0.5px solid var(--border2);color:var(--muted);" onclick="rejectNotif('${notifId}',this.closest('div[style]'))">Kapat</button>
+          </div>`;
+      } else if (n.type === 'friend_checkin') {
+        card.innerHTML = `
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px;">
+            <div class="person-av">${n.fromInitials || '?'}</div>
+            <div><div style="font-size:13px; font-weight:500; color:var(--text);">${n.fromName}</div>
+            <div style="font-size:11px; color:var(--gold); margin-top:2px;">📍 ${n.adliye || 'Adliyeye'} giriş yaptı</div></div>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button class="action-btn btn-msg" style="flex:2;" onclick="rejectNotif('${notifId}',null); closeFriendRequests(); goPage('cafe', document.querySelectorAll('.nav-tab')[1]); renderFriendMap()">Haritada Gör</button>
+            <button class="action-btn" style="flex:1;padding:8px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;background:transparent;border:0.5px solid var(--border2);color:var(--muted);" onclick="rejectNotif('${notifId}',this.closest('div[style]'))">Kapat</button>
+          </div>`;
+      }
+      list.appendChild(card);
+    });
+  });
+}
+
+function acceptFriend(notifId, fromId, fromName, fromInitials, cardEl) {
+  db.ref('notifications/' + userId + '/' + notifId).update({ read: true });
+  // Karşılıklı arkadaşlık kaydı
+  db.ref('friends/' + userId + '/' + fromId).set({ name: fromName, initials: fromInitials || '?', since: firebase.database.ServerValue.TIMESTAMP });
+  const myInitials = document.querySelector('.profile-avatar').textContent;
+  db.ref('friends/' + fromId + '/' + userId).set({ name: state.userName, initials: myInitials, since: firebase.database.ServerValue.TIMESTAMP });
+  // Karşı tarafa kabul bildirimi + tarayıcı bildirimi tetikle
+  db.ref('notifications/' + fromId).push({
+    type: 'friend_accepted',
+    fromId: userId,
+    fromName: state.userName,
+    fromInitials: myInitials,
+    timestamp: firebase.database.ServerValue.TIMESTAMP,
+    read: false
+  });
+  if (cardEl) cardEl.innerHTML = '<div style="text-align:center; color:var(--green); font-size:13px; padding:8px;">✓ Kabul Edildi</div>';
+  showToast(fromName + ' artık arkadaşınız!');
+}
+
+function rejectNotif(notifId, cardEl) {
+  db.ref('notifications/' + userId + '/' + notifId).update({ read: true });
+  if (cardEl) cardEl.remove();
+}
+
+// ─── ARKADAŞLARA CHECK-IN BİLDİRİMİ ───
+function notifyFriendsCheckin(adliye, myName, myInitials) {
+  db.ref('friends/' + userId).once('value', snap => {
+    const friends = snap.val();
+    if (!friends) return;
+    Object.keys(friends).forEach(friendId => {
+      db.ref('notifications/' + friendId).push({
+        type: 'friend_checkin',
+        fromId: userId,
+        fromName: myName,
+        fromInitials: myInitials || '?',
+        adliye: adliye,
+        timestamp: firebase.database.ServerValue.TIMESTAMP,
+        read: false
+      });
+    });
+  });
+}
+
+// ─── HARİTA: ARKADAŞ KONUMLARI ───
+function renderFriendMap() {
+  const cont = document.getElementById('friend-map-content');
+  cont.innerHTML = '<div class="map-empty">⏳<br><br>Yükleniyor...</div>';
+
+  db.ref('friends/' + userId).once('value', snap => {
+    const friends = snap.val();
+    if (!friends) {
+      cont.innerHTML = '<div class="map-empty">👥<br><br>Henüz arkadaşınız yok.<br>Aynı adliyedeki meslektaşlarınıza<br>arkadaşlık isteği gönderin.</div>';
+      return;
+    }
+
+    // Her adliye için arkadaş listesi oluştur
+    const byAdliye = {}; // { adliyeAdi: [{ friendId, name, initials, status, kahveUntil }] }
+
+    const friendIds = Object.keys(friends);
+    let pending = friendIds.length;
+
+    friendIds.forEach(fid => {
+      // O arkadaşın check-in yaptığı adliyeyi bul
+      ADLIYELER.forEach(a => {
+        db.ref('adliyeler/' + a + '/' + fid).once('value', snap2 => {
+          if (snap2.exists()) {
+            const p = snap2.val();
+            if (!byAdliye[a]) byAdliye[a] = [];
+            byAdliye[a].push({ id: fid, name: p.name || friends[fid].name, initials: p.initials || friends[fid].initials || '?', status: p.status || 'Müsaitim', kahveUntil: p.kahveUntil });
+          }
+          pending--;
+          if (pending <= 0) renderMapCards(byAdliye, cont, friends);
+        });
+      });
+    });
+
+    // Hiç adliye yoksa timeout ile tamamla
+    if (friendIds.length === 0) renderMapCards({}, cont, friends);
+  });
+}
+
+function renderMapCards(byAdliye, cont, friends) {
+  cont.innerHTML = '';
+  const adliyeNames = Object.keys(byAdliye);
+
+  // Check-in yapan arkadaşlar
+  if (adliyeNames.length > 0) {
+    adliyeNames.forEach(adliye => {
+      const people = byAdliye[adliye];
+      const card = document.createElement('div');
+      card.className = 'map-adliye-card has-friends';
+      card.innerHTML = `
+        <div class="map-adliye-header">
+          <div class="map-adliye-name">⚖️ ${adliye}</div>
+          <div class="map-adliye-count">${people.length} arkadaş</div>
+        </div>
+        ${people.map(p => {
+          let statusBadge = p.status === 'Kahveye Açığım'
+            ? '<span style="font-size:10px;color:var(--green);">☕ Kahveye açık</span>'
+            : p.status === 'Duruşmada'
+            ? '<span style="font-size:10px;color:var(--red);">🔴 Duruşmada</span>'
+            : p.status === 'Kalemde'
+            ? '<span style="font-size:10px;color:var(--yellow);">🟡 Kalemde</span>'
+            : '<span style="font-size:10px;color:var(--green);">🟢 Müsait</span>';
+          return `<div class="map-friend-row">
+            <div class="map-friend-av">${p.initials}</div>
+            <div class="map-friend-info">
+              <div>${p.name}</div>
+              <div class="map-friend-status">${statusBadge}</div>
+            </div>
+            <button class="action-btn btn-msg" style="flex:0;padding:6px 12px;font-size:11px;" onclick="openChat('${p.id}','${p.name}','${p.initials}')">Yaz</button>
+          </div>`;
+        }).join('')}
+      `;
+      cont.appendChild(card);
+    });
+  }
+
+  // Check-in yapmamış arkadaşlar
+  const checkedInIds = new Set(adliyeNames.flatMap(a => byAdliye[a].map(p => p.id)));
+  const offlineFriends = Object.entries(friends).filter(([fid]) => !checkedInIds.has(fid));
+  if (offlineFriends.length > 0) {
+    const offCard = document.createElement('div');
+    offCard.className = 'map-adliye-card';
+    offCard.style.opacity = '0.6';
+    offCard.innerHTML = `
+      <div class="map-adliye-header">
+        <div class="map-adliye-name" style="color:var(--muted);">📴 Adliyede Değil</div>
+        <div style="font-size:11px;color:var(--muted2);">${offlineFriends.length} kişi</div>
+      </div>
+      ${offlineFriends.map(([fid, f]) => `
+        <div class="map-friend-row">
+          <div class="map-friend-av" style="border-color:var(--muted2);color:var(--muted2);">${f.initials || '?'}</div>
+          <div class="map-friend-info" style="color:var(--muted);">${f.name}</div>
+        </div>`).join('')}
+    `;
+    cont.appendChild(offCard);
+  }
+
+  if (adliyeNames.length === 0 && offlineFriends.length === 0) {
+    cont.innerHTML = '<div class="map-empty">🗺️<br><br>Tüm arkadaşlarınız<br>şu an adliyede değil.</div>';
+  }
+}
+
+// ─── TARAYICI BİLDİRİMİ ───
+function requestNotifPermission() {
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
+}
+
+function sendBrowserNotif(title, body) {
+  if ('Notification' in window && Notification.permission === 'granted') {
+    new Notification('Duruşma Arası — ' + title, {
+      body: body,
+      icon: 'data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 180 180%27%3E%3Crect width=%27180%27 height=%27180%27 rx=%2740%27 fill=%27%230F0A04%27/%3E%3Ctext x=%2790%27 y=%27115%27 font-size=%2780%27 text-anchor=%27middle%27%3E%E2%98%95%3C/text%3E%3C/svg%3E',
+      badge: 'data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 180 180%27%3E%3Crect width=%27180%27 height=%27180%27 rx=%2740%27 fill=%27%230F0A04%27/%3E%3Ctext x=%2790%27 y=%27115%27 font-size=%2780%27 text-anchor=%27middle%27%3E%E2%98%95%3C/text%3E%3C/svg%3E',
+      tag: 'durusma-arasi',
+      renotify: true
+    });
+  }
+}
+
+// ─── BİLDİRİMLERİ DİNLE (canlı) ───
+let knownNotifIds = new Set();
+
+function listenNotifications() {
+  requestNotifPermission();
+  db.ref('notifications/' + userId).orderByChild('read').equalTo(false).on('value', snap => {
+    const count = snap.numChildren();
+    const badge = document.getElementById('notif-count');
+    if (count > 0) {
+      badge.textContent = count;
+      badge.style.display = 'flex';
+    } else {
+      badge.style.display = 'none';
+    }
+    // Yeni bildirimler için tarayıcı bildirimi gönder
+    if (snap.val()) {
+      Object.entries(snap.val()).forEach(([id, n]) => {
+        if (knownNotifIds.has(id)) return;
+        knownNotifIds.add(id);
+        // Sayfa ilk yüklenince gelen eski bildirimleri atla
+        const age = Date.now() - (n.timestamp || 0);
+        if (age > 10000) return;
+        if (n.type === 'message') {
+          sendBrowserNotif(n.fromName, '"' + n.preview + '"');
+        } else if (n.type === 'friend_request') {
+          sendBrowserNotif(n.fromName, n.fromName + ' sizi arkadaş olarak eklemek istiyor.');
+        } else if (n.type === 'friend_accepted') {
+          sendBrowserNotif('Arkadaşlık Kabul Edildi', n.fromName + ' arkadaşlık isteğinizi kabul etti!');
+        } else if (n.type === 'friend_checkin') {
+          sendBrowserNotif(n.fromName, n.fromName + ' şu an ' + n.adliye + "'e giriş yaptı! 📍");
+        }
+      });
+    }
+  });
+}
+
+// ─── PULL-TO-REFRESH ENGELLEYİCİ ───
+(function() {
+  let startY = 0;
+  document.addEventListener('touchstart', e => { startY = e.touches[0].clientY; }, { passive: true });
+  document.addEventListener('touchmove', e => {
+    const el = e.target.closest('.page, #chat-messages, #friend-requests-list');
+    if (!el) { if (window.scrollY === 0) e.preventDefault(); return; }
+    const atTop = el.scrollTop === 0;
+    const pullDown = e.touches[0].clientY > startY;
+    if (atTop && pullDown) e.preventDefault();
+  }, { passive: false });
+})();
+
+// ─── iOS BANNER ───
+(function() {
+  const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isStandalone = ('standalone' in navigator) && navigator.standalone;
+  if (isIos && !isStandalone && !sessionStorage.getItem('ios-banner-dismissed')) {
+    setTimeout(() => document.getElementById('ios-banner').classList.add('visible'), 3000);
+  }
+})();
+
+
+// ─── STORAGE YARDIMCISI (localStorage + cookie çift güvence) ───
+function saveToStorage(key, val) {
+  try { localStorage.setItem(key, val); } catch(e) {}
+  try {
+    const d = new Date(); d.setFullYear(d.getFullYear() + 1);
+    document.cookie = key + '=' + encodeURIComponent(val) + '; expires=' + d.toUTCString() + '; path=/; SameSite=Lax';
+  } catch(e) {}
+}
+function getFromStorage(key) {
+  try {
+    const ls = localStorage.getItem(key);
+    if (ls !== null) return ls;
+  } catch(e) {}
+  try {
+    const match = document.cookie.match('(?:^|; )' + key + '=([^;]*)');
+    if (match) return decodeURIComponent(match[1]);
+  } catch(e) {}
+  return null;
+}
+function removeFromStorage(key) {
+  try { localStorage.removeItem(key); } catch(e) {}
+  try { document.cookie = key + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax'; } catch(e) {}
+}
+
+// ─── SAYFA YÜKLENİNCE: OTOMATİK GİRİŞ & FORM DOLDUR ───
+(function() {
+  const savedName  = getFromStorage('durusma_name');
+  const savedSicil = getFromStorage('durusma_sicil');
+  const savedTel   = getFromStorage('durusma_tel');
+  const loggedIn   = getFromStorage('durusma_loggedin');
+
+  if (savedName)  document.getElementById('inp-name').value  = savedName;
+  if (savedSicil) document.getElementById('inp-sicil').value = savedSicil;
+  if (savedTel)   document.getElementById('inp-tel').value   = savedTel;
+
+  if (loggedIn === '1' && savedName) {
+    applyLogin(savedName, savedSicil || '', savedTel || '');
+  }
+})();
 </script>
+
+
+<!-- BİLDİRİM PANELİ -->
+<div id="notif-panel" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:2000; align-items:flex-end; justify-content:center; padding:20px;">
+  <div id="notif-card" style="background:var(--bg2); border:0.5px solid var(--border2); border-radius:20px; padding:24px; width:100%; max-width:420px; animation:modal-in .25s ease;">
+    <div id="notif-icon" style="font-size:32px; text-align:center; margin-bottom:10px;">💬</div>
+    <div id="notif-title" style="font-family:'Playfair Display',serif; font-size:17px; color:var(--gold-light); text-align:center; margin-bottom:6px;"></div>
+    <div id="notif-body" style="font-size:13px; color:var(--muted); text-align:center; margin-bottom:20px; line-height:1.6;"></div>
+    <div id="notif-actions" style="display:flex; gap:10px;"></div>
+  </div>
+</div>
+
+<!-- ARKADAŞLIK İSTEKLERİ SAYFASI -->
+<div id="friend-requests-panel" style="display:none; position:fixed; inset:0; background:var(--bg); z-index:1500; flex-direction:column;">
+  <div class="app-header">
+    <div style="display:flex; align-items:center; gap:12px;">
+      <div class="icon-btn" onclick="closeFriendRequests()">←</div>
+      <div><div class="header-logo serif">Arkadaşlık İstekleri</div></div>
+    </div>
+    <div id="friend-req-badge" style="background:var(--red); color:white; border-radius:20px; padding:3px 10px; font-size:12px; display:none;"></div>
+  </div>
+  <div id="friend-requests-list" style="flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:10px;"></div>
+</div>
+
+<div id="chat-panel" style="display:none; position:fixed; inset:0; background:var(--bg); z-index:1000; flex-direction:column; animation: slide-up 0.3s ease-out;">
+  <div class="app-header">
+    <div style="display:flex; align-items:center; gap:12px;">
+      <div class="icon-btn" onclick="closeChat()">←</div>
+      <div>
+        <div class="header-logo serif" id="chat-user-name">Av. Meslektaş</div>
+        <div class="header-greeting" id="chat-user-status">Çevrimiçi</div>
+      </div>
+    </div>
+  </div>
+  <div id="chat-messages" style="flex:1; padding:16px; overflow-y:auto; display:flex; flex-direction:column; gap:8px;">
+    <div style="align-self:center; background:var(--bg3); padding:6px 12px; border-radius:12px; font-size:11px; color:var(--muted2);">Sohbet Başlatıldı</div>
+  </div>
+  <div style="padding:12px 16px; border-top:0.5px solid var(--border); display:flex; gap:10px; background:var(--bg2); padding-bottom:calc(12px + env(safe-area-inset-bottom));">
+    <input type="text" id="chat-input" placeholder="Mesajınızı yazın..." style="flex:1; background:var(--bg3); border:0.5px solid var(--border); border-radius:20px; padding:10px 16px; color:var(--text); outline:none;" onkeydown="if(event.key==='Enter') sendMessage()">
+    <button class="icon-btn" style="background:var(--gold); color:var(--bg); border:none; width:42px; height:42px;" onclick="sendMessage()">➔</button>
+  </div>
+</div>
+
+<style>
+@keyframes slide-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.action-btn { flex:1; padding:8px; border-radius:8px; font-size:12px; font-weight:500; cursor:pointer; text-align:center; transition: 0.2s; }
+.btn-add { background: var(--bg2); border: 0.5px solid var(--gold); color: var(--gold); }
+.btn-msg { background: var(--gold); border: none; color: var(--bg); }
+</style>
+
 </body>
 </html>
