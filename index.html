@@ -198,17 +198,6 @@ html {
 .toggle::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:white;top:3px;left:3px;transition:transform .2s}
 .toggle.on{background:var(--gold)} .toggle.on::after{transform:translateX(18px)}
 
-/* PROFİL: ARKADAŞLAR */
-.profile-friend-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:0.5px solid var(--border);cursor:pointer;transition:background .15s;}
-.profile-friend-row:last-child{border-bottom:none;}
-.profile-friend-row:hover{background:rgba(200,137,42,.04);}
-.profile-friend-av{width:36px;height:36px;border-radius:50%;background:var(--card);border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--gold-light);flex-shrink:0;}
-.profile-friend-info{flex:1;}
-.profile-friend-name{font-size:13px;color:var(--text);font-weight:500;}
-.profile-friend-status{font-size:11px;color:var(--muted);margin-top:2px;}
-.profile-friend-yaz{padding:6px 14px;border-radius:8px;font-size:11px;font-weight:500;background:var(--gold);border:none;color:var(--bg);cursor:pointer;white-space:nowrap;transition:opacity .2s;}
-.profile-friend-yaz:hover{opacity:.85;}
-
 /* MODAL */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;align-items:center;justify-content:center;padding:20px}
 .modal-overlay.open{display:flex}
@@ -253,47 +242,17 @@ html {
   <div class="landing-content">
     <div class="app-logo serif">Duruşma Arası</div>
     <div class="app-tagline">Adliyedeyken meslektaşınla buluş</div>
-    <div class="login-box" id="login-box">
+    <div class="login-box">
       <h2>Giriş Yap</h2>
-      <p>Sadece kayıtlı baro üyeleri katılabilir.</p>
-      
-      <div class="field-label" style="margin-top:20px;">Baro Sicil No</div>
-      <input class="field-input" type="text" id="inp-sicil" placeholder="Örn: 34/12345" value="">
-      <div class="field-label">Telefon (Kayıtlı)</div>
-      <input class="field-input" type="tel" id="inp-tel" placeholder="05** *** ** **" value="">
-      
-      <div style="margin-bottom: 20px; font-size: 11px; color: var(--muted); display: flex; align-items: flex-start; gap: 8px;">
-        <input type="checkbox" id="kvkk-check-login" style="margin-top: 2px;">
-        <label for="kvkk-check-login" style="line-height:1.4;">
-          <u style="cursor:pointer;color:var(--gold-light);" onclick="openKvkkModal()">Kişisel verilerinizin işlenmesine ilişkin Aydınlatma Metni</u>'ni okudum ve kabul ediyorum.
-        </label>
-      </div>
-      
-      <button class="btn-primary" onclick="doLogin()">Giriş Yap →</button>
-      <div class="login-note" style="margin-top:20px; cursor:pointer; color:var(--gold);" onclick="toggleAuthMode('register')">Burada kayıtlı değilsen kayıt ol</div>
-    </div>
-
-    <!-- KAYIT EKRANI -->
-    <div class="login-box" id="register-box" style="display:none;">
-      <h2>Kayıt Ol</h2>
-      <p>Sisteme giriş yapabilmek için kayıt oluşturmalısınız.</p>
-      
-      <div class="field-label" style="margin-top:20px;">Ad Soyad</div>
-      <input class="field-input" type="text" id="reg-name" placeholder="Avukat Adı ve Soyadı">
+      <p>Sadece baro üyeleri katılabilir. Baro kartınızla kimliğinizi doğrulayın.</p>
+      <div class="field-label">Ad Soyad</div>
+      <input class="field-input" type="text" id="inp-name" placeholder="Avukat Adı ve Soyadı" value="">
       <div class="field-label">Baro Sicil No</div>
-      <input class="field-input" type="text" id="reg-sicil" placeholder="Örn: 34/12345">
+      <input class="field-input" type="text" id="inp-sicil" placeholder="" value="">
       <div class="field-label">Telefon</div>
-      <input class="field-input" type="tel" id="reg-tel" placeholder="05** *** ** **">
-      
-      <div style="margin-bottom: 20px; font-size: 11px; color: var(--muted); display: flex; align-items: flex-start; gap: 8px;">
-        <input type="checkbox" id="kvkk-check-reg" style="margin-top: 2px;">
-        <label for="kvkk-check-reg" style="line-height:1.4;">
-          <u style="cursor:pointer;color:var(--gold-light);" onclick="openKvkkModal()">Kişisel verilerinizin işlenmesine ilişkin Aydınlatma Metni</u>'ni okudum ve kabul ediyorum.
-        </label>
-      </div>
-
-      <button class="btn-primary" onclick="doRegister()">Kayıt Talep Et →</button>
-      <div class="login-note" style="margin-top:20px; cursor:pointer;" onclick="toggleAuthMode('login')">Zaten hesabın var mı? Giriş yap</div>
+      <input class="field-input" type="tel" id="inp-tel" placeholder="05** *** ** **" value="">
+      <button class="btn-primary" onclick="doLogin()">Giriş Yap →</button>
+      <div class="login-note">Baro kartı doğrulaması için hesabınız 24 saat içinde onaylanır.</div>
     </div>
   </div>
 </div>
@@ -332,6 +291,7 @@ html {
           <div class="mood-chip selected" onclick="setMood(this,'Müsaitim')"><span class="mood-icon">🟢</span>Müsaitim</div>
           <div class="mood-chip" onclick="setMood(this,'Duruşmada')"><span class="mood-icon">🔴</span>Duruşmada</div>
           <div class="mood-chip" onclick="setMood(this,'Kalemde')"><span class="mood-icon">🟡</span>Kalemde</div>
+          <div class="mood-chip" id="kahve-chip" onclick="setMood(this,'Kahveye Açığım')"><span class="mood-icon">☕</span>Kahveye Açığım<div class="kahve-timer" id="kahve-timer" style="display:none;"></div></div>
         </div>
       </div>
       <div class="nearby-section" id="nearby-section" style="display:none;">
@@ -372,7 +332,7 @@ html {
         </div>
         <div class="settings-row" onclick="toggleSetting(this)">
           <div class="settings-row-left"><span class="settings-icon">👥</span><span class="settings-label">Sadece rehberimdekiler görsün</span></div>
-          <button class="toggle on" tabindex="-1"></button>
+          <button class="toggle" tabindex="-1"></button>
         </div>
         <div class="settings-row" onclick="toggleSetting(this)">
           <div class="settings-row-left"><span class="settings-icon">🔔</span><span class="settings-label">Bildirimler</span></div>
@@ -391,12 +351,6 @@ html {
         </div>
         <div class="settings-row" onclick="doLogout()">
           <div class="settings-row-left"><span class="settings-icon">🚪</span><span class="settings-label" style="color:var(--red);">Çıkış Yap</span></div>
-        </div>
-      </div>
-      <div class="section-title" style="margin-bottom:10px;">Arkadaşlar</div>
-      <div class="settings-group" id="profile-friends-group">
-        <div class="settings-row" style="cursor:default;">
-          <div style="color:var(--muted2);font-size:12px;padding:4px 0;">⏳ Yükleniyor...</div>
         </div>
       </div>
     </div>
@@ -585,84 +539,16 @@ function restoreCheckin() {
   listenNearbyAvukats(savedAdliye);
 }
 
-function toggleAuthMode(mode) {
-  if (mode === 'register') {
-    document.getElementById('login-box').style.display = 'none';
-    document.getElementById('register-box').style.display = 'block';
-  } else {
-    document.getElementById('login-box').style.display = 'block';
-    document.getElementById('register-box').style.display = 'none';
-  }
-}
-
-function openKvkkModal() { document.getElementById('kvkk-modal').classList.add('open'); }
-function closeKvkkModal() { document.getElementById('kvkk-modal').classList.remove('open'); }
-function openCookiePolicy() { document.getElementById('cookie-modal').classList.add('open'); }
-function closeCookieModal() { document.getElementById('cookie-modal').classList.remove('open'); }
-
-function handleCookieConsent(acceptedAll) {
-  saveToStorage('durusma_cookie_consent', acceptedAll ? 'all' : 'essential');
-  document.getElementById('cookie-banner').style.display = 'none';
-}
-
 function doLogin() {
-  const sicil = document.getElementById('inp-sicil').value.trim();
+  const name = document.getElementById('inp-name').value.trim() || 'Av. Enes Emre';
+  const sicil = document.getElementById('inp-sicil').value.trim() || '34/82741';
   const tel = document.getElementById('inp-tel').value.trim();
-  const kvkk = document.getElementById('kvkk-check-login').checked;
-  
-  if(!sicil || !tel) { showToast('Sicil No ve Telefon zorunludur.'); return; }
-  if(!kvkk) { showToast("Aydınlatma Metni'ni onaylamalısınız."); return; }
-
-  const safeSicil = sicil.replace(/\//g, '_');
-  
-  db.ref('users/' + safeSicil).once('value', snap => {
-    if(snap.exists() && snap.val().approved) {
-       const u = snap.val();
-       if(u.tel !== tel) {
-          showToast('Telefon numarası eşleşmedi.');
-          return;
-       }
-       saveToStorage('durusma_name', u.name);
-       saveToStorage('durusma_sicil', u.sicil);
-       saveToStorage('durusma_tel', u.tel);
-       saveToStorage('durusma_loggedin', '1');
-       applyLogin(u.name, u.sicil, u.tel);
-    } else {
-       showToast('Kullanıcı bulunamadı veya henüz yönetici onayında.');
-    }
-  });
-}
-
-function doRegister() {
-  const name = document.getElementById('reg-name').value.trim();
-  const sicil = document.getElementById('reg-sicil').value.trim();
-  const tel = document.getElementById('reg-tel').value.trim();
-  const kvkk = document.getElementById('kvkk-check-reg').checked;
-
-  if(!name || !sicil || !tel) { showToast('Lütfen tüm bilgileri girin.'); return; }
-  if(!kvkk) { showToast("Aydınlatma Metni'ni onaylamalısınız."); return; }
-  
-  const safeSicil = sicil.replace(/\//g, '_');
-  
-  db.ref('users/' + safeSicil).once('value', snap => {
-    if(snap.exists()) {
-       showToast('Bu sicil no ile onaylı bir hesap zaten var.');
-       return;
-    }
-    db.ref('registrations/' + safeSicil).set({
-        name: name,
-        sicil: sicil,
-        tel: tel,
-        timestamp: firebase.database.ServerValue.TIMESTAMP
-    }).then(() => {
-       showToast('Kayıt talebiniz alındı. Onaydan sonra giriş yapabilirsiniz.');
-       toggleAuthMode('login');
-       document.getElementById('reg-name').value = '';
-       document.getElementById('reg-sicil').value = '';
-       document.getElementById('reg-tel').value = '';
-       document.getElementById('kvkk-check-reg').checked = false;
-    });
-  });
+  // Bilgileri kalıcı olarak sakla
+  saveToStorage('durusma_name', name);
+  saveToStorage('durusma_sicil', sicil);
+  saveToStorage('durusma_tel', tel);
+  saveToStorage('durusma_loggedin', '1');
+  applyLogin(name, sicil, tel);
 }
 
 // ─── SAYFA GEÇİŞİ ───
@@ -675,77 +561,6 @@ function goPage(page, tab) {
 function goProfile() {
   goPage('profile');
   document.querySelectorAll('.nav-tab').forEach((t,i) => { if(i===2) t.classList.add('active'); else t.classList.remove('active'); });
-  renderProfileFriends();
-}
-
-// ─── PROFİL: ARKADAŞLAR BÖLÜMÜ ───
-function renderProfileFriends() {
-  const group = document.getElementById('profile-friends-group');
-  if (!group) return;
-  group.innerHTML = '<div style="padding:14px 16px;color:var(--muted2);font-size:12px;">⏳ Yükleniyor...</div>';
-
-  db.ref('friends/' + userId).once('value', snap => {
-    const friends = snap.val();
-    if (!friends || Object.keys(friends).length === 0) {
-      group.innerHTML = '<div style="padding:14px 16px;color:var(--muted2);font-size:12px;text-align:center;">Henüz arkadaşınız yok.<br>Aynı adliyedeki meslektaşlarınıza istek gönderin.</div>';
-      return;
-    }
-
-    const friendEntries = Object.entries(friends);
-    let pending = friendEntries.length;
-    // { friendId: { name, initials, adliye?, status? } }
-    const result = {};
-
-    friendEntries.forEach(([fid, fdata]) => {
-      result[fid] = { name: fdata.name, initials: fdata.initials || '?', adliye: null, status: null };
-      let found = false;
-      let adliyeChecked = 0;
-      ADLIYELER.forEach(a => {
-        db.ref('adliyeler/' + a + '/' + fid).once('value', snap2 => {
-          adliyeChecked++;
-          if (snap2.exists() && !found) {
-            found = true;
-            const p = snap2.val();
-            result[fid].adliye = a;
-            result[fid].status = p.status || 'Müsaitim';
-          }
-          if (adliyeChecked === ADLIYELER.length) {
-            pending--;
-            if (pending <= 0) _buildProfileFriendsList(result, group);
-          }
-        });
-      });
-    });
-  });
-}
-
-function _buildProfileFriendsList(result, group) {
-  group.innerHTML = '';
-  Object.entries(result).forEach(([fid, f]) => {
-    const row = document.createElement('div');
-    row.className = 'profile-friend-row';
-
-    const isHere = !!f.adliye;
-    // Short adliye name — strip "Adliyesi" for brevity
-    const shortAdliye = f.adliye ? f.adliye.replace(' Adliyesi','').replace('İstanbul Anadolu Adliyesi (Kartal)','Kartal') : '';
-    const statusText = isHere
-      ? `📍 ${shortAdliye} · ${f.status}`
-      : 'Adliyede değil';
-    const statusColor = isHere ? 'var(--green)' : 'var(--muted2)';
-
-    row.innerHTML = `
-      <div class="profile-friend-av">${f.initials}</div>
-      <div class="profile-friend-info">
-        <div class="profile-friend-name">${f.name}</div>
-        <div class="profile-friend-status" style="color:${statusColor};">${statusText}</div>
-      </div>
-      ${isHere ? `<button class="profile-friend-yaz" onclick="event.stopPropagation();openChat('${fid}','${f.name}','${f.initials}')">Yaz</button>` : ''}
-    `;
-    if (isHere) {
-      row.onclick = () => openChat(fid, f.name, f.initials);
-    }
-    group.appendChild(row);
-  });
 }
 
 // ─── BÜYÜK BUTON ───
@@ -1498,19 +1313,12 @@ function removeFromStorage(key) {
   const savedTel   = getFromStorage('durusma_tel');
   const loggedIn   = getFromStorage('durusma_loggedin');
 
-  if (savedName) {
-    const inpName = document.getElementById('inp-name');
-    if (inpName) inpName.value = savedName;
-  }
+  if (savedName)  document.getElementById('inp-name').value  = savedName;
   if (savedSicil) document.getElementById('inp-sicil').value = savedSicil;
   if (savedTel)   document.getElementById('inp-tel').value   = savedTel;
 
   if (loggedIn === '1' && savedName) {
     applyLogin(savedName, savedSicil || '', savedTel || '');
-  }
-
-  if (!getFromStorage('durusma_cookie_consent')) {
-    document.getElementById('cookie-banner').style.display = 'flex';
   }
 })();
 </script>
@@ -1563,50 +1371,6 @@ function removeFromStorage(key) {
 .btn-add { background: var(--bg2); border: 0.5px solid var(--gold); color: var(--gold); }
 .btn-msg { background: var(--gold); border: none; color: var(--bg); }
 </style>
-
-<!-- KVKK Modal -->
-<div class="modal-overlay" id="kvkk-modal">
-  <div class="modal" style="display:flex; flex-direction:column; max-height: 85vh;">
-    <div class="modal-title" style="margin-bottom:15px;">Aydınlatma Metni</div>
-    <div class="modal-sub" style="flex:1; font-size: 12px; text-align: left; overflow-y: auto; color: var(--muted); padding-right: 15px; line-height:1.7;">
-      <b>Veri Sorumlusu:</b> Duruşma Arası platformu (bundan böyle "Veri Sorumlusu" olarak anılacaktır).<br><br>
-      <b>Veri İşleme Amacı:</b> Sağladığınız Ad-Soyad ve Baro Sicil numaranız, yalnızca baro sisteminde avukat olup olmadığınızın doğrulanması ve platform içerisindeki meslektaşlarınızla kimlik doğrulaması amacıyla işlenmektedir. Platforma girdiğiniz telefon numaranız, meslektaşlarınızın sizi tanıyabilmesi veya idari onay süreçlerinin yönetilmesi içindir.<br><br>
-      <b>Konum Verisi:</b> Konum erişimine (GPS) onay vermeniz durumunda, konumunuz sadece "Adliyede Check-in" işlemini gerçekleştirmek üzere anlık olarak işlenir. Uygulama hiçbir şekilde konumunuzu arka planda veya geçmişe dönük olarak <b>izlemez, takip etmez ve kaydetmez</b>. Check-out yaptığınız anda konum bilginiz sistemden tamamen silinir.<br><br>
-      <b>Verilerin Aktarımı:</b> Kişisel verileriniz hiçbir kurum, kuruluş veya üçüncü şahısla ticari amaçla paylaşılamaz veya satılamaz. Uygulama içerisindeki veri trafiği uçtan uca şifrelenmiş (HTTPS/SSL) olup güvence altındadır.<br><br>
-      <b>KVKK Madde 11 Uyarınca Haklarınız:</b><br>
-      Kişisel verilerinizin işlenip işlenmediğini öğrenme,<br>
-      İşlenmişse bilgi talep etme,<br>
-      Verilerinizin eksik veya yanlış işlenmesi durumunda düzeltilmesini isteme,<br>
-      Verilerinizin silinmesini veya yok edilmesini talep etme haklarına sahipsiniz.
-    </div>
-    <button class="btn-primary" style="margin-top: 20px; flex-shrink:0;" onclick="closeKvkkModal()">Okudum, Kapat</button>
-  </div>
-</div>
-
-<!-- Cookie Modal -->
-<div class="modal-overlay" id="cookie-modal">
-  <div class="modal" style="display:flex; flex-direction:column; max-height: 85vh;">
-    <div class="modal-title" style="margin-bottom:15px;">Çerez Politikası</div>
-    <div class="modal-sub" style="flex:1; font-size: 12px; text-align: left; overflow-y: auto; color: var(--muted); padding-right: 15px; line-height:1.7;">
-      Bu platformda, sistem güvenliğini sağlamak ve aktif oturumunuzu (login) kesintisiz sürdürebilmek için "Zorunlu Çerezler (Strictly Necessary Cookies)" kullanılmaktadır.<br><br>
-      Ayrıca, açık rızanız bulunması halinde platform kullanım istatistiklerini (hangi adliyelerde ne kadar aktif kullanıcı var vb.) anonim olarak analiz etmek amacıyla analitik çerezler kullanılabilir.<br><br>
-      Zorunlu çerezler dışındakileri reddetme hakkına sahipsiniz. Oturum açarak işleyiş için şart olan zorunlu çerezleri okuduğunuzu ve kabul ettiğinizi beyan etmiş olursunuz.
-    </div>
-    <button class="btn-primary" style="margin-top: 20px; flex-shrink:0;" onclick="closeCookieModal()">Anladım, Kapat</button>
-  </div>
-</div>
-
-<!-- Cookie Banner -->
-<div id="cookie-banner" style="display:none; position:fixed; bottom:0; left:50%; transform:translateX(-50%); background:var(--bg2); border:1px solid var(--border2); border-radius:16px 16px 0 0; padding:24px 20px; z-index:9999; flex-direction:column; gap:16px; align-items:center; width:100%; max-width:480px; box-shadow: 0 -10px 40px rgba(0,0,0,0.5);">
-  <div style="font-size:12px; color:var(--muted); text-align:center; line-height:1.6;">
-    Deneyiminizi iyileştirmek için çerezleri (cookies) kullanıyoruz. Temel fonksiyonlar dışındaki izleme çerezlerini kabul ediyor musunuz? 
-    <u style="cursor:pointer; color:var(--gold-light);" onclick="openCookiePolicy()">Çerez Politikası</u>
-  </div>
-  <div style="display:flex; gap:12px; width:100%;">
-    <button style="flex:1; padding:12px; background:transparent; border:0.5px solid var(--border2); border-radius:10px; font-family:'DM Sans',sans-serif; font-size:13px; color:var(--muted); cursor:pointer;" onclick="handleCookieConsent(false)">Reddet</button>
-    <button style="flex:1; padding:12px; background:var(--gold); border:none; border-radius:10px; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:500; color:var(--bg); cursor:pointer;" onclick="handleCookieConsent(true)">Kabul Et</button>
-  </div>
-</div>
 
 </body>
 </html>
