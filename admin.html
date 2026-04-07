@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Paneli - Duruşma Arası</title>
+  <style>
+    body { font-family: 'DM Sans', sans-serif; background: #f4f4f4; padding: 20px; color: #333; margin: 0; }
+    .container { max-width: 800px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+    h2 { border-bottom: 2px solid #C8892A; padding-bottom: 10px; margin-top: 0; font-family: 'Playfair Display', serif; color: #2A1E0A; }
+    .user-card { display: flex; justify-content: space-between; align-items: center; background: #fafafa; padding: 15px; margin-bottom: 10px; border: 1px solid #eee; border-radius: 8px; transition: 0.2s; }
+    .user-card:hover { border-color: #ddd; background: #fdfdfd; }
+    .user-info p { margin: 5px 0; font-size: 14px; }
+    .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; transition: opacity 0.2s; }
+    .btn:hover { opacity: 0.8; }
+    .btn-approve { background: #5AAF5A; color: white; margin-right: 8px; }
+    .btn-reject { background: #C05050; color: white; }
+    .empty-msg { color: #888; font-size: 14px; font-style: italic; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Kayıt Onay Bekleyenler</h2>
+  <div id="pending-users">Yükleniyor...</div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+  // index.html'deki mevcut Firebase ayarlarınız
+  const firebaseConfig = {
+    apiKey: "AIzaSyCmoN0WvhAOz3xGMPvpwstT8XsSuwwC-QQ",
+    authDomain: "durusma-arasi-210bb.firebaseapp.com",
+    databaseURL: "https://durusma-arasi-210bb-default-rtdb.firebaseio.com",
+    projectId: "durusma-arasi-210bb",
+    storageBucket: "durusma-arasi-210bb.firebasestorage.app",
+    messagingSenderId: "954201469428",
+    appId: "1:954201469428:web:dbe2eccf83c97fce5509a1"
+  };
+  
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
+  const db = firebase.database();
+
+  function loadPendingUsers() {
+    // Sadece durumu "onay bekliyor" olan kullanıcıları listele
+    db.ref('users').orderByChild('status').equalTo('onay bekliyor').on('value', (snapshot) => {
+      const container = document.getElementById('pending-users');
+      container.innerHTML = '';
+      
+      if (!snapshot.exists()) {
+        container.innerHTML = '<p class="empty-msg">Şu anda onay bekleyen yeni bir kayıt talebi bulunmuyor.</p>';
+        return;
+      }
+
+      snapshot.forEach(childSnapshot => {
+        const userId = childSnapshot.key;
+        const user = childSnapshot.val();
+        
+        container.innerHTML += `
+          <div class="user-card">
+            <div class="user-info">
+              <p><strong>Ad Soyad:</strong> ${user.name}</p>
+              <p><strong>Sicil No:</strong> ${user.sicil}</p>
+              <p><strong>Telefon:</strong> ${user.tel}</p>
+            </div>
+            <div class="actions">
+              <button class="btn btn-approve" onclick="approveUser('${userId}')">Onayla ✓</button>
+              <button class="btn btn-reject" onclick="rejectUser('${userId}')">Reddet ✕</button>
+            </div>
+          </div>
+        `;
+      });
+    });
+  }
+
+  // Kullanıcıyı Onayla (Veritabanındaki statüsünü "onaylandi" yapar)
+  function approveUser(userId) {
+    if (confirm("Bu kullanıcıyı sisteme kabul etmek istediğinize emin misiniz?")) {
+      db.ref('users/' + userId).update({ status: 'onaylandi' }).then(() => {
+        alert("Kullanıcı başarıyla onaylandı!");
+      });
+    }
+  }
+
+  // Kullanıcıyı Reddet (Veritabanından siler)
+  function rejectUser(userId) {
+    if (confirm("Kullanıcıyı reddedip silmek istediğinize emin misiniz?")) {
+      db.ref('users/' + userId).remove().then(() => {
+        alert("Kullanıcı reddedildi.");
+      });
+    }
+  }
+
+  // Sayfa açıldığında bekleyen kullanıcıları yükle
+  window.onload = loadPendingUsers;
+</script>
+
+</body>
+</html>
