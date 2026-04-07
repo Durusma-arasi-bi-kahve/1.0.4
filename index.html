@@ -279,18 +279,7 @@ body {
   }
 
 
-  /* ==================================================================== */
-  / <script>
-// ─── FIREBASE YAPILANDIRMA ───
-const firebaseConfig = {
-  apiKey: "AIzaSyCmoN0WvhAOz3xGMPvpwstT8XsSuwwC-QQ",
-  authDomain: "durusma-arasi-210bb.firebaseapp.com",
-  databaseURL: "https://durusma-arasi-210bb-default-rtdb.firebaseio.com",
-  projectId: "durusma-arasi-210bb",
-  storageBucket: "durusma-arasi-210bb.firebasestorage.app",
-  messagingSenderId: "954201469428",
-  appId: "1:954201469428:web:dbe2eccf83c97fce5509a1",
-  measurementId: "G-VBX7SOWESG"
+  
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
@@ -450,33 +439,6 @@ function handleCookieConsent(acceptedAll) {
   document.getElementById('cookie-banner').style.display = 'none';
 }
 
-function doLogin() {
-  const sicil = document.getElementById('inp-sicil').value.trim();
-  const tel = document.getElementById('inp-tel').value.trim();
-  const kvkk = document.getElementById('kvkk-check-login').checked;
-  
-  if(!sicil || !tel) { showToast('Sicil No ve Telefon zorunludur.'); return; }
-  if(!kvkk) { showToast("Aydınlatma Metni'ni onaylamalısınız."); return; }
-
-  const safeSicil = sicil.replace(/\//g, '_');
-  
-  db.ref('users/' + safeSicil).once('value', snap => {
-    if(snap.exists() && snap.val().approved) {
-       const u = snap.val();
-       if(u.tel !== tel) {
-          showToast('Telefon numarası eşleşmedi.');
-          return;
-       }
-       saveToStorage('durusma_name', u.name);
-       saveToStorage('durusma_sicil', u.sicil);
-       saveToStorage('durusma_tel', u.tel);
-       saveToStorage('durusma_loggedin', '1');
-       applyLogin(u.name, u.sicil, u.tel);
-    } else {
-       showToast('Kullanıcı bulunamadı veya henüz yönetici onayında.');
-    }
-  });
-}
 
 function doRegister() {
   const name = document.getElementById('reg-name').value.trim();
