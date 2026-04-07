@@ -253,17 +253,39 @@ html {
   <div class="landing-content">
     <div class="app-logo serif">Duruşma Arası</div>
     <div class="app-tagline">Adliyedeyken meslektaşınla buluş</div>
-    <div class="login-box">
+    <!-- GİRİŞ FORMU -->
+    <div class="login-box" id="login-box">
       <h2>Giriş Yap</h2>
-      <p>Sadece baro üyeleri katılabilir. Baro kartınızla kimliğinizi doğrulayın.</p>
-      <div class="field-label">Ad Soyad</div>
-      <input class="field-input" type="text" id="inp-name" placeholder="Avukat Adı ve Soyadı" value="">
+      <p>Sadece baro üyeleri katılabilir. Kayıtlı hesabınızla giriş yapın.</p>
       <div class="field-label">Baro Sicil No</div>
-      <input class="field-input" type="text" id="inp-sicil" placeholder="" value="">
+      <input class="field-input" type="text" id="inp-sicil" placeholder="Sicil numaranız" value="">
       <div class="field-label">Telefon</div>
       <input class="field-input" type="tel" id="inp-tel" placeholder="05** *** ** **" value="">
       <button class="btn-primary" onclick="doLogin()">Giriş Yap →</button>
-      <div class="login-note">Baro kartı doğrulaması için hesabınız 24 saat içinde onaylanır.</div>
+      <div class="login-note" style="cursor:pointer;color:var(--gold);margin-top:16px;" onclick="showRegister()">Hesabınız yok mu? <u>Kayıt Olun</u></div>
+    </div>
+
+    <!-- KAYIT FORMU -->
+    <div class="login-box" id="register-box" style="display:none;">
+      <h2>Kayıt Ol</h2>
+      <p>Üyelik talebiniz admin onayına sunulacak. Onay sonrası giriş yapabilirsiniz.</p>
+      <div class="field-label">Ad Soyad</div>
+      <input class="field-input" type="text" id="reg-name" placeholder="Avukat Adı ve Soyadı">
+      <div class="field-label">Baro Sicil No</div>
+      <input class="field-input" type="text" id="reg-sicil" placeholder="Sicil numaranız">
+      <div class="field-label">Telefon</div>
+      <input class="field-input" type="tel" id="reg-tel" placeholder="05** *** ** **">
+      <button class="btn-primary" onclick="doRegister()">Kayıt Talebi Gönder →</button>
+      <div class="login-note" style="cursor:pointer;color:var(--gold);margin-top:16px;" onclick="showLogin()">Zaten hesabınız var mı? <u>Giriş Yapın</u></div>
+    </div>
+
+    <!-- ONAY BEKLİYOR EKRANI -->
+    <div class="login-box" id="pending-box" style="display:none;text-align:center;">
+      <div style="font-size:40px;margin-bottom:16px;">⏳</div>
+      <h2 style="text-align:center;margin-bottom:12px;">Onay Bekleniyor</h2>
+      <p style="text-align:center;margin-bottom:20px;">Üyelik talebiniz alındı. Admin onayının ardından giriş yapabileceksiniz.<br><br>Bu süreç genellikle 24 saat içinde tamamlanır.</p>
+      <button class="btn-primary" onclick="checkPendingStatus()" style="margin-bottom:10px;">Durumu Kontrol Et 🔄</button>
+      <div class="login-note" style="cursor:pointer;color:var(--red);" onclick="cancelPendingRequest()">Talebi iptal et</div>
     </div>
   </div>
 </div>
@@ -555,16 +577,110 @@ function restoreCheckin() {
   listenNearbyAvukats(savedAdliye);
 }
 
+// ─── KAYIT & GİRİŞ EKRANI YÖNETİMİ ───
+function showRegister() {
+  document.getElementById('login-box').style.display = 'none';
+  document.getElementById('register-box').style.display = 'block';
+  document.getElementById('pending-box').style.display = 'none';
+}
+function showLogin() {
+  document.getElementById('login-box').style.display = 'block';
+  document.getElementById('register-box').style.display = 'none';
+  document.getElementById('pending-box').style.display = 'none';
+}
+function showPending() {
+  document.getElementById('login-box').style.display = 'none';
+  document.getElementById('register-box').style.display = 'none';
+  document.getElementById('pending-box').style.display = 'block';
+}
+
+// ─── KAYIT OL ───
+function doRegister() {
+  const name  = document.getElementById('reg-name').value.trim();
+  const sicil = document.getElementById('reg-sicil').value.trim();
+  const tel   = document.getElementById('reg-tel').value.trim();
+  if (!name || !sicil || !tel) { showToast('⚠️ Tüm alanları doldurun'); return; }
+
+  // Sicil no'yu kayıt kimliği olarak kullan (boşluk/slash temizle)
+  const regId = 'reg_' + sicil.replace(/[^a-zA-Z0-9]/g,'_');
+
+  db.ref('kayit_talepleri/' + regId).set({
+    name, sicil, tel,
+    status: 'bekliyor',
+    requestedAt: firebase.database.ServerValue.TIMESTAMP
+  }).then(() => {
+    saveToStorage('durusma_reg_id', regId);
+    saveToStorage('durusma_reg_name', name);
+    saveToStorage('durusma_reg_sicil', sicil);
+    saveToStorage('durusma_reg_tel', tel);
+    showPending();
+    showToast('✅ Kayıt talebiniz alındı!');
+  }).catch(() => showToast('❌ Hata oluştu, tekrar deneyin.'));
+}
+
+// ─── ONAY DURUMU KONTROL ───
+function checkPendingStatus() {
+  const regId = getFromStorage('durusma_reg_id');
+  if (!regId) { showLogin(); return; }
+  showToast('🔄 Kontrol ediliyor...');
+  db.ref('kayit_talepleri/' + regId).once('value', snap => {
+    const data = snap.val();
+    if (!data) { showToast('❌ Talep bulunamadı'); return; }
+    if (data.status === 'onaylandi') {
+      saveToStorage('durusma_name', data.name);
+      saveToStorage('durusma_sicil', data.sicil);
+      saveToStorage('durusma_tel', data.tel || '');
+      saveToStorage('durusma_loggedin', '1');
+      removeFromStorage('durusma_reg_id');
+      showToast('✅ Hesabınız onaylandı! Hoş geldiniz.');
+      applyLogin(data.name, data.sicil, data.tel || '');
+    } else if (data.status === 'reddedildi') {
+      showToast('❌ Üyelik talebiniz reddedildi.');
+      removeFromStorage('durusma_reg_id');
+      showLogin();
+    } else {
+      showToast('⏳ Henüz onay bekleniyor.');
+    }
+  });
+}
+
+function cancelPendingRequest() {
+  const regId = getFromStorage('durusma_reg_id');
+  if (regId) db.ref('kayit_talepleri/' + regId).remove();
+  removeFromStorage('durusma_reg_id');
+  removeFromStorage('durusma_reg_name');
+  removeFromStorage('durusma_reg_sicil');
+  removeFromStorage('durusma_reg_tel');
+  showLogin();
+  showToast('Talep iptal edildi.');
+}
+
+// ─── GİRİŞ ───
 function doLogin() {
-  const name = document.getElementById('inp-name').value.trim() || 'Av. Enes Emre';
-  const sicil = document.getElementById('inp-sicil').value.trim() || '34/82741';
-  const tel = document.getElementById('inp-tel').value.trim();
-  // Bilgileri kalıcı olarak sakla
-  saveToStorage('durusma_name', name);
-  saveToStorage('durusma_sicil', sicil);
-  saveToStorage('durusma_tel', tel);
-  saveToStorage('durusma_loggedin', '1');
-  applyLogin(name, sicil, tel);
+  const sicil = document.getElementById('inp-sicil').value.trim();
+  const tel   = document.getElementById('inp-tel').value.trim();
+  if (!sicil || !tel) { showToast('⚠️ Sicil ve telefon gerekli'); return; }
+
+  const regId = 'reg_' + sicil.replace(/[^a-zA-Z0-9]/g,'_');
+  showToast('🔄 Giriş yapılıyor...');
+  db.ref('kayit_talepleri/' + regId).once('value', snap => {
+    const data = snap.val();
+    if (!data) { showToast('❌ Kayıtlı hesap bulunamadı. Kayıt olun.'); return; }
+    if (data.status === 'bekliyor') {
+      saveToStorage('durusma_reg_id', regId);
+      showPending();
+      showToast('⏳ Hesabınız henüz onaylanmadı.');
+      return;
+    }
+    if (data.status === 'reddedildi') { showToast('❌ Üyelik talebiniz reddedildi.'); return; }
+    if (data.tel && data.tel !== tel) { showToast('❌ Telefon numarası eşleşmiyor.'); return; }
+    // Onaylı
+    saveToStorage('durusma_name', data.name);
+    saveToStorage('durusma_sicil', data.sicil);
+    saveToStorage('durusma_tel', tel);
+    saveToStorage('durusma_loggedin', '1');
+    applyLogin(data.name, data.sicil, tel);
+  });
 }
 
 // ─── SAYFA GEÇİŞİ ───
@@ -1399,13 +1515,30 @@ function removeFromStorage(key) {
   const savedSicil = getFromStorage('durusma_sicil');
   const savedTel   = getFromStorage('durusma_tel');
   const loggedIn   = getFromStorage('durusma_loggedin');
+  const regId      = getFromStorage('durusma_reg_id');
 
-  if (savedName)  document.getElementById('inp-name').value  = savedName;
   if (savedSicil) document.getElementById('inp-sicil').value = savedSicil;
   if (savedTel)   document.getElementById('inp-tel').value   = savedTel;
 
   if (loggedIn === '1' && savedName) {
     applyLogin(savedName, savedSicil || '', savedTel || '');
+  } else if (regId) {
+    // Onay bekleyen kayıt var mı kontrol et
+    db.ref('kayit_talepleri/' + regId).once('value', snap => {
+      const data = snap.val();
+      if (!data) { removeFromStorage('durusma_reg_id'); return; }
+      if (data.status === 'onaylandi') {
+        saveToStorage('durusma_name', data.name);
+        saveToStorage('durusma_sicil', data.sicil);
+        saveToStorage('durusma_loggedin', '1');
+        removeFromStorage('durusma_reg_id');
+        applyLogin(data.name, data.sicil, data.tel || '');
+      } else if (data.status === 'bekliyor') {
+        showPending();
+      } else {
+        removeFromStorage('durusma_reg_id');
+      }
+    });
   }
 })();
 </script>
