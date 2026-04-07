@@ -14,122 +14,219 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #0F0A04; --bg2: #1A1208; --bg3: #231808; --card: #2A1E0A;
-  --border: #3D2B0E; --border2: #5A3F18;
-  --gold: #C8892A; --gold-light: #E8C97A; --gold-pale: #F5E4B0;
-  --text: #F0DFB8; --muted: #9A7A50; --muted2: #6A5030;
-  --green: #5AAF5A; --red: #C05050; --yellow: #D4A030; --blue: #4A90C8;
+  --bg:#0F0A04;--bg2:#1A1208;--bg3:#231808;--card:#2A1E0A;
+  --border:#3D2B0E;--border2:#5A3F18;
+  --gold:#C8892A;--gold-light:#E8C97A;--gold-pale:#F5E4B0;
+  --text:#F0DFB8;--muted:#9A7A50;--muted2:#6A5030;
+  --green:#5AAF5A;--red:#C05050;--yellow:#D4A030;--blue:#4A90C8;
 }
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html { height: -webkit-fill-available; overscroll-behavior: none; overscroll-behavior-y: contain; }
-body {
-  font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text);
-  min-height: 100vh; min-height: -webkit-fill-available; overflow-x: hidden;
-  -webkit-font-smoothing: antialiased; overscroll-behavior: none; overscroll-behavior-y: contain; touch-action: pan-x pan-y;
-}
-.serif { font-family: 'Playfair Display', serif; }
-.screen { display: none; min-height: 100vh; min-height: -webkit-fill-available; }
-.screen.active { display: flex; flex-direction: column; }
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{height:-webkit-fill-available;overscroll-behavior:none;overscroll-behavior-y:contain}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;min-height:-webkit-fill-available;overflow-x:hidden;-webkit-font-smoothing:antialiased;overscroll-behavior:none;overscroll-behavior-y:contain;touch-action:pan-x pan-y}
+.serif{font-family:'Playfair Display',serif}
+.screen{display:none;min-height:100vh;min-height:-webkit-fill-available}
+.screen.active{display:flex;flex-direction:column}
 
 /* LANDING */
-#s-landing { align-items: center; justify-content: center; position: relative; overflow: hidden; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
-.landing-bg { position: absolute; inset: 0; background: radial-gradient(ellipse 60% 50% at 50% 40%, #3D2B0E 0%, transparent 70%); pointer-events: none; }
-.landing-rings { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; }
-.ring { position: absolute; border-radius: 50%; border: 1px solid var(--border); opacity: 0.3; animation: pulse-ring 4s ease-in-out infinite; }
-.ring:nth-child(1) { width: 300px; height: 300px; animation-delay: 0s; }
-.ring:nth-child(2) { width: 450px; height: 450px; animation-delay: 0.8s; }
-.ring:nth-child(3) { width: 600px; height: 600px; animation-delay: 1.6s; }
-@keyframes pulse-ring { 0%,100%{opacity:.15;transform:scale(1)} 50%{opacity:.35;transform:scale(1.02)} }
-.landing-content { position: relative; z-index: 2; text-align: center; animation: fade-up 0.8s ease both; }
-@keyframes fade-up { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
-.app-logo { font-family:'Playfair Display',serif; font-size:42px; font-weight:500; color:var(--gold); letter-spacing:-0.5px; margin-bottom:8px; }
-.app-tagline { font-size:14px; color:var(--muted); margin-bottom:48px; letter-spacing:.05em; }
-.login-box { background:var(--bg2); border:0.5px solid var(--border); border-radius:20px; padding:32px; width:340px; text-align:left; }
-.login-box h2 { font-family:'Playfair Display',serif; font-size:20px; font-weight:500; color:var(--gold-light); margin-bottom:6px; }
-.login-box p { font-size:13px; color:var(--muted); margin-bottom:24px; line-height:1.6; }
-.field-label { font-size:11px; color:var(--muted); letter-spacing:.06em; text-transform:uppercase; margin-bottom:6px; }
-.field-input { width:100%; background:var(--bg3); border:0.5px solid var(--border); border-radius:10px; padding:11px 14px; font-family:'DM Sans',sans-serif; font-size:16px; color:var(--text); outline:none; transition:border-color .2s; margin-bottom:16px; -webkit-appearance:none; }
-.field-input:focus { border-color:var(--gold); }
-.field-input::placeholder { color:var(--muted2); }
-.btn-primary { width:100%; background:var(--gold); border:none; border-radius:10px; padding:13px; font-family:'DM Sans',sans-serif; font-size:14px; font-weight:500; color:var(--bg); cursor:pointer; transition:opacity .2s,transform .1s; -webkit-appearance:none; touch-action:manipulation; }
-.btn-primary:hover{opacity:.9} .btn-primary:active{transform:scale(.98);opacity:.85}
-.login-note { font-size:11px; color:var(--muted2); text-align:center; margin-top:14px; line-height:1.5; }
+#s-landing{align-items:center;justify-content:center;position:relative;overflow:hidden;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+.landing-bg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 50% 40%,#3D2B0E 0%,transparent 70%);pointer-events:none}
+.landing-rings{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.ring{position:absolute;border-radius:50%;border:1px solid var(--border);opacity:.3;animation:pulse-ring 4s ease-in-out infinite}
+.ring:nth-child(1){width:300px;height:300px;animation-delay:0s}
+.ring:nth-child(2){width:450px;height:450px;animation-delay:.8s}
+.ring:nth-child(3){width:600px;height:600px;animation-delay:1.6s}
+@keyframes pulse-ring{0%,100%{opacity:.15;transform:scale(1)}50%{opacity:.35;transform:scale(1.02)}}
+.landing-content{position:relative;z-index:2;text-align:center;animation:fade-up .8s ease both}
+@keyframes fade-up{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.app-logo{font-family:'Playfair Display',serif;font-size:42px;font-weight:500;color:var(--gold);letter-spacing:-.5px;margin-bottom:8px}
+.app-tagline{font-size:14px;color:var(--muted);margin-bottom:48px;letter-spacing:.05em}
+.login-box{background:var(--bg2);border:.5px solid var(--border);border-radius:20px;padding:32px;width:340px;text-align:left}
+.login-box h2{font-family:'Playfair Display',serif;font-size:20px;font-weight:500;color:var(--gold-light);margin-bottom:6px}
+.login-box p{font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.6}
+.field-label{font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px}
+.field-input{width:100%;background:var(--bg3);border:.5px solid var(--border);border-radius:10px;padding:11px 14px;font-family:'DM Sans',sans-serif;font-size:16px;color:var(--text);outline:none;transition:border-color .2s;margin-bottom:16px;-webkit-appearance:none}
+.field-input:focus{border-color:var(--gold)}
+.field-input::placeholder{color:var(--muted2)}
+.btn-primary{width:100%;background:var(--gold);border:none;border-radius:10px;padding:13px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;color:var(--bg);cursor:pointer;transition:opacity .2s,transform .1s;-webkit-appearance:none;touch-action:manipulation}
+.btn-primary:hover{opacity:.9}.btn-primary:active{transform:scale(.98);opacity:.85}
+.login-note{font-size:11px;color:var(--muted2);text-align:center;margin-top:14px;line-height:1.5}
 
 /* APP SHELL */
-#s-app { flex-direction:column; max-width:480px; margin:0 auto; width:100%; }
-.app-header { display:flex; align-items:center; justify-content:space-between; padding:16px 20px 12px; padding-top:calc(16px + env(safe-area-inset-top)); border-bottom:0.5px solid var(--border); background:var(--bg); position:sticky; top:0; z-index:100; }
-.header-logo { font-family:'Playfair Display',serif; font-size:18px; color:var(--gold); }
-.header-greeting { font-size:11px; color:var(--muted); margin-top:1px; }
-.header-right { display:flex; gap:10px; align-items:center; }
-.icon-btn { width:34px; height:34px; border-radius:50%; background:var(--bg3); border:0.5px solid var(--border); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:14px; transition:border-color .2s; color:var(--muted); }
+#s-app{flex-direction:column;max-width:480px;margin:0 auto;width:100%}
+.app-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px;padding-top:calc(16px + env(safe-area-inset-top));border-bottom:.5px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:100}
+.header-logo{font-family:'Playfair Display',serif;font-size:18px;color:var(--gold)}
+.header-greeting{font-size:11px;color:var(--muted);margin-top:1px}
+.header-right{display:flex;gap:10px;align-items:center}
+.icon-btn{width:34px;height:34px;border-radius:50%;background:var(--bg3);border:.5px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;transition:border-color .2s;color:var(--muted)}
 .icon-btn:hover{border-color:var(--gold);color:var(--gold)}
-.avatar-sm { width:34px; height:34px; border-radius:50%; background:var(--card); border:1.5px solid var(--gold); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:500; color:var(--gold-light); cursor:pointer; background-size: cover; background-position: center; }
-.bottom-nav { display:flex; border-top:0.5px solid var(--border); background:var(--bg); position:sticky; bottom:0; padding-bottom:env(safe-area-inset-bottom); }
-.nav-tab { flex:1; padding:10px 4px 12px; text-align:center; cursor:pointer; transition:color .2s; border:none; background:none; color:var(--muted2); touch-action:manipulation; }
+.avatar-sm{width:34px;height:34px;border-radius:50%;background:var(--card);border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:var(--gold-light);cursor:pointer;background-size:cover;background-position:center;overflow:hidden;flex-shrink:0}
+.bottom-nav{display:flex;border-top:.5px solid var(--border);background:var(--bg);position:sticky;bottom:0;padding-bottom:env(safe-area-inset-bottom)}
+.nav-tab{flex:1;padding:10px 4px 12px;text-align:center;cursor:pointer;transition:color .2s;border:none;background:none;color:var(--muted2);touch-action:manipulation}
 .nav-tab.active{color:var(--gold)}
-.nav-icon{font-size:18px;display:block;margin-bottom:2px} .nav-label{font-size:10px;letter-spacing:.03em}
+.nav-icon{font-size:18px;display:block;margin-bottom:2px}.nav-label{font-size:10px;letter-spacing:.03em}
 .page{display:none;flex:1;flex-direction:column;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .page.active{display:flex}
 
-/* KAFETERYA / HARİTA SAYFASI */
-.map-page{flex:1;display:flex;flex-direction:column;overflow-y:auto;padding:16px 20px 20px;}
-.map-empty{text-align:center;padding:40px 20px;color:var(--muted2);font-size:13px;line-height:1.8;}
+/* HOME */
+.home-content{flex:1;display:flex;flex-direction:column;align-items:center;padding:24px 20px 20px}
+.checkin-status{width:100%;background:var(--bg3);border:.5px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:28px;display:flex;align-items:center;gap:12px}
+.status-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.status-dot.off{background:var(--muted2)}.status-dot.on{background:var(--green);box-shadow:0 0 8px var(--green);animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+.status-text{font-size:13px;color:var(--muted);flex:1}.status-text strong{color:var(--gold-light)}
+.status-exit{font-size:11px;color:var(--red);cursor:pointer;padding:4px 8px;border:.5px solid var(--red);border-radius:6px;white-space:nowrap}
+.status-exit:hover{background:rgba(192,80,80,.1)}
+.big-btn-wrap{position:relative;margin:10px 0 32px}
+.big-btn-ring{position:absolute;border-radius:50%;border:1px solid var(--gold);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;opacity:0}
+.big-btn-ring.r1{width:200px;height:200px}.big-btn-ring.r2{width:240px;height:240px;animation-delay:.3s}
+.big-btn{width:170px;height:170px;border-radius:50%;background:var(--gold);border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;transition:transform .15s,opacity .2s;position:relative;z-index:2;touch-action:manipulation;-webkit-appearance:none}
+.big-btn:hover{transform:scale(1.03)}.big-btn:active{transform:scale(.96)}
+.big-btn.checked-in{background:var(--bg3);border:2px solid var(--green)}
+.big-btn-icon{font-size:32px}
+.big-btn-text{font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;color:var(--bg);text-align:center;line-height:1.4;max-width:110px}
+.big-btn.checked-in .big-btn-text{color:var(--green)}
+.big-btn-detecting{font-size:11px;color:var(--muted);text-align:center;margin-top:-16px;margin-bottom:16px;min-height:18px}
+.mood-section{width:100%;margin-bottom:24px}
+.section-title{font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px}
+.mood-row{display:flex;gap:8px}
+.mood-chip{flex:1;padding:9px 8px;border-radius:10px;border:.5px solid var(--border);background:var(--bg3);font-family:'DM Sans',sans-serif;font-size:12px;color:var(--muted);cursor:pointer;text-align:center;transition:all .2s}
+.mood-chip:hover{border-color:var(--border2);color:var(--text)}
+.mood-chip.selected{border-color:var(--gold);color:var(--gold-light);background:rgba(200,137,42,.08)}
+.mood-icon{font-size:16px;display:block;margin-bottom:3px}
+.nearby-section{width:100%}.nearby-list{display:flex;flex-direction:column;gap:8px}
+.nearby-person{display:flex;align-items:center;gap:12px;padding:11px 14px;background:var(--bg3);border:.5px solid var(--border);border-radius:12px;transition:border-color .2s}
+.nearby-person:hover{border-color:var(--border2)}
+.person-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0;background:var(--card);color:var(--gold);border:1px solid var(--gold);background-size:cover;background-position:center;overflow:hidden}
+.person-info{flex:1}.person-name{font-size:13px;color:var(--text);font-weight:500}.person-role{font-size:11px;color:var(--muted);margin-top:1px}
+.person-badge{font-size:10px;padding:3px 8px;border-radius:20px}
+.badge-green{background:rgba(90,175,90,.12);color:var(--green);border:.5px solid rgba(90,175,90,.3)}
+.badge-red{background:rgba(192,80,80,.12);color:var(--red);border:.5px solid rgba(192,80,80,.3)}
+.badge-yellow{background:rgba(212,160,48,.12);color:var(--yellow);border:.5px solid rgba(212,160,48,.3)}
+.empty-state{text-align:center;padding:32px 20px;color:var(--muted2);font-size:13px;line-height:1.7}
+.empty-icon{font-size:32px;display:block;margin-bottom:10px;opacity:.5}
+
+/* HARİTA */
+.map-page{flex:1;display:flex;flex-direction:column;overflow-y:auto;padding:16px 20px 20px}
+.map-adliye-card{background:var(--bg3);border:.5px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:border-color .2s}
+.map-adliye-card:hover{border-color:var(--border2)}
+.map-adliye-card.has-friends{border-color:rgba(90,175,90,.4);background:rgba(90,175,90,.04)}
+.map-adliye-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.map-adliye-name{font-family:'Playfair Display',serif;font-size:15px;color:var(--gold-light)}
+.map-adliye-count{font-size:11px;padding:3px 9px;border-radius:20px;background:rgba(90,175,90,.12);color:var(--green);border:.5px solid rgba(90,175,90,.3)}
+.map-friend-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:.5px solid var(--border)}
+.map-friend-av{width:30px;height:30px;border-radius:50%;background:var(--card);border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--gold);flex-shrink:0;background-size:cover;background-position:center;overflow:hidden}
+.map-friend-info{flex:1;font-size:12px;color:var(--text)}
+.map-friend-status{font-size:10px;color:var(--muted);margin-top:1px}
+.map-empty{text-align:center;padding:40px 20px;color:var(--muted2);font-size:13px;line-height:1.8}
 
 /* PROFİL */
-.profile-header{display:flex;flex-direction:column;align-items:center;padding:28px 20px 20px;border-bottom:0.5px solid var(--border)}
-.profile-avatar{width:72px;height:72px;border-radius:50%;background:var(--card);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:26px;color:var(--gold-light);margin-bottom:12px; cursor:pointer; background-size: cover; background-position: center; position: relative;}
-.profile-avatar-edit { position: absolute; bottom: 0; right: -5px; background: var(--gold); color: var(--bg); border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 12px; border: 2px solid var(--bg); }
+.profile-header{display:flex;flex-direction:column;align-items:center;padding:28px 20px 20px;border-bottom:.5px solid var(--border)}
+.profile-avatar-wrap{position:relative;margin-bottom:12px;cursor:pointer}
+.profile-avatar{width:80px;height:80px;border-radius:50%;background:var(--card);border:2.5px solid var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:28px;color:var(--gold-light);background-size:cover;background-position:center;overflow:hidden;transition:opacity .2s}
+.profile-avatar-wrap:hover .profile-avatar{opacity:.85}
+.profile-avatar-edit{position:absolute;bottom:2px;right:0;background:var(--gold);color:var(--bg);border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:13px;border:2px solid var(--bg2);box-shadow:0 2px 6px rgba(0,0,0,.4)}
+.upload-progress{position:absolute;inset:0;border-radius:50%;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;font-size:13px;color:white;font-weight:600}
+.upload-progress.show{display:flex}
 .profile-name{font-family:'Playfair Display',serif;font-size:20px;color:var(--gold-light)}
 .profile-baro{font-size:12px;color:var(--muted);margin-top:4px}
-.verified-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--green);background:rgba(90,175,90,.08);border:0.5px solid rgba(90,175,90,.2);border-radius:20px;padding:3px 9px;margin-top:8px}
+.verified-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--green);background:rgba(90,175,90,.08);border:.5px solid rgba(90,175,90,.2);border-radius:20px;padding:3px 9px;margin-top:8px}
 .settings-section{padding:16px 20px}
-.settings-group{background:var(--bg3);border:0.5px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:14px}
-.settings-row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:0.5px solid var(--border);cursor:pointer;transition:background .15s}
-.settings-row:last-child{border-bottom:none} .settings-row:hover{background:rgba(200,137,42,.04)}
+.settings-group{background:var(--bg3);border:.5px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:14px}
+.settings-row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:.5px solid var(--border);cursor:pointer;transition:background .15s}
+.settings-row:last-child{border-bottom:none}.settings-row:hover{background:rgba(200,137,42,.04)}
 .settings-row-left{display:flex;align-items:center;gap:12px}
-.settings-icon{font-size:16px;width:20px;text-align:center} .settings-label{font-size:13px;color:var(--text)} .settings-value{font-size:12px;color:var(--muted)}
+.settings-icon{font-size:16px;width:20px;text-align:center}.settings-label{font-size:13px;color:var(--text)}.settings-value{font-size:12px;color:var(--muted)}
+.toggle{width:40px;height:22px;border-radius:11px;background:var(--muted2);position:relative;cursor:pointer;transition:background .2s;border:none;flex-shrink:0}
+.toggle::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:white;top:3px;left:3px;transition:transform .2s}
+.toggle.on{background:var(--gold)}.toggle.on::after{transform:translateX(18px)}
 
-/* PROFİL: ARKADAŞLAR */
-.profile-friend-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:0.5px solid var(--border);transition:background .15s;}
-.profile-friend-row:last-child{border-bottom:none;}
-.profile-friend-row:hover{background:rgba(200,137,42,.04);}
-.profile-friend-av{width:36px;height:36px;border-radius:50%;background:var(--card);border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--gold-light);flex-shrink:0;}
-.profile-friend-info{flex:1;}
-.profile-friend-name{font-size:13px;color:var(--text);font-weight:500;}
-.profile-friend-status{font-size:11px;color:var(--muted);margin-top:2px;}
-.profile-friend-yaz{padding:6px 10px;border-radius:8px;font-size:11px;font-weight:500;background:var(--gold);border:none;color:var(--bg);cursor:pointer;white-space:nowrap;transition:opacity .2s; margin-right: 4px;}
-.profile-friend-sil{padding:6px 10px;border-radius:8px;font-size:11px;font-weight:500;background:rgba(192,80,80,.15);border:0.5px solid rgba(192,80,80,.3);color:var(--red);cursor:pointer;white-space:nowrap;transition:opacity .2s;}
-.profile-friend-yaz:hover, .profile-friend-sil:hover{opacity:.85;}
+/* ARKADAŞLAR */
+.profile-friend-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:.5px solid var(--border);transition:background .15s,opacity .3s}
+.profile-friend-row:last-child{border-bottom:none}
+.profile-friend-row:hover{background:rgba(200,137,42,.04)}
+.profile-friend-av{width:36px;height:36px;border-radius:50%;background:var(--card);border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--gold-light);flex-shrink:0;background-size:cover;background-position:center;overflow:hidden}
+.profile-friend-info{flex:1}
+.profile-friend-name{font-size:13px;color:var(--text);font-weight:500}
+.profile-friend-status{font-size:11px;color:var(--muted);margin-top:2px}
+.profile-friend-actions{display:flex;gap:6px}
+.profile-friend-yaz{padding:6px 10px;border-radius:8px;font-size:11px;font-weight:500;background:var(--gold);border:none;color:var(--bg);cursor:pointer;white-space:nowrap;transition:opacity .2s}
+.profile-friend-sil{padding:6px 10px;border-radius:8px;font-size:11px;font-weight:500;background:rgba(192,80,80,.12);border:.5px solid rgba(192,80,80,.3);color:var(--red);cursor:pointer;white-space:nowrap;transition:all .2s}
+.profile-friend-yaz:hover{opacity:.85}.profile-friend-sil:hover{background:rgba(192,80,80,.25)}
 
-@media(min-width:600px){
-  #s-app{max-width:480px;margin:0 auto;border-left:0.5px solid var(--border);border-right:0.5px solid var(--border);min-height:100vh}
-  body{background:#070503}
-}
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg2);border:.5px solid var(--border2);border-radius:20px;padding:28px;width:100%;max-width:360px;animation:modal-in .25s ease}
+@keyframes modal-in{from{opacity:0;transform:scale(.95) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.modal-title{font-family:'Playfair Display',serif;font-size:20px;color:var(--gold-light);margin-bottom:8px}
+.modal-sub{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6}
+.adliye-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px}
+.adliye-btn{padding:12px 10px;background:var(--bg3);border:.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--text);cursor:pointer;text-align:center;transition:all .15s}
+.adliye-btn:hover{border-color:var(--gold);color:var(--gold-light)}
+.adliye-btn.selected{border-color:var(--gold);background:rgba(200,137,42,.1);color:var(--gold-light)}
+.modal-btn-row{display:flex;gap:10px}
+.btn-secondary{flex:1;padding:12px;background:transparent;border:.5px solid var(--border2);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted);cursor:pointer;transition:all .2s}
+.btn-secondary:hover{border-color:var(--text);color:var(--text)}
+.btn-confirm{flex:2;padding:12px;background:var(--gold);border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--bg);cursor:pointer;transition:opacity .2s}
+.btn-confirm:hover{opacity:.88}
+.del-modal{background:var(--bg2);border:.5px solid var(--border2);border-radius:20px;padding:28px;width:100%;max-width:320px;animation:modal-in .25s ease;text-align:center}
+.del-modal-icon{font-size:36px;margin-bottom:12px}
+.del-modal-title{font-family:'Playfair Display',serif;font-size:18px;color:var(--gold-light);margin-bottom:8px}
+.del-modal-sub{font-size:13px;color:var(--muted);margin-bottom:22px;line-height:1.6}
+
+/* TOAST */
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--bg2);border:.5px solid var(--gold);border-radius:12px;padding:12px 18px;font-size:13px;color:var(--gold-light);z-index:9999;transition:transform .35s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;max-width:90vw}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* iOS BANNER */
+.ios-banner{display:none;position:fixed;bottom:calc(16px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:var(--bg2);border:.5px solid var(--border2);border-radius:16px;padding:14px 18px;z-index:900;width:calc(100% - 32px);max-width:420px}
+.ios-banner.visible{display:flex;align-items:center;gap:12px}
+.ios-banner-icon{font-size:28px;flex-shrink:0}
+.ios-banner-text{flex:1}
+.ios-banner-title{font-size:13px;font-weight:500;color:var(--gold-light);margin-bottom:2px}
+.ios-banner-desc{font-size:11px;color:var(--muted);line-height:1.5}
+.ios-banner-close{font-size:18px;color:var(--muted2);cursor:pointer;padding:4px;flex-shrink:0}
+
+/* KAHVE */
+.mood-chip.kahve-active{border-color:var(--green)!important;color:#fff!important;background:rgba(90,175,90,.15)!important}
+.avatar-sm.kahve-aura{border-color:var(--green)!important;box-shadow:0 0 0 3px rgba(90,175,90,.35),0 0 14px rgba(90,175,90,.5);animation:aura-pulse 2s ease-in-out infinite}
+@keyframes aura-pulse{0%,100%{box-shadow:0 0 0 3px rgba(90,175,90,.35),0 0 14px rgba(90,175,90,.5)}50%{box-shadow:0 0 0 6px rgba(90,175,90,.2),0 0 24px rgba(90,175,90,.7)}}
+.badge-coffee{background:rgba(90,175,90,.12);color:var(--green);border:.5px solid rgba(90,175,90,.4)}
+
+.action-btn{flex:1;padding:8px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;text-align:center;transition:.2s}
+.btn-add{background:var(--bg2);border:.5px solid var(--gold);color:var(--gold)}
+.btn-msg{background:var(--gold);border:none;color:var(--bg)}
+@keyframes slide-up{from{transform:translateY(100%)}to{transform:translateY(0)}}
+
+@media(min-width:600px){#s-app{max-width:480px;margin:0 auto;border-left:.5px solid var(--border);border-right:.5px solid var(--border);min-height:100vh}body{background:#070503}}
 </style>
 </head>
 <body>
 
+<!-- ═══ LANDING ═══ -->
 <div class="screen active" id="s-landing">
   <div class="landing-bg"></div>
   <div class="landing-rings"><div class="ring"></div><div class="ring"></div><div class="ring"></div></div>
   <div class="landing-content">
     <div class="app-logo serif">Duruşma Arası</div>
     <div class="app-tagline">Adliyedeyken meslektaşınla buluş</div>
-    
+
+    <!-- GİRİŞ -->
     <div class="login-box" id="login-box">
       <h2>Giriş Yap</h2>
-      <p>Sadece baro üyeleri katılabilir. Kayıtlı hesabınızla giriş yapın.</p>
+      <p>Sicil numaranız ve telefonunuzla giriş yapın.</p>
       <div class="field-label">Baro Sicil No</div>
-      <input class="field-input" type="text" id="inp-sicil" placeholder="Sicil numaranız" value="">
+      <input class="field-input" type="text" id="inp-sicil" placeholder="Sicil numaranız">
       <div class="field-label">Telefon</div>
-      <input class="field-input" type="tel" id="inp-tel" placeholder="05** *** ** **" value="">
+      <input class="field-input" type="tel" id="inp-tel" placeholder="05** *** ** **" onkeydown="if(event.key==='Enter')doLogin()">
       <button class="btn-primary" onclick="doLogin()">Giriş Yap →</button>
       <div class="login-note" style="cursor:pointer;color:var(--gold);margin-top:16px;" onclick="showRegister()">Hesabınız yok mu? <u>Kayıt Olun</u></div>
     </div>
 
+    <!-- KAYIT -->
     <div class="login-box" id="register-box" style="display:none;">
       <h2>Kayıt Ol</h2>
-      <p>Üyelik talebiniz admin onayına sunulacak. Onay sonrası giriş yapabilirsiniz.</p>
+      <p>Üyelik talebiniz admin onayına sunulacak.</p>
       <div class="field-label">Ad Soyad</div>
       <input class="field-input" type="text" id="reg-name" placeholder="Avukat Adı ve Soyadı">
       <div class="field-label">Baro Sicil No</div>
@@ -139,53 +236,106 @@ body {
       <button class="btn-primary" onclick="doRegister()">Kayıt Talebi Gönder →</button>
       <div class="login-note" style="cursor:pointer;color:var(--gold);margin-top:16px;" onclick="showLogin()">Zaten hesabınız var mı? <u>Giriş Yapın</u></div>
     </div>
+
+    <!-- ONAY BEKLİYOR -->
+    <div class="login-box" id="pending-box" style="display:none;text-align:center;">
+      <div style="font-size:40px;margin-bottom:16px;">⏳</div>
+      <h2 style="text-align:center;margin-bottom:12px;">Onay Bekleniyor</h2>
+      <p style="text-align:center;margin-bottom:20px;">Üyelik talebiniz alındı. Admin onayının ardından giriş yapabileceksiniz.</p>
+      <button class="btn-primary" onclick="checkPendingStatus()" style="margin-bottom:10px;">Durumu Kontrol Et 🔄</button>
+      <div class="login-note" style="cursor:pointer;color:var(--red);" onclick="cancelPendingRequest()">Talebi iptal et</div>
+    </div>
   </div>
 </div>
 
+<!-- ═══ APP ═══ -->
 <div class="screen" id="s-app">
   <div class="app-header">
     <div>
       <div class="header-logo serif">Duruşma Arası</div>
-      <div class="header-greeting" id="greeting">Merhaba, Av. Enes</div>
+      <div class="header-greeting" id="greeting">Merhaba</div>
     </div>
     <div class="header-right">
-      <div class="icon-btn">🔔</div>
-      <div class="avatar-sm" id="header-avatar" onclick="goPage('profile', document.querySelectorAll('.nav-tab')[2])">EE</div>
+      <div class="icon-btn" onclick="openFriendRequests()" style="position:relative;">🔔<span id="notif-count" style="display:none;position:absolute;top:-4px;right:-4px;background:var(--red);color:white;border-radius:50%;width:16px;height:16px;font-size:9px;align-items:center;justify-content:center;"></span></div>
+      <div class="avatar-sm" id="header-avatar" onclick="goProfile()">EE</div>
     </div>
   </div>
 
+  <!-- ANA EKRAN -->
   <div class="page active" id="page-home">
-    <div style="padding: 24px; text-align: center; color: var(--muted);">
-       <p style="margin-bottom: 20px;">Ana Ekran İçeriğiniz...</p>
+    <div class="home-content">
+      <div class="checkin-status" id="checkin-status" style="display:none;">
+        <div class="status-dot on"></div>
+        <div class="status-text" id="status-text">Aktif değil</div>
+        <div class="status-exit" onclick="doCheckOut()">Çıkış Yap</div>
+      </div>
+      <div class="big-btn-wrap">
+        <div class="big-btn-ring r1" id="ring1"></div>
+        <div class="big-btn-ring r2" id="ring2"></div>
+        <button class="big-btn" id="big-btn" onclick="handleBigBtn()">
+          <span class="big-btn-icon">☕</span>
+          <span class="big-btn-text" id="big-btn-text">Adliyedeyim<br>Kahveye Beklerim</span>
+        </button>
+      </div>
+      <div class="big-btn-detecting" id="detecting-text"></div>
+      <div class="mood-section" id="mood-section" style="display:none;">
+        <div class="section-title">Durumunu seç</div>
+        <div class="mood-row">
+          <div class="mood-chip selected" onclick="setMood(this,'Müsaitim')"><span class="mood-icon">🟢</span>Müsaitim</div>
+          <div class="mood-chip" onclick="setMood(this,'Duruşmada')"><span class="mood-icon">🔴</span>Duruşmada</div>
+          <div class="mood-chip" onclick="setMood(this,'Kalemde')"><span class="mood-icon">🟡</span>Kalemde</div>
+        </div>
+      </div>
+      <div class="nearby-section" id="nearby-section" style="display:none;">
+        <div class="section-title" id="nearby-title">Aynı adliyedekiler</div>
+        <div class="nearby-list" id="nearby-list">
+          <div class="empty-state"><span class="empty-icon">📍</span>Şu an bu adliyede<br>başka meslektaşınız görünmüyor.</div>
+        </div>
+      </div>
+      <div id="pre-checkin-hint" style="text-align:center;margin-top:16px;">
+        <div style="font-size:12px;color:var(--muted2);line-height:1.7;">Butona basınca sistem sizi en yakın<br>adliyeye otomatik olarak check-in yapar.</div>
+      </div>
     </div>
   </div>
 
+  <!-- KİM NEREDE -->
   <div class="page" id="page-cafe">
     <div class="map-page">
       <div style="font-family:'Playfair Display',serif;font-size:20px;color:var(--gold-light);margin-bottom:4px;">Kim Nerede?</div>
       <div style="font-size:12px;color:var(--muted);margin-bottom:20px;">Arkadaşlarının bulunduğu adliyeler</div>
-      <div id="friend-map-content">
-        <div class="map-empty">🗺️<br><br>Arkadaş listeniz yüklenince<br>adliye bazlı konumları burada görünür.</div>
-      </div>
+      <div id="friend-map-content"><div class="map-empty">🗺️<br><br>Arkadaş listeniz yüklenince<br>adliye bazlı konumları burada görünür.</div></div>
     </div>
   </div>
 
+  <!-- PROFİL -->
   <div class="page" id="page-profile">
     <div class="profile-header">
-      
-      <input type="file" id="profile-pic-input" accept="image/*" style="display: none;" onchange="handlePicUpload(event)">
-      
-      <div class="profile-avatar" id="profile-avatar-large" onclick="document.getElementById('profile-pic-input').click()" title="Profil Fotoğrafı Yükle">
-        EE
+      <input type="file" id="profile-pic-input" accept="image/*" style="display:none;" onchange="handlePicUpload(event)">
+      <div class="profile-avatar-wrap" onclick="document.getElementById('profile-pic-input').click()">
+        <div class="profile-avatar" id="profile-avatar-large">EE</div>
+        <div class="upload-progress" id="upload-progress">⏳</div>
         <div class="profile-avatar-edit">📷</div>
       </div>
-      
-      <div class="profile-name" id="p-name">Av. Enes Emre</div>
-      <div class="profile-baro" id="p-baro">İstanbul Barosu · Sicil: <span id="display-sicil">Belirlenmedi</span></div>
+      <div class="profile-name" id="p-name">Av. —</div>
+      <div class="profile-baro" id="p-baro">İstanbul Barosu · Sicil: —</div>
       <div class="verified-badge">✓ Doğrulanmış Üye</div>
     </div>
-
     <div class="settings-section">
+      <div class="section-title" style="margin-bottom:10px;">Gizlilik</div>
+      <div class="settings-group">
+        <div class="settings-row" onclick="toggleSetting(this)">
+          <div class="settings-row-left"><span class="settings-icon">👁</span><span class="settings-label">Konumumu göster</span></div>
+          <button class="toggle on" tabindex="-1"></button>
+        </div>
+        <div class="settings-row" onclick="toggleSetting(this)">
+          <div class="settings-row-left"><span class="settings-icon">👥</span><span class="settings-label">Sadece rehberimdekiler görsün</span></div>
+          <button class="toggle" tabindex="-1"></button>
+        </div>
+        <div class="settings-row" onclick="toggleSetting(this)">
+          <div class="settings-row-left"><span class="settings-icon">🔔</span><span class="settings-label">Bildirimler</span></div>
+          <button class="toggle on" tabindex="-1"></button>
+        </div>
+      </div>
       <div class="section-title" style="margin-bottom:10px;">Hesap</div>
       <div class="settings-group">
         <div class="settings-row">
@@ -194,162 +344,645 @@ body {
         </div>
         <div class="settings-row">
           <div class="settings-row-left"><span class="settings-icon">📋</span><span class="settings-label">Sicil No</span></div>
-          <span class="settings-value" id="settings-sicil">Belirlenmedi</span>
+          <span class="settings-value" id="settings-sicil">—</span>
         </div>
         <div class="settings-row" onclick="doLogout()">
           <div class="settings-row-left"><span class="settings-icon">🚪</span><span class="settings-label" style="color:var(--red);">Çıkış Yap</span></div>
         </div>
       </div>
-
       <div class="section-title" style="margin-bottom:10px;">Arkadaşlar</div>
       <div class="settings-group" id="profile-friends-group">
-        <div class="profile-friend-row">
-          <div class="profile-friend-av">AY</div>
-          <div class="profile-friend-info">
-            <div class="profile-friend-name">Av. Ali Yılmaz</div>
-            <div class="profile-friend-status">Çevrimiçi</div>
-          </div>
-          <div>
-            <button class="profile-friend-yaz">Yaz</button>
-            <button class="profile-friend-sil" onclick="deleteFriend(this)">Sil</button>
-          </div>
-        </div>
-        <div class="profile-friend-row">
-          <div class="profile-friend-av">ZK</div>
-          <div class="profile-friend-info">
-            <div class="profile-friend-name">Stj. Av. Zeynep Kaya</div>
-            <div class="profile-friend-status">Son görülme: 2 saat önce</div>
-          </div>
-          <div>
-            <button class="profile-friend-yaz">Yaz</button>
-            <button class="profile-friend-sil" onclick="deleteFriend(this)">Sil</button>
-          </div>
-        </div>
+        <div style="padding:14px 16px;color:var(--muted2);font-size:12px;">⏳ Yükleniyor...</div>
       </div>
     </div>
   </div>
 
   <div class="bottom-nav">
     <button class="nav-tab active" onclick="goPage('home',this)"><span class="nav-icon">🏠</span><span class="nav-label">Ana Ekran</span></button>
-    <button class="nav-tab" onclick="goPage('cafe',this)"><span class="nav-icon">🗺️</span><span class="nav-label">Kim Nerede</span></button>
+    <button class="nav-tab" onclick="goPage('cafe',this);renderFriendMap()"><span class="nav-icon">🗺️</span><span class="nav-label">Kim Nerede</span></button>
     <button class="nav-tab" onclick="goPage('profile',this)"><span class="nav-icon">👤</span><span class="nav-label">Profil</span></button>
   </div>
 </div>
 
+<!-- ═══ MODALLER ═══ -->
+<div class="modal-overlay" id="adliye-modal">
+  <div class="modal">
+    <div class="modal-title">Hangi adliyedesin?</div>
+    <div class="modal-sub">GPS konumunuz adliyeye yakın. Doğru adliyeyi seçin.</div>
+    <div class="adliye-grid" id="adliye-grid"></div>
+    <div class="modal-btn-row">
+      <button class="btn-secondary" onclick="closeModal()">İptal</button>
+      <button class="btn-confirm" onclick="confirmCheckin()">Check-in Yap ✓</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="delete-friend-modal">
+  <div class="del-modal">
+    <div class="del-modal-icon">🗑️</div>
+    <div class="del-modal-title">Arkadaşı Sil</div>
+    <div class="del-modal-sub" id="del-modal-sub">Bu kişiyi arkadaş listenizden çıkarmak istediğinize emin misiniz?</div>
+    <div class="modal-btn-row" style="margin-top:0">
+      <button class="btn-secondary" onclick="closeDeleteModal()">Vazgeç</button>
+      <button class="btn-confirm" style="background:var(--red);" onclick="confirmDeleteFriend()">Evet, Sil</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="ios-banner" id="ios-banner">
+  <div class="ios-banner-icon">☕</div>
+  <div class="ios-banner-text">
+    <div class="ios-banner-title">Ana Ekrana Ekle</div>
+    <div class="ios-banner-desc">Safari'de <strong style="color:var(--gold)">Paylaş</strong> → <strong style="color:var(--gold)">Ana Ekrana Ekle</strong> ile uygulama gibi kullan</div>
+  </div>
+  <div class="ios-banner-close" onclick="closeBanner()">✕</div>
+</div>
+
+<!-- BİLDİRİM PANELİ -->
+<div id="notif-panel" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:2000;align-items:flex-end;justify-content:center;padding:20px;">
+  <div id="notif-card" style="background:var(--bg2);border:.5px solid var(--border2);border-radius:20px;padding:24px;width:100%;max-width:420px;animation:modal-in .25s ease;">
+    <div id="notif-icon" style="font-size:32px;text-align:center;margin-bottom:10px;">💬</div>
+    <div id="notif-title" style="font-family:'Playfair Display',serif;font-size:17px;color:var(--gold-light);text-align:center;margin-bottom:6px;"></div>
+    <div id="notif-body" style="font-size:13px;color:var(--muted);text-align:center;margin-bottom:20px;line-height:1.6;"></div>
+    <div id="notif-actions" style="display:flex;gap:10px;"></div>
+  </div>
+</div>
+
+<!-- ARKADAŞLIK İSTEKLERİ PANELİ -->
+<div id="friend-requests-panel" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:1500;flex-direction:column;">
+  <div class="app-header">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div class="icon-btn" onclick="closeFriendRequests()">←</div>
+      <div><div class="header-logo serif">Arkadaşlık İstekleri</div></div>
+    </div>
+    <div id="friend-req-badge" style="background:var(--red);color:white;border-radius:20px;padding:3px 10px;font-size:12px;display:none;"></div>
+  </div>
+  <div id="friend-requests-list" style="flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:10px;"></div>
+</div>
+
+<!-- CHAT PANELİ -->
+<div id="chat-panel" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:1000;flex-direction:column;animation:slide-up .3s ease-out;">
+  <div class="app-header">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div class="icon-btn" onclick="closeChat()">←</div>
+      <div>
+        <div class="header-logo serif" id="chat-user-name">Av. Meslektaş</div>
+        <div class="header-greeting" id="chat-user-status">Çevrimiçi</div>
+      </div>
+    </div>
+  </div>
+  <div id="chat-messages" style="flex:1;padding:16px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;">
+    <div style="align-self:center;background:var(--bg3);padding:6px 12px;border-radius:12px;font-size:11px;color:var(--muted2);">Sohbet Başlatıldı</div>
+  </div>
+  <div style="padding:12px 16px;border-top:.5px solid var(--border);display:flex;gap:10px;background:var(--bg2);padding-bottom:calc(12px + env(safe-area-inset-bottom));">
+    <input type="text" id="chat-input" placeholder="Mesajınızı yazın..." style="flex:1;background:var(--bg3);border:.5px solid var(--border);border-radius:20px;padding:10px 16px;color:var(--text);outline:none;font-family:'DM Sans',sans-serif;font-size:14px;" onkeydown="if(event.key==='Enter')sendMessage()">
+    <button class="icon-btn" style="background:var(--gold);color:var(--bg);border:none;width:42px;height:42px;" onclick="sendMessage()">➔</button>
+  </div>
+</div>
+
+<!-- ═══════════════ FİREBASE & JS ═══════════════ -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 <script>
-  // ---- 1. GİRİŞ VE SİCİL NUMARASI İŞLEMLERİ ----
-  function doLogin() {
-    const sicilInput = document.getElementById('inp-sicil').value;
-    
-    // Sicil numarasını tarayıcıya kaydet
-    if(sicilInput.trim() !== "") {
-      localStorage.setItem('userSicilNo', sicilInput.trim());
+// ─── FİREBASE ───
+const firebaseConfig = {
+  apiKey:"AIzaSyCmoN0WvhAOz3xGMPvpwstT8XsSuwwC-QQ",
+  authDomain:"durusma-arasi-210bb.firebaseapp.com",
+  databaseURL:"https://durusma-arasi-210bb-default-rtdb.firebaseio.com",
+  projectId:"durusma-arasi-210bb",
+  storageBucket:"durusma-arasi-210bb.firebasestorage.app",
+  messagingSenderId:"954201469428",
+  appId:"1:954201469428:web:dbe2eccf83c97fce5509a1",
+  measurementId:"G-VBX7SOWESG"
+};
+firebase.initializeApp(firebaseConfig);
+const db      = firebase.database();
+const storage = firebase.storage();
+
+// ─── LOCAL STORAGE YARDIMCISI ───
+function saveToStorage(k,v){try{localStorage.setItem(k,v)}catch(e){}try{const d=new Date();d.setFullYear(d.getFullYear()+1);document.cookie=k+'='+encodeURIComponent(v)+'; expires='+d.toUTCString()+'; path=/; SameSite=Lax'}catch(e){}}
+function getFromStorage(k){try{const v=localStorage.getItem(k);if(v!==null)return v}catch(e){}try{const m=document.cookie.match('(?:^|; )'+k+'=([^;]*)');if(m)return decodeURIComponent(m[1])}catch(e){}return null}
+function removeFromStorage(k){try{localStorage.removeItem(k)}catch(e){}try{document.cookie=k+'=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax'}catch(e){}}
+
+// ─── CİHAZ ID ───
+let userId=getFromStorage('durusma_uid');
+if(!userId){userId='user_'+Math.random().toString(36).substr(2,9);saveToStorage('durusma_uid',userId)}
+
+// ─── SABİTLER ───
+const ADLIYELER=['Çağlayan Adliyesi','İstanbul Anadolu Adliyesi (Kartal)','Bakırköy Adliyesi (Ana Bina)','Bakırköy Adliyesi Ek Bina','Küçükçekmece Adliyesi','GOP Adliyesi'];
+const ADLIYE_COORDS={'Çağlayan Adliyesi':{lat:41.0689,lng:28.9809},'İstanbul Anadolu Adliyesi (Kartal)':{lat:40.9105,lng:29.1865},'Bakırköy Adliyesi (Ana Bina)':{lat:40.9793,lng:28.8726},'Bakırköy Adliyesi Ek Bina':{lat:40.9801,lng:28.8692},'Küçükçekmece Adliyesi':{lat:40.9987,lng:28.7850},'GOP Adliyesi':{lat:41.0631,lng:28.9108}};
+function calcDistance(la1,ln1,la2,ln2){const R=6371,dL=(la2-la1)*Math.PI/180,dG=(ln2-ln1)*Math.PI/180,a=Math.sin(dL/2)**2+Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(dG/2)**2;return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))}
+function findNearestAdliye(lat,lng){let n=null,m=Infinity;Object.entries(ADLIYE_COORDS).forEach(([name,c])=>{const d=calcDistance(lat,lng,c.lat,c.lng);if(d<m){m=d;n=name}});return{name:n,distKm:m}}
+
+let state={checkedIn:false,currentAdliye:'',selectedMood:'Müsaitim',selectedAdliye:'',userName:'',userSicil:'',userPhotoURL:''};
+let pendingDeleteFriendId=null;
+
+// ══════════════════════════
+// KAYIT / GİRİŞ
+// ══════════════════════════
+function showRegister(){document.getElementById('login-box').style.display='none';document.getElementById('register-box').style.display='block';document.getElementById('pending-box').style.display='none'}
+function showLogin(){document.getElementById('login-box').style.display='block';document.getElementById('register-box').style.display='none';document.getElementById('pending-box').style.display='none'}
+function showPending(){document.getElementById('login-box').style.display='none';document.getElementById('register-box').style.display='none';document.getElementById('pending-box').style.display='block'}
+
+function doRegister(){
+  const name=document.getElementById('reg-name').value.trim();
+  const sicil=document.getElementById('reg-sicil').value.trim();
+  const tel=document.getElementById('reg-tel').value.trim();
+  if(!name||!sicil||!tel){showToast('⚠️ Tüm alanları doldurun');return}
+  const regId='reg_'+sicil.replace(/[^a-zA-Z0-9]/g,'_');
+  db.ref('kayit_talepleri/'+regId).set({name,sicil,tel,status:'bekliyor',requestedAt:firebase.database.ServerValue.TIMESTAMP})
+    .then(()=>{saveToStorage('durusma_reg_id',regId);showPending();showToast('✅ Kayıt talebiniz alındı!')})
+    .catch(()=>showToast('❌ Hata oluştu, tekrar deneyin.'))
+}
+
+function checkPendingStatus(){
+  const regId=getFromStorage('durusma_reg_id');
+  if(!regId){showLogin();return}
+  showToast('🔄 Kontrol ediliyor...');
+  db.ref('kayit_talepleri/'+regId).once('value',snap=>{
+    const d=snap.val();
+    if(!d){showToast('❌ Talep bulunamadı');return}
+    if(d.status==='onaylandi'){saveToStorage('durusma_name',d.name);saveToStorage('durusma_sicil',d.sicil);saveToStorage('durusma_tel',d.tel||'');saveToStorage('durusma_loggedin','1');removeFromStorage('durusma_reg_id');showToast('✅ Hesabınız onaylandı! Hoş geldiniz.');applyLogin(d.name,d.sicil,d.tel||'')}
+    else if(d.status==='reddedildi'){showToast('❌ Üyelik talebiniz reddedildi.');removeFromStorage('durusma_reg_id');showLogin()}
+    else showToast('⏳ Henüz onay bekleniyor.')
+  })
+}
+
+function cancelPendingRequest(){
+  const regId=getFromStorage('durusma_reg_id');
+  if(regId)db.ref('kayit_talepleri/'+regId).remove();
+  removeFromStorage('durusma_reg_id');showLogin();showToast('Talep iptal edildi.')
+}
+
+function doLogin(){
+  const sicil=document.getElementById('inp-sicil').value.trim();
+  const tel=document.getElementById('inp-tel').value.trim();
+  if(!sicil||!tel){showToast('⚠️ Sicil ve telefon gerekli');return}
+  const regId='reg_'+sicil.replace(/[^a-zA-Z0-9]/g,'_');
+  showToast('🔄 Giriş yapılıyor...');
+  db.ref('kayit_talepleri/'+regId).once('value',snap=>{
+    const d=snap.val();
+    if(!d){showToast('❌ Kayıtlı hesap bulunamadı. Kayıt olun.');return}
+    if(d.status==='bekliyor'){saveToStorage('durusma_reg_id',regId);showPending();showToast('⏳ Hesabınız henüz onaylanmadı.');return}
+    if(d.status==='reddedildi'){showToast('❌ Üyelik talebiniz reddedildi.');return}
+    if(d.tel&&d.tel!==tel){showToast('❌ Telefon numarası eşleşmiyor.');return}
+    saveToStorage('durusma_name',d.name);saveToStorage('durusma_sicil',d.sicil);saveToStorage('durusma_tel',tel);saveToStorage('durusma_loggedin','1');
+    applyLogin(d.name,d.sicil,tel)
+  })
+}
+
+// ══════════════════════════
+// GİRİŞ SONRASI
+// ══════════════════════════
+function applyLogin(name,sicil,tel){
+  state.userName=name;state.userSicil=sicil;
+  const initials=name.replace('Av.','').trim().split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+  document.getElementById('greeting').textContent='Merhaba, '+(name.split(' ')[1]||name);
+  document.getElementById('p-name').textContent=name;
+
+  // ✅ Sicil numarasını doğru göster
+  document.getElementById('p-baro').textContent='İstanbul Barosu · Sicil: '+sicil;
+  document.getElementById('settings-sicil').textContent=sicil;
+
+  // Avatar başlangıç harfleri
+  document.getElementById('profile-avatar-large').textContent=initials;
+  document.getElementById('header-avatar').textContent=initials;
+
+  // Profil fotoğrafını yükle
+  loadProfilePhoto();
+
+  document.getElementById('s-landing').classList.remove('active');
+  document.getElementById('s-app').classList.add('active');
+  listenNotifications();
+  restoreCheckin();
+}
+
+// ══════════════════════════
+// PROFİL FOTOĞRAFI
+// Firebase Storage'a yükler,
+// URL'yi Realtime DB'ye kaydeder
+// ══════════════════════════
+function loadProfilePhoto(){
+  db.ref('user_photos/'+userId).once('value',snap=>{
+    const url=snap.val();
+    if(url)applyPhotoToUI(url);
+  })
+}
+
+function applyPhotoToUI(url){
+  state.userPhotoURL=url;
+  const large=document.getElementById('profile-avatar-large');
+  const header=document.getElementById('header-avatar');
+  large.style.backgroundImage=`url('${url}')`;large.textContent='';
+  header.style.backgroundImage=`url('${url}')`;header.textContent='';
+  // Aktif check-in varsa fotoğrafı güncelle
+  if(state.checkedIn&&state.currentAdliye)
+    db.ref('adliyeler/'+state.currentAdliye+'/'+userId+'/photoURL').set(url);
+}
+
+function handlePicUpload(event){
+  const file=event.target.files[0];
+  if(!file)return;
+  if(file.size>3*1024*1024){showToast('⚠️ Fotoğraf 3MB\'dan küçük olmalı');return}
+  const progress=document.getElementById('upload-progress');
+  progress.classList.add('show');
+  const ref=storage.ref('profile_photos/'+userId+'.jpg');
+  const task=ref.put(file);
+  task.on('state_changed',
+    s=>{const p=Math.round(s.bytesTransferred/s.totalBytes*100);progress.textContent=p+'%'},
+    err=>{progress.classList.remove('show');showToast('❌ Yükleme hatası: '+err.message)},
+    ()=>{
+      task.snapshot.ref.getDownloadURL().then(url=>{
+        progress.classList.remove('show');
+        applyPhotoToUI(url);
+        db.ref('user_photos/'+userId).set(url);
+        showToast('✅ Profil fotoğrafı güncellendi!');
+        // Arkadaşların cache'ini güncelle
+        db.ref('friends/'+userId).once('value',fsnap=>{
+          if(fsnap.val())Object.keys(fsnap.val()).forEach(fid=>{db.ref('user_photos_cache/'+fid+'/'+userId).set(url)})
+        })
+      })
     }
+  );
+  event.target.value='';
+}
 
-    // Ekranları değiştir
-    document.getElementById('s-landing').classList.remove('active');
-    document.getElementById('s-app').classList.add('active');
+// ══════════════════════════
+// ARKADAŞ SİLME
+// ══════════════════════════
+function askDeleteFriend(friendId,friendName){
+  pendingDeleteFriendId=friendId;
+  document.getElementById('del-modal-sub').textContent='"'+friendName+'" adlı meslektaşı arkadaş listenizden çıkarmak istediğinize emin misiniz?';
+  document.getElementById('delete-friend-modal').classList.add('open');
+}
+function closeDeleteModal(){document.getElementById('delete-friend-modal').classList.remove('open');pendingDeleteFriendId=null}
+function confirmDeleteFriend(){
+  if(!pendingDeleteFriendId)return;
+  const fid=pendingDeleteFriendId;
+  closeDeleteModal();
+  // Her iki taraftan da Firebase'den sil
+  const updates={};
+  updates['friends/'+userId+'/'+fid]=null;
+  updates['friends/'+fid+'/'+userId]=null;
+  db.ref().update(updates)
+    .then(()=>{showToast('✅ Arkadaş silindi.');renderProfileFriends()})
+    .catch(()=>showToast('❌ Silme işlemi başarısız.'))
+}
 
-    // Kaydedilen verileri profilde göster
-    loadProfileData();
-  }
-
-  function doRegister() {
-    const sicilInput = document.getElementById('reg-sicil').value;
-    if(sicilInput.trim() !== "") {
-      localStorage.setItem('userSicilNo', sicilInput.trim());
+// ══════════════════════════
+// PROFİL ARKADAŞLAR LİSTESİ
+// ══════════════════════════
+function renderProfileFriends(){
+  const group=document.getElementById('profile-friends-group');
+  if(!group)return;
+  group.innerHTML='<div style="padding:14px 16px;color:var(--muted2);font-size:12px;">⏳ Yükleniyor...</div>';
+  db.ref('friends/'+userId).once('value',snap=>{
+    const friends=snap.val();
+    if(!friends||Object.keys(friends).length===0){
+      group.innerHTML='<div style="padding:14px 16px;color:var(--muted2);font-size:12px;text-align:center;">Henüz arkadaşınız yok.<br>Aynı adliyedeki meslektaşlarınıza istek gönderin.</div>';return
     }
-    alert("Kayıt talebiniz alındı! Yönetici onayı bekliyor.");
-    showLogin();
+    const entries=Object.entries(friends);let pending=entries.length;const result={};
+    entries.forEach(([fid,fdata])=>{
+      db.ref('adliyeler').once('value',asnap=>{
+        let adliyeStr='';
+        Object.entries(asnap.val()||{}).forEach(([adliye,users])=>{if(users&&users[fid])adliyeStr=adliye});
+        db.ref('user_photos_cache/'+userId+'/'+fid).once('value',psnap=>{
+          result[fid]={
+            name:fdata.name||'Avukat',
+            initials:(fdata.name||'AV').replace('Av.','').trim().split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase(),
+            adliye:adliyeStr,photoURL:psnap.val()||null
+          };
+          pending--;
+          if(pending===0)buildFriendList(group,result)
+        })
+      })
+    })
+  })
+}
+
+function buildFriendList(group,result){
+  if(!result||Object.keys(result).length===0){
+    group.innerHTML='<div style="padding:14px 16px;color:var(--muted2);font-size:12px;text-align:center;">Henüz arkadaşınız yok.</div>';return
   }
+  group.innerHTML=Object.entries(result).map(([fid,f])=>{
+    const statusTxt=f.adliye?'📍 '+f.adliye:'Şu an adliyede değil';
+    const avStyle=f.photoURL?`style="background-image:url('${f.photoURL}');color:transparent;"`:''
+    return `<div class="profile-friend-row" id="friend-row-${fid}">
+      <div class="profile-friend-av" ${avStyle}>${f.photoURL?'':escHtml(f.initials)}</div>
+      <div class="profile-friend-info">
+        <div class="profile-friend-name">${escHtml(f.name)}</div>
+        <div class="profile-friend-status">${statusTxt}</div>
+      </div>
+      <div class="profile-friend-actions">
+        <button class="profile-friend-yaz" onclick="openChat('${fid}','${escHtml(f.name)}','${statusTxt}')">Yaz</button>
+        <button class="profile-friend-sil" onclick="askDeleteFriend('${fid}','${escHtml(f.name)}')">Sil</button>
+      </div>
+    </div>`
+  }).join('')
+}
 
-  function showRegister() {
-    document.getElementById('login-box').style.display = 'none';
-    document.getElementById('register-box').style.display = 'block';
+function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+// ══════════════════════════
+// CHECK-IN
+// ══════════════════════════
+function restoreCheckin(){
+  const savedAdliye=getFromStorage('durusma_checkin_adliye');
+  const checkinActive=getFromStorage('durusma_checkin_active');
+  if(!savedAdliye||checkinActive!=='1')return;
+  state.checkedIn=true;state.currentAdliye=savedAdliye;state.selectedAdliye=savedAdliye;
+  const initials=document.getElementById('profile-avatar-large').textContent||'?';
+  document.getElementById('big-btn').classList.add('checked-in');
+  document.getElementById('big-btn-text').textContent='Check-in Aktif\nGüncelle';
+  document.getElementById('ring1').style.cssText='animation:pulse-ring 2s ease-in-out infinite;opacity:.4;';
+  document.getElementById('ring2').style.cssText='animation:pulse-ring 2s ease-in-out .5s infinite;opacity:.2;';
+  document.getElementById('checkin-status').style.display='flex';
+  document.getElementById('status-text').innerHTML='<strong>'+savedAdliye+'</strong> · Check-in aktif';
+  document.getElementById('mood-section').style.display='block';
+  document.getElementById('nearby-section').style.display='block';
+  document.getElementById('pre-checkin-hint').style.display='none';
+  document.getElementById('nearby-title').textContent=savedAdliye+' — Buradakiler';
+  const ref=db.ref('adliyeler/'+savedAdliye+'/'+userId);
+  ref.set({name:state.userName,initials,status:state.selectedMood,photoURL:state.userPhotoURL||null,timestamp:firebase.database.ServerValue.TIMESTAMP});
+  ref.onDisconnect().remove();
+  listenNearbyAvukats(savedAdliye)
+}
+
+function handleBigBtn(){
+  if(!state.checkedIn){
+    document.getElementById('detecting-text').textContent='📡 Konum alınıyor...';
+    navigator.geolocation.getCurrentPosition(pos=>{
+      const{latitude:lat,longitude:lng}=pos.coords;
+      const{name:nearest}=findNearestAdliye(lat,lng);
+      document.getElementById('detecting-text').textContent='';
+      const grid=document.getElementById('adliye-grid');
+      grid.innerHTML=ADLIYELER.map(a=>`<button class="adliye-btn${a===nearest?' selected':''}" onclick="selectAdliye(this,'${a}')">${a}</button>`).join('');
+      state.selectedAdliye=nearest;
+      document.getElementById('adliye-modal').classList.add('open');
+    },()=>{
+      document.getElementById('detecting-text').textContent='';
+      const grid=document.getElementById('adliye-grid');
+      grid.innerHTML=ADLIYELER.map(a=>`<button class="adliye-btn" onclick="selectAdliye(this,'${a}')">${a}</button>`).join('');
+      state.selectedAdliye='';
+      document.getElementById('adliye-modal').classList.add('open');
+    })
+  }else{document.getElementById('adliye-modal').classList.add('open')}
+}
+
+function selectAdliye(btn,name){document.querySelectorAll('.adliye-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');state.selectedAdliye=name}
+function closeModal(){document.getElementById('adliye-modal').classList.remove('open')}
+
+function confirmCheckin(){
+  if(!state.selectedAdliye){showToast('⚠️ Lütfen bir adliye seçin');return}
+  closeModal();
+  if(state.checkedIn&&state.currentAdliye&&state.currentAdliye!==state.selectedAdliye)
+    db.ref('adliyeler/'+state.currentAdliye+'/'+userId).remove();
+  state.checkedIn=true;state.currentAdliye=state.selectedAdliye;
+  const initials=document.getElementById('profile-avatar-large').textContent||'?';
+  const ref=db.ref('adliyeler/'+state.currentAdliye+'/'+userId);
+  ref.set({name:state.userName,initials,status:state.selectedMood,photoURL:state.userPhotoURL||null,timestamp:firebase.database.ServerValue.TIMESTAMP});
+  ref.onDisconnect().remove();
+  saveToStorage('durusma_checkin_adliye',state.currentAdliye);saveToStorage('durusma_checkin_active','1');
+  document.getElementById('big-btn').classList.add('checked-in');
+  document.getElementById('big-btn-text').textContent='Check-in Aktif\nGüncelle';
+  document.getElementById('ring1').style.cssText='animation:pulse-ring 2s ease-in-out infinite;opacity:.4;';
+  document.getElementById('ring2').style.cssText='animation:pulse-ring 2s ease-in-out .5s infinite;opacity:.2;';
+  document.getElementById('checkin-status').style.display='flex';
+  document.getElementById('status-text').innerHTML='<strong>'+state.currentAdliye+'</strong> · Check-in aktif';
+  document.getElementById('mood-section').style.display='block';
+  document.getElementById('nearby-section').style.display='block';
+  document.getElementById('pre-checkin-hint').style.display='none';
+  document.getElementById('nearby-title').textContent=state.currentAdliye+' — Buradakiler';
+  listenNearbyAvukats(state.currentAdliye);
+  showToast('✅ '+state.currentAdliye+' — Check-in aktif!')
+}
+
+function doCheckOut(){
+  if(state.checkedIn&&state.currentAdliye)db.ref('adliyeler/'+state.currentAdliye+'/'+userId).remove();
+  state.checkedIn=false;state.currentAdliye='';
+  removeFromStorage('durusma_checkin_adliye');removeFromStorage('durusma_checkin_active');
+  document.getElementById('big-btn').classList.remove('checked-in');
+  document.getElementById('big-btn-text').textContent='Adliyedeyim\nKahveye Beklerim';
+  document.getElementById('ring1').style.cssText='';document.getElementById('ring2').style.cssText='';
+  document.getElementById('checkin-status').style.display='none';
+  document.getElementById('mood-section').style.display='none';
+  document.getElementById('nearby-section').style.display='none';
+  document.getElementById('pre-checkin-hint').style.display='block';
+  document.getElementById('nearby-list').innerHTML='<div class="empty-state"><span class="empty-icon">📍</span>Şu an bu adliyede<br>başka meslektaşınız görünmüyor.</div>';
+  showToast('👋 Adliyeden çıkış yapıldı.')
+}
+
+function setMood(chip,mood){
+  document.querySelectorAll('.mood-chip').forEach(c=>c.classList.remove('selected'));
+  chip.classList.add('selected');state.selectedMood=mood;
+  if(state.checkedIn&&state.currentAdliye)db.ref('adliyeler/'+state.currentAdliye+'/'+userId+'/status').set(mood)
+}
+
+// ─── YAKINDAKILER ───
+let nearbyListener=null;
+function listenNearbyAvukats(adliye){
+  if(nearbyListener)nearbyListener();
+  nearbyListener=db.ref('adliyeler/'+adliye).on('value',snap=>{
+    const data=snap.val()||{};
+    const list=document.getElementById('nearby-list');
+    const others=Object.entries(data).filter(([id])=>id!==userId);
+    if(others.length===0){list.innerHTML='<div class="empty-state"><span class="empty-icon">📍</span>Şu an bu adliyede<br>başka meslektaşınız görünmüyor.</div>';return}
+    list.innerHTML=others.map(([uid,u])=>{
+      const badge=u.status==='Müsaitim'?'badge-green':u.status==='Duruşmada'?'badge-red':'badge-yellow';
+      const avStyle=u.photoURL?`style="background-image:url('${u.photoURL}');color:transparent;"`:''
+      return`<div class="nearby-person"><div class="person-av" ${avStyle}>${u.photoURL?'':escHtml(u.initials||'?')}</div><div class="person-info"><div class="person-name">${escHtml(u.name||'Avukat')}</div><div class="person-role">${escHtml(adliye)}</div></div><span class="person-badge ${badge}">${escHtml(u.status||'')}</span></div>`
+    }).join('')
+  })
+}
+
+// ─── KİM NEREDE ───
+function renderFriendMap(){
+  const el=document.getElementById('friend-map-content');
+  el.innerHTML='<div class="map-empty">⏳<br><br>Yükleniyor...</div>';
+  db.ref('friends/'+userId).once('value',fsnap=>{
+    const friends=fsnap.val();
+    if(!friends){el.innerHTML='<div class="map-empty">🗺️<br><br>Arkadaş listeniz yüklenince<br>adliye bazlı konumları burada görünür.</div>';return}
+    const friendIds=Object.keys(friends);
+    db.ref('adliyeler').once('value',asnap=>{
+      const adliyeData=asnap.val()||{};const grouped={};
+      Object.entries(adliyeData).forEach(([adliye,users])=>{
+        Object.entries(users||{}).forEach(([uid,u])=>{
+          if(friendIds.includes(uid)){if(!grouped[adliye])grouped[adliye]=[];grouped[adliye].push({uid,...u})}
+        })
+      });
+      if(Object.keys(grouped).length===0){el.innerHTML='<div class="map-empty">🗺️<br><br>Şu an adliyede arkadaşınız yok.</div>';return}
+      el.innerHTML=Object.entries(grouped).map(([adliye,users])=>{
+        const rows=users.map(u=>{const avStyle=u.photoURL?`style="background-image:url('${u.photoURL}');color:transparent;"`:''
+          return`<div class="map-friend-row"><div class="map-friend-av" ${avStyle}>${u.photoURL?'':escHtml(u.initials||'?')}</div><div class="map-friend-info"><div>${escHtml(u.name||'Avukat')}</div><div class="map-friend-status">${escHtml(u.status||'')}</div></div></div>`
+        }).join('');
+        return`<div class="map-adliye-card has-friends"><div class="map-adliye-header"><div class="map-adliye-name">${escHtml(adliye)}</div><div class="map-adliye-count">${users.length} kişi</div></div>${rows}</div>`
+      }).join('')
+    })
+  })
+}
+
+// ─── BİLDİRİMLER ───
+function listenNotifications(){
+  db.ref('notifications/'+userId).on('value',snap=>{
+    const notifs=snap.val();if(!notifs)return;
+    Object.entries(notifs).forEach(([nid,n])=>{
+      if(n.seen)return;
+      db.ref('notifications/'+userId+'/'+nid+'/seen').set(true);
+      if(n.type==='friend_request')showFriendRequestNotif(n,nid)
+    })
+  })
+}
+
+function showFriendRequestNotif(n,nid){
+  document.getElementById('notif-icon').textContent='👋';
+  document.getElementById('notif-title').textContent='Arkadaşlık İsteği';
+  document.getElementById('notif-body').textContent=n.fromName+' sizi arkadaş olarak eklemek istiyor.';
+  document.getElementById('notif-actions').innerHTML=`
+    <button class="btn-secondary" style="flex:1" onclick="rejectFriendReq('${n.fromId}');document.getElementById('notif-panel').style.display='none'">Reddet</button>
+    <button class="btn-confirm" style="flex:2" onclick="acceptFriendReq('${n.fromId}','${escHtml(n.fromName||'')}');document.getElementById('notif-panel').style.display='none'">Kabul Et</button>`;
+  document.getElementById('notif-panel').style.display='flex'
+}
+
+function acceptFriendReq(fid,fname){
+  const updates={};updates['friends/'+userId+'/'+fid]={name:fname};updates['friends/'+fid+'/'+userId]={name:state.userName};updates['friend_requests/'+userId+'/'+fid]=null;
+  db.ref().update(updates).then(()=>{
+    showToast('✅ '+fname+' arkadaş eklendi!');
+    db.ref('notifications/'+fid).push({type:'friend_accepted',fromId:userId,fromName:state.userName,seen:false,ts:firebase.database.ServerValue.TIMESTAMP})
+  })
+}
+function rejectFriendReq(fid){db.ref('friend_requests/'+userId+'/'+fid).remove()}
+function openFriendRequests(){document.getElementById('friend-requests-panel').style.display='flex';loadFriendRequests()}
+function closeFriendRequests(){document.getElementById('friend-requests-panel').style.display='none'}
+function loadFriendRequests(){
+  const list=document.getElementById('friend-requests-list');
+  list.innerHTML='<div style="text-align:center;color:var(--muted2);padding:20px;">⏳ Yükleniyor...</div>';
+  db.ref('friend_requests/'+userId).once('value',snap=>{
+    const reqs=snap.val();
+    if(!reqs||Object.keys(reqs).length===0){list.innerHTML='<div style="text-align:center;color:var(--muted2);padding:40px 20px;font-size:13px;">Bekleyen arkadaşlık isteği yok.</div>';return}
+    list.innerHTML=Object.entries(reqs).map(([fid,r])=>`
+      <div style="background:var(--bg3);border:.5px solid var(--border);border-radius:14px;padding:16px;display:flex;align-items:center;gap:12px;">
+        <div style="width:40px;height:40px;border-radius:50%;background:var(--card);border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:var(--gold-light);">${(r.name||'AV').replace('Av.','').trim().split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase()}</div>
+        <div style="flex:1"><div style="font-size:13px;font-weight:500;">${escHtml(r.name||'Avukat')}</div></div>
+        <div style="display:flex;gap:8px">
+          <button class="btn-secondary" style="padding:7px 12px;font-size:12px;" onclick="rejectFriendReq('${fid}');this.closest('div[style]').remove()">Reddet</button>
+          <button class="btn-confirm" style="padding:7px 12px;font-size:12px;" onclick="acceptFriendReq('${fid}','${escHtml(r.name||'Avukat')}');this.closest('div[style]').remove()">Kabul</button>
+        </div>
+      </div>`).join('')
+  })
+}
+
+// ─── CHAT ───
+let currentChatId=null,chatListener=null;
+function openChat(uid,name,status){
+  currentChatId=[userId,uid].sort().join('_');
+  document.getElementById('chat-user-name').textContent=name;
+  document.getElementById('chat-user-status').textContent=status;
+  document.getElementById('chat-panel').style.display='flex';
+  const msgs=document.getElementById('chat-messages');
+  msgs.innerHTML='<div style="align-self:center;background:var(--bg3);padding:6px 12px;border-radius:12px;font-size:11px;color:var(--muted2);">Sohbet Başlatıldı</div>';
+  if(chatListener)chatListener();
+  chatListener=db.ref('chats/'+currentChatId).on('value',snap=>{
+    const data=snap.val()||{};
+    const entries=Object.entries(data).sort((a,b)=>a[1].ts-b[1].ts);
+    msgs.innerHTML='<div style="align-self:center;background:var(--bg3);padding:6px 12px;border-radius:12px;font-size:11px;color:var(--muted2);">Sohbet Başlatıldı</div>';
+    entries.forEach(([,m])=>{
+      const mine=m.from===userId;
+      const el=document.createElement('div');
+      el.style.cssText=`align-self:${mine?'flex-end':'flex-start'};max-width:75%;background:${mine?'var(--gold)':'var(--bg3)'};color:${mine?'var(--bg)':'var(--text)'};padding:9px 13px;border-radius:${mine?'16px 16px 4px 16px':'16px 16px 16px 4px'};font-size:13px;line-height:1.5;`;
+      el.textContent=m.text;msgs.appendChild(el)
+    });
+    setTimeout(()=>msgs.scrollTop=msgs.scrollHeight,50)
+  })
+}
+function closeChat(){document.getElementById('chat-panel').style.display='none';if(chatListener){chatListener();chatListener=null}currentChatId=null}
+function sendMessage(){
+  const inp=document.getElementById('chat-input');const text=inp.value.trim();
+  if(!text||!currentChatId)return;
+  db.ref('chats/'+currentChatId).push({from:userId,text,ts:firebase.database.ServerValue.TIMESTAMP});
+  inp.value=''
+}
+
+// ─── SAYFA GEÇİŞİ ───
+function goPage(page,tab){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  if(tab)tab.classList.add('active');
+  if(page==='profile')renderProfileFriends()
+}
+function goProfile(){
+  goPage('profile');
+  document.querySelectorAll('.nav-tab').forEach((t,i)=>{if(i===2)t.classList.add('active');else t.classList.remove('active')})
+}
+
+// ─── DİĞER ───
+function toggleSetting(row){row.querySelector('.toggle').classList.toggle('on')}
+function doLogout(){
+  if(state.checkedIn&&state.currentAdliye)db.ref('adliyeler/'+state.currentAdliye+'/'+userId).remove();
+  removeFromStorage('durusma_loggedin');
+  document.getElementById('s-app').classList.remove('active');
+  document.getElementById('s-landing').classList.add('active');
+  showLogin();
+  // Avatar ve sicili sıfırla
+  document.getElementById('profile-avatar-large').style.backgroundImage='';
+  document.getElementById('profile-avatar-large').textContent='EE';
+  document.getElementById('header-avatar').style.backgroundImage='';
+  document.getElementById('header-avatar').textContent='EE';
+  state={checkedIn:false,currentAdliye:'',selectedMood:'Müsaitim',selectedAdliye:'',userName:'',userSicil:'',userPhotoURL:''}
+}
+
+let toastTimer;
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),3000)}
+
+// ─── iOS BANNER ───
+(function(){
+  const isIos=/iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isStandalone='standalone' in navigator&&navigator.standalone;
+  if(isIos&&!isStandalone&&!sessionStorage.getItem('ios-banner-dismissed'))
+    setTimeout(()=>document.getElementById('ios-banner').classList.add('visible'),3000)
+})();
+function closeBanner(){document.getElementById('ios-banner').classList.remove('visible');sessionStorage.setItem('ios-banner-dismissed','1')}
+
+// ─── PULL-TO-REFRESH ENGELLEYİCİ ───
+(function(){
+  let startY=0;
+  document.addEventListener('touchstart',e=>{startY=e.touches[0].clientY},{passive:true});
+  document.addEventListener('touchmove',e=>{
+    const el=e.target.closest('.page,#chat-messages,#friend-requests-list');
+    if(!el){if(window.scrollY===0)e.preventDefault();return}
+    if(el.scrollTop===0&&e.touches[0].clientY>startY)e.preventDefault()
+  },{passive:false})
+})();
+
+// ─── SAYFA YÜKLENİNCE ───
+(function(){
+  const savedName=getFromStorage('durusma_name');
+  const savedSicil=getFromStorage('durusma_sicil');
+  const savedTel=getFromStorage('durusma_tel');
+  const loggedIn=getFromStorage('durusma_loggedin');
+  const regId=getFromStorage('durusma_reg_id');
+
+  if(savedSicil)document.getElementById('inp-sicil').value=savedSicil;
+  if(savedTel)document.getElementById('inp-tel').value=savedTel;
+
+  if(loggedIn==='1'&&savedName){
+    applyLogin(savedName,savedSicil||'',savedTel||'')
+  }else if(regId){
+    db.ref('kayit_talepleri/'+regId).once('value',snap=>{
+      const d=snap.val();
+      if(!d){removeFromStorage('durusma_reg_id');return}
+      if(d.status==='onaylandi'){
+        saveToStorage('durusma_name',d.name);saveToStorage('durusma_sicil',d.sicil);
+        saveToStorage('durusma_loggedin','1');removeFromStorage('durusma_reg_id');
+        applyLogin(d.name,d.sicil,d.tel||'')
+      }else if(d.status==='bekliyor')showPending();
+      else removeFromStorage('durusma_reg_id')
+    })
   }
-
-  function showLogin() {
-    document.getElementById('register-box').style.display = 'none';
-    document.getElementById('login-box').style.display = 'block';
-  }
-
-  function doLogout() {
-    document.getElementById('s-app').classList.remove('active');
-    document.getElementById('s-landing').classList.add('active');
-    // Sayfayı ana sayfaya sıfırla
-    goPage('home', document.querySelectorAll('.nav-tab')[0]);
-  }
-
-  // ---- 2. PROFİL VERİLERİNİ YÜKLEME (Fotoğraf & Sicil) ----
-  function loadProfileData() {
-    // Sicil No Getir ve Yazdır
-    const savedSicil = localStorage.getItem('userSicilNo');
-    if (savedSicil) {
-      document.getElementById('display-sicil').innerText = savedSicil;
-      document.getElementById('settings-sicil').innerText = savedSicil;
-    }
-
-    // Profil Fotoğrafı Getir ve Göster
-    const savedPic = localStorage.getItem('userProfilePic');
-    if (savedPic) {
-      const headerAvatar = document.getElementById('header-avatar');
-      const largeAvatar = document.getElementById('profile-avatar-large');
-      
-      // Fotoğrafı arkaplan olarak ayarla ve harfleri gizle
-      headerAvatar.style.backgroundImage = `url(${savedPic})`;
-      headerAvatar.style.color = "transparent"; 
-      
-      largeAvatar.style.backgroundImage = `url(${savedPic})`;
-      largeAvatar.style.color = "transparent";
-    }
-  }
-
-  // Profil Fotoğrafı Yükleme İşlemi
-  function handlePicUpload(event) {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const dataUrl = e.target.result;
-        // Tarayıcıya kaydet
-        localStorage.setItem('userProfilePic', dataUrl);
-        // Anında ekranda göster
-        loadProfileData();
-      };
-      reader.readAsDataURL(file);
-    }
-  }
-
-  // ---- 3. ARKADAŞ SİLME İŞLEMİ ----
-  function deleteFriend(buttonElement) {
-    const isConfirmed = confirm("Bu meslektaşı arkadaş listenizden çıkarmak istediğinize emin misiniz?");
-    if (isConfirmed) {
-      const friendRow = buttonElement.closest('.profile-friend-row');
-      if (friendRow) {
-        friendRow.style.opacity = '0'; // Silinme efekti
-        setTimeout(() => {
-          friendRow.remove(); // Tamamen DOM'dan kaldır
-        }, 200);
-      }
-    }
-  }
-
-  // ---- SEKME (SAYFA) DEĞİŞTİRME ----
-  function goPage(pageId, tabElement) {
-    // Sayfaları gizle
-    document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-    // Tıklanan sayfayı göster
-    document.getElementById('page-' + pageId).classList.add('active');
-    
-    // Alt menüdeki aktif class'ı ayarla
-    document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
-    tabElement.classList.add('active');
-  }
-
-  // Sayfa yüklendiğinde varolan verileri (sicil, foto) kontrol et
-  window.onload = function() {
-    loadProfileData();
-  };
+})();
 </script>
 </body>
 </html>
