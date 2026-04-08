@@ -349,11 +349,16 @@ html {
   </div>
 
   <div class="page" id="page-profile">
-    <div class="profile-header">
-      <div class="profile-avatar">EE</div>
-      <div class="profile-name" id="p-name">Av. Enes Emre</div>
-      <div class="profile-baro" id="p-baro">İstanbul Barosu · Sicil: 34/82741</div>
-      <div class="verified-badge">✓ Doğrulanmış Üye</div>
+    <<input type="file" id="avatar-upload" accept="image/png, image/jpeg, image/jpg" style="display:none;" onchange="handleAvatarUpload(event)">
+
+<div class="profile-header">
+  <div class="profile-avatar" id="prof-avatar" onclick="document.getElementById('avatar-upload').click()" style="cursor: pointer; background-size: cover; background-position: center; position: relative;">
+      <span id="prof-initials"></span>
+      <div style="position: absolute; bottom: -5px; right: -5px; background: var(--bg); border: 1px solid var(--gold); border-radius: 50%; width: 24px; height: 24px; font-size: 12px; display: flex; align-items: center; justify-content: center;">📷</div>
+  </div>
+  <div class="profile-name" id="prof-name">Av. İsim</div>
+  <div class="profile-baro">Baro Sicil No: <strong id="prof-sicil-no" style="color:var(--text);">—</strong></div>
+  <div class="verified-badge">✓ Baro Onaylı Avukat</div>
     </div>
     <div class="settings-section">
       <div class="section-title" style="margin-bottom:10px;">Gizlilik</div>
@@ -695,7 +700,74 @@ function goProfile() {
   document.querySelectorAll('.nav-tab').forEach((t,i) => { if(i===2) t.classList.add('active'); else t.classList.remove('active'); });
   renderProfileFriends();
 }
+// ─── PROFİL FOTOĞRAFI YÜKLEME ───
+function handleAvatarUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
 
+  // Fotoğrafı Base64 formatına çevir (Hızlı veritabanı kaydı için)
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const base64Image = e.target.result;
+    
+    // Ekranda hemen göster
+    document.getElementById('prof-avatar').style.backgroundImage = `url(${base64Image})`;
+    document.getElementById('prof-initials').style.display = 'none';
+    
+    // Üst bardaki küçük avatarda da göster
+    document.querySelector('.avatar-sm').style.backgroundImage = `url(${base64Image})`;
+    document.querySelector('.avatar-sm').style.backgroundSize = 'cover';
+    document.querySelector('.avatar-sm').style.backgroundPosition = 'center';
+    document.querySelector('.avatar-sm').textContent = '';
+
+    // Firebase'e kaydet (kullanıcının profil bilgisine ekle)
+    db.ref('users/' + userId + '/avatar').set(base64Image)
+      .then(() => showToast('✅ Profil fotoğrafı güncellendi.'))
+      .catch(() => showToast('❌ Fotoğraf yüklenemedi.'));
+  };
+  reader.readAsDataURL(file);
+}
+
+// ─── PROFİL YÜKLENDİĞİNDE SİCİL NO VE FOTOĞRAFI ÇEK ───
+function loadProfileData() {
+  // Sicil No'yu storage'dan (kayıt olurkenki değerinden) al ve ekrana yaz
+  const savedSicil = getFromStorage('durusma_sicil') || 'Bilinmiyor';
+  document.getElementById('prof-sicil-no').textContent = savedSicil;
+
+  // Firebase'den mevcut profil fotoğrafını çek
+  db.ref('users/' + userId + '/avatar').once('value', snap => {
+    const avatarData = snap.val();
+    if (avatarData) {
+      document.getElementById('prof-avatar').style.backgroundImage = `url(${avatarData})`;
+      document.getElementById('prof-initials').style.display = 'none';
+      
+      const headerAvatar = document.querySelector('.avatar-sm');
+      headerAvatar.style.backgroundImage = `url(${avatarData})`;
+      headerAvatar.style.backgroundSize = 'cover';
+      headerAvatar.style.backgroundPosition = 'center';
+      headerAvatar.textContent = '';
+    } else {
+      document.getElementById('prof-initials').textContent = getFromStorage('durusma_name').replace('Av.', '').trim().split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+      document.getElementById('prof-initials').style.display = 'block';
+    }
+  });
+}
+
+// Profil sayfasına geçerken bu fonksiyonu tetikleyin
+// Örneğin: goProfile() fonksiyonunuzun içine loadProfileData(); satırını ekleyin.
+
+// ─── ARKADAŞ SİLME ───
+function removeFriend(friendId) {
+  if (!confirm('Bu meslektaşınızı arkadaşlıktan çıkarmak istediğinize emin misiniz?')) return;
+  
+  // Her iki taraftan da arkadaşlığı sil
+  db.ref('friends/' + userId + '/' + friendId).remove().then(() => {
+    db.ref('friends/' + friendId + '/' + userId).remove().then(() => {
+      showToast('🗑️ Arkadaş silindi.');
+      renderProfileFriends(); // Listeyi yenile
+    });
+  });
+}
 // ─── PROFİL: ARKADAŞLAR BÖLÜMÜ ───
 function renderProfileFriends() {
   const group = document.getElementById('profile-friends-group');
@@ -752,15 +824,27 @@ function _buildProfileFriendsList(result, group) {
     const statusColor = isHere ? 'var(--green)' : 'var(--muted2)';
 
     row.innerHTML = `
+      function _buildProfileFriendsList(result, group) {
+  group.innerHTML = '';
+  Object.entries(result).forEach(([fid, f]) => {
+    const row = document.createElement('div');
+    row.className = 'profile-friend-row';
+    const isHere = !!f.adliye;
+    const shortAdliye = f.adliye ? f.adliye.replace(' Adliyesi', '') : '';
+    
+    // --- BURASI DEĞİŞTİ ---
+    row.innerHTML = `
       <div class="profile-friend-av">${f.initials}</div>
       <div class="profile-friend-info">
         <div class="profile-friend-name">${f.name}</div>
-        <div class="profile-friend-status" style="color:${statusColor};">${statusText}</div>
+        <div class="profile-friend-status">${isHere ? '<span style="color:var(--green)">📍 ' + shortAdliye + '</span>' : '📍 Adliyede değil'}</div>
       </div>
-      ${isHere ? `<button class="profile-friend-yaz" onclick="event.stopPropagation();openChat('${fid}','${f.name}','${f.initials}')">Yaz</button>` : ''}
-    `;
-    if (isHere) {
-      row.onclick = () => openChat(fid, f.name, f.initials);
+      <div style="display:flex; gap:6px;">
+        <button class="profile-friend-yaz" onclick="openChat('${fid}','${f.name}','${f.initials}')">Yaz</button>
+        <button class="profile-friend-yaz" style="background:transparent; border:0.5px solid var(--red); color:var(--red);" onclick="removeFriend('${fid}')">Sil</button>
+      </div>
+   
+    // ----------------------
     }
     group.appendChild(row);
   });
