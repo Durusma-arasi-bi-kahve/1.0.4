@@ -184,7 +184,12 @@ html {
 
 /* PROFİL */
 .profile-header{display:flex;flex-direction:column;align-items:center;padding:28px 20px 20px;border-bottom:0.5px solid var(--border)}
-.profile-avatar{width:72px;height:72px;border-radius:50%;background:var(--card);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:26px;color:var(--gold-light);margin-bottom:12px}
+.profile-avatar-wrap{position:relative;display:inline-block;margin-bottom:12px;cursor:pointer}
+.profile-avatar{width:72px;height:72px;border-radius:50%;background:var(--card);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:26px;color:var(--gold-light);background-size:cover;background-position:center;overflow:hidden;transition:opacity .2s}
+.profile-avatar-wrap:hover .profile-avatar{opacity:.85}
+.avatar-edit-badge{position:absolute;bottom:1px;right:1px;width:22px;height:22px;border-radius:50%;background:var(--gold);border:2px solid var(--bg2);display:flex;align-items:center;justify-content:center;font-size:11px;pointer-events:none}
+.upload-overlay{position:absolute;inset:0;border-radius:50%;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:white;letter-spacing:.02em}
+.upload-overlay.show{display:flex}
 .profile-name{font-family:'Playfair Display',serif;font-size:20px;color:var(--gold-light)}
 .profile-baro{font-size:12px;color:var(--muted);margin-top:4px}
 .verified-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--green);background:rgba(90,175,90,.08);border:0.5px solid rgba(90,175,90,.2);border-radius:20px;padding:3px 9px;margin-top:8px}
@@ -202,12 +207,14 @@ html {
 .profile-friend-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:0.5px solid var(--border);cursor:pointer;transition:background .15s;}
 .profile-friend-row:last-child{border-bottom:none;}
 .profile-friend-row:hover{background:rgba(200,137,42,.04);}
-.profile-friend-av{width:36px;height:36px;border-radius:50%;background:var(--card);border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--gold-light);flex-shrink:0;}
+.profile-friend-av{width:36px;height:36px;border-radius:50%;background:var(--card);border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--gold-light);flex-shrink:0;background-size:cover;background-position:center;overflow:hidden}
 .profile-friend-info{flex:1;}
 .profile-friend-name{font-size:13px;color:var(--text);font-weight:500;}
 .profile-friend-status{font-size:11px;color:var(--muted);margin-top:2px;}
-.profile-friend-yaz{padding:6px 14px;border-radius:8px;font-size:11px;font-weight:500;background:var(--gold);border:none;color:var(--bg);cursor:pointer;white-space:nowrap;transition:opacity .2s;}
+.profile-friend-yaz{padding:6px 10px;border-radius:8px;font-size:11px;font-weight:500;background:var(--gold);border:none;color:var(--bg);cursor:pointer;white-space:nowrap;transition:opacity .2s;}
 .profile-friend-yaz:hover{opacity:.85;}
+.profile-friend-sil{padding:6px 10px;border-radius:8px;font-size:11px;font-weight:500;background:transparent;border:0.5px solid rgba(192,80,80,.4);color:var(--red);cursor:pointer;white-space:nowrap;transition:all .2s;margin-left:4px}
+.profile-friend-sil:hover{background:rgba(192,80,80,.12)}
 
 /* MODAL */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;align-items:center;justify-content:center;padding:20px}
@@ -350,7 +357,13 @@ html {
 
   <div class="page" id="page-profile">
     <div class="profile-header">
-      <div class="profile-avatar">EE</div>
+      <!-- Profil fotoğrafı -->
+      <input type="file" id="pic-file-input" accept="image/*" style="display:none" onchange="handlePicUpload(event)">
+      <div class="profile-avatar-wrap" onclick="document.getElementById('pic-file-input').click()" title="Fotoğraf yükle">
+        <div class="profile-avatar" id="profile-avatar">EE</div>
+        <div class="upload-overlay" id="upload-overlay">⏳</div>
+        <div class="avatar-edit-badge">📷</div>
+      </div>
       <div class="profile-name" id="p-name">Av. Enes Emre</div>
       <div class="profile-baro" id="p-baro">İstanbul Barosu · Sicil: 34/82741</div>
       <div class="verified-badge">✓ Doğrulanmış Üye</div>
@@ -426,6 +439,7 @@ html {
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 
 <script>
 // ─── FIREBASE YAPILANDIRMA ───
@@ -441,6 +455,7 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
+const storage = firebase.storage();
 
 // Her cihaza özgü ID (localStorage + cookie)
 function _get(k) { try { const v=localStorage.getItem(k); if(v) return v; } catch(e){} try { const m=document.cookie.match('(?:^|; )'+k+'=([^;]*)'); if(m) return decodeURIComponent(m[1]); } catch(e){} return null; }
@@ -530,28 +545,106 @@ function applyLogin(name, sicil, tel) {
   document.getElementById('greeting').textContent = 'Merhaba, ' + (name.split(' ')[1] || name);
   document.getElementById('p-name').textContent = name;
   document.getElementById('p-baro').textContent = 'İstanbul Barosu · Sicil: ' + sicil;
-  document.querySelector('.profile-avatar').textContent = initials;
+  document.getElementById('profile-avatar').textContent = initials;
   document.querySelector('.avatar-sm').textContent = initials;
   document.getElementById('s-landing').classList.remove('active');
   document.getElementById('s-app').classList.add('active');
+  // Kayıtlı profil fotoğrafını yükle
+  loadProfilePhoto();
   listenNotifications();
   // Önceki check-in'i geri yükle
   restoreCheckin();
   // Kahve sayacını geri yükle
   restoreKahveTimer();
+  // Son açık sayfayı geri yükle
+  restoreLastPage();
+}
+
+// ─── PROFİL FOTOĞRAFI: Firebase Storage'dan yükle ───
+function loadProfilePhoto() {
+  db.ref('user_photos/' + userId).once('value', snap => {
+    const url = snap.val();
+    if (url) applyPhotoToUI(url);
+  });
+}
+
+function applyPhotoToUI(url) {
+  const avatarEl = document.getElementById('profile-avatar');
+  const headerEl = document.querySelector('.avatar-sm');
+  avatarEl.style.backgroundImage = `url('${url}')`;
+  avatarEl.style.color = 'transparent';
+  avatarEl.textContent = '';
+  if (headerEl) {
+    headerEl.style.backgroundImage = `url('${url}')`;
+    headerEl.style.color = 'transparent';
+    headerEl.textContent = '';
+  }
+}
+
+// ─── PROFİL FOTOĞRAFI: Yükle ───
+function handlePicUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) { showToast('⚠️ Fotoğraf 5MB\'dan küçük olmalı'); return; }
+
+  const overlay = document.getElementById('upload-overlay');
+  overlay.textContent = '0%';
+  overlay.classList.add('show');
+
+  const ext = file.name.split('.').pop() || 'jpg';
+  const storageRef = storage.ref('profile_photos/' + userId + '.' + ext);
+  const task = storageRef.put(file);
+
+  task.on('state_changed',
+    snap => {
+      const pct = Math.round(snap.bytesTransferred / snap.totalBytes * 100);
+      overlay.textContent = pct + '%';
+    },
+    err => {
+      overlay.classList.remove('show');
+      showToast('❌ Yükleme hatası: ' + err.message);
+      event.target.value = '';
+    },
+    () => {
+      task.snapshot.ref.getDownloadURL().then(url => {
+        overlay.classList.remove('show');
+        // URL'yi DB'ye kaydet
+        db.ref('user_photos/' + userId).set(url);
+        // UI'ya uygula
+        applyPhotoToUI(url);
+        // Aktif check-in varsa oradaki kaydı da güncelle
+        if (state.checkedIn && state.currentAdliye) {
+          db.ref('adliyeler/' + state.currentAdliye + '/' + userId + '/photoURL').set(url);
+        }
+        showToast('✅ Profil fotoğrafı güncellendi!');
+      });
+      event.target.value = '';
+    }
+  );
 }
 
 function restoreCheckin() {
-  const savedAdliye = getFromStorage('durusma_checkin_adliye');
+  const savedAdliye   = getFromStorage('durusma_checkin_adliye');
   const checkinActive = getFromStorage('durusma_checkin_active');
+  const checkinUntil  = parseInt(getFromStorage('durusma_checkin_until') || '0');
+
   if (!savedAdliye || checkinActive !== '1') return;
 
-  state.checkedIn = true;
-  state.currentAdliye = savedAdliye;
+  // Süre dolduysa otomatik çıkış yap
+  if (checkinUntil && Date.now() > checkinUntil) {
+    removeFromStorage('durusma_checkin_adliye');
+    removeFromStorage('durusma_checkin_active');
+    removeFromStorage('durusma_checkin_until');
+    db.ref('adliyeler/' + savedAdliye + '/' + userId).remove();
+    return;
+  }
+
+  state.checkedIn      = true;
+  state.currentAdliye  = savedAdliye;
   state.selectedAdliye = savedAdliye;
 
-  const myName = state.userName || getFromStorage('durusma_name') || 'Avukat';
-  const myInitials = document.querySelector('.profile-avatar').textContent || '?';
+  const myName     = state.userName || getFromStorage('durusma_name') || 'Avukat';
+  const myInitials = document.getElementById('profile-avatar').textContent || '?';
 
   document.getElementById('big-btn').classList.add('checked-in');
   document.getElementById('big-btn-text').textContent = 'Check-in Aktif\nGüncelle';
@@ -564,15 +657,16 @@ function restoreCheckin() {
   document.getElementById('pre-checkin-hint').style.display = 'none';
   document.getElementById('nearby-title').textContent = savedAdliye + ' — Buradakiler';
 
-  // Firebase'e tekrar kaydet (onDisconnect ile silinmiş olabilir)
+  // Firebase'e tekrar yaz (sayfa yenilendiyse kaydı tazeliyoruz, süre uzatmıyoruz)
   const ref = db.ref('adliyeler/' + savedAdliye + '/' + userId);
   ref.set({
     name: myName,
     initials: myInitials,
     status: state.selectedMood,
-    timestamp: firebase.database.ServerValue.TIMESTAMP
+    timestamp: firebase.database.ServerValue.TIMESTAMP,
+    checkinUntil: checkinUntil || (Date.now() + 8 * 60 * 60 * 1000)
   });
-  ref.onDisconnect().remove();
+  // onDisconnect YOK — tarayıcı kapansa da devam eder
 
   listenNearbyAvukats(savedAdliye);
 }
@@ -689,6 +783,8 @@ function goPage(page, tab) {
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
   document.getElementById('page-' + page).classList.add('active');
   if (tab) tab.classList.add('active');
+  // Aktif sayfayı kaydet — tarayıcı kapansa da kaldığı yerden açılsın
+  saveToStorage('durusma_last_page', page);
 }
 function goProfile() {
   goPage('profile');
@@ -715,7 +811,11 @@ function renderProfileFriends() {
     const result = {};
 
     friendEntries.forEach(([fid, fdata]) => {
-      result[fid] = { name: fdata.name, initials: fdata.initials || '?', adliye: null, status: null };
+      result[fid] = { name: fdata.name, initials: fdata.initials || '?', adliye: null, status: null, photoURL: null };
+      // Önce fotoğrafı çek
+      db.ref('user_photos/' + fid).once('value', psnap => {
+        result[fid].photoURL = psnap.val() || null;
+      });
       let found = false;
       let adliyeChecked = 0;
       ADLIYELER.forEach(a => {
@@ -742,28 +842,55 @@ function _buildProfileFriendsList(result, group) {
   Object.entries(result).forEach(([fid, f]) => {
     const row = document.createElement('div');
     row.className = 'profile-friend-row';
+    row.id = 'friend-row-' + fid;
 
     const isHere = !!f.adliye;
-    // Short adliye name — strip "Adliyesi" for brevity
     const shortAdliye = f.adliye ? f.adliye.replace(' Adliyesi','').replace('İstanbul Anadolu Adliyesi (Kartal)','Kartal') : '';
-    const statusText = isHere
-      ? `📍 ${shortAdliye} · ${f.status}`
-      : 'Adliyede değil';
+    const statusText = isHere ? `📍 ${shortAdliye} · ${f.status}` : 'Adliyede değil';
     const statusColor = isHere ? 'var(--green)' : 'var(--muted2)';
 
+    // Fotoğraf: DB'den çek
+    const photoURL = f.photoURL || null;
+    const avStyle = photoURL
+      ? `style="background-image:url('${photoURL}');color:transparent;"`
+      : '';
+    const avText = photoURL ? '' : (f.initials || '?');
+
     row.innerHTML = `
-      <div class="profile-friend-av">${f.initials}</div>
+      <div class="profile-friend-av" ${avStyle}>${avText}</div>
       <div class="profile-friend-info">
         <div class="profile-friend-name">${f.name}</div>
         <div class="profile-friend-status" style="color:${statusColor};">${statusText}</div>
       </div>
-      ${isHere ? `<button class="profile-friend-yaz" onclick="event.stopPropagation();openChat('${fid}','${f.name}','${f.initials}')">Yaz</button>` : ''}
+      <div style="display:flex;align-items:center;gap:0">
+        ${isHere ? `<button class="profile-friend-yaz" onclick="event.stopPropagation();openChat('${fid}','${f.name}','${f.initials}')">Yaz</button>` : ''}
+        <button class="profile-friend-sil" onclick="event.stopPropagation();askDeleteFriend('${fid}','${f.name}')">Sil</button>
+      </div>
     `;
     if (isHere) {
       row.onclick = () => openChat(fid, f.name, f.initials);
     }
     group.appendChild(row);
   });
+}
+
+// ─── ARKADAŞ SİLME ───
+function askDeleteFriend(friendId, friendName) {
+  if (!confirm('"' + friendName + '" adlı kişiyi arkadaş listenizden çıkarmak istediğinize emin misiniz?')) return;
+  const updates = {};
+  updates['friends/' + userId + '/' + friendId] = null;
+  updates['friends/' + friendId + '/' + userId] = null;
+  db.ref().update(updates)
+    .then(() => {
+      const row = document.getElementById('friend-row-' + friendId);
+      if (row) {
+        row.style.transition = 'opacity .3s';
+        row.style.opacity = '0';
+        setTimeout(() => row.remove(), 300);
+      }
+      showToast('✅ Arkadaşlıktan çıkarıldı.');
+    })
+    .catch(() => showToast('❌ İşlem başarısız, tekrar deneyin.'));
 }
 
 // ─── BÜYÜK BUTON ───
@@ -871,21 +998,24 @@ function confirmCheckin() {
 
   // Kullanıcı adını güvenli şekilde al
   const myName = state.userName || getFromStorage('durusma_name') || 'Avukat';
-  const myInitials = document.querySelector('.profile-avatar').textContent || myName.replace('Av.','').trim().split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+  const myInitials = document.getElementById('profile-avatar').textContent || myName.replace('Av.','').trim().split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
 
-  // Firebase'e kaydet
+  // Firebase'e kaydet — onDisconnect KULLANMIYORUZ, tarayıcı kapansa da kalıcı
+  const checkinUntil = Date.now() + 8 * 60 * 60 * 1000; // 8 saat
   const ref = db.ref('adliyeler/' + state.currentAdliye + '/' + userId);
   ref.set({
     name: myName,
     initials: myInitials,
     status: state.selectedMood,
-    timestamp: firebase.database.ServerValue.TIMESTAMP
+    timestamp: firebase.database.ServerValue.TIMESTAMP,
+    checkinUntil: checkinUntil
   });
-  ref.onDisconnect().remove();
+  // onDisconnect KASTEN YOK — tarayıcı kapansa da kayıt devam eder
 
-  // Check-in durumunu localStorage'a kaydet (sayfa yenilenince geri dönmek için)
+  // Check-in durumunu localStorage'a kaydet
   saveToStorage('durusma_checkin_adliye', state.currentAdliye);
   saveToStorage('durusma_checkin_active', '1');
+  saveToStorage('durusma_checkin_until', String(checkinUntil));
 
   listenNearbyAvukats(state.currentAdliye);
 
@@ -897,6 +1027,7 @@ function confirmCheckin() {
 function doCheckOut() {
   removeFromStorage('durusma_checkin_adliye');
   removeFromStorage('durusma_checkin_active');
+  removeFromStorage('durusma_checkin_until');
   if (state.currentAdliye) {
     db.ref('adliyeler/' + state.currentAdliye + '/' + userId).remove();
     db.ref('adliyeler/' + state.currentAdliye).off();
@@ -1006,7 +1137,27 @@ function restoreKahveTimer() {
   }
 }
 
-// ─── FIREBASE: CANLI LİSTE ───
+// ─── SON AÇIK SAYFAYI GERİ YÜKLE ───
+function restoreLastPage() {
+  const lastPage = getFromStorage('durusma_last_page');
+  // Geçerli sayfa isimleri: home, cafe, profile
+  const validPages = ['home', 'cafe', 'profile'];
+  if (!lastPage || !validPages.includes(lastPage)) return;
+
+  // İlgili nav tab'ı bul ve tıkla
+  const pageIndex = { home: 0, cafe: 1, profile: 2 };
+  const tabs = document.querySelectorAll('.nav-tab');
+  const idx = pageIndex[lastPage];
+
+  if (lastPage === 'profile') {
+    goProfile();
+  } else if (lastPage === 'cafe') {
+    goPage('cafe', tabs[idx]);
+    renderFriendMap();
+  } else {
+    goPage('home', tabs[idx]);
+  }
+}
 function listenNearbyAvukats(adliyeName) {
   const list = document.getElementById('nearby-list');
   list.innerHTML = '<div class="empty-state"><span class="empty-icon">⏳</span>Bağlanıyor...</div>';
@@ -1014,14 +1165,22 @@ function listenNearbyAvukats(adliyeName) {
     const data = snapshot.val();
     list.innerHTML = '';
     let hasOthers = false;
+    const now = Date.now();
     if (data) {
       Object.keys(data).forEach(key => {
         if (key === userId) return;
-        hasOthers = true;
         const p = data[key];
+
+        // Süresi dolmuş check-in'leri Firebase'den sil ve gösterme
+        if (p.checkinUntil && now > p.checkinUntil) {
+          db.ref('adliyeler/' + adliyeName + '/' + key).remove();
+          return;
+        }
+
+        hasOthers = true;
         let badge = '';
         if (p.status === 'Kahveye Açığım') {
-          const remaining = p.kahveUntil ? Math.max(0, Math.floor((p.kahveUntil - Date.now()) / 60000)) : 45;
+          const remaining = p.kahveUntil ? Math.max(0, Math.floor((p.kahveUntil - now) / 60000)) : 45;
           badge = '<span class="person-badge badge-coffee">☕ ' + remaining + 'dk</span>';
         } else if (p.status === 'Müsaitim') badge = '<span class="person-badge badge-green">Müsait</span>';
         else if (p.status === 'Duruşmada') badge = '<span class="person-badge badge-red">Duruşmada</span>';
@@ -1153,7 +1312,7 @@ function sendMessage() {
   db.ref('chats/' + chatId).push(msg);
 
   // Karşı tarafa bildirim gönder
-  const myInitialsNow = document.querySelector('.profile-avatar').textContent || '?';
+  const myInitialsNow = document.getElementById('profile-avatar').textContent || '?';
   db.ref('notifications/' + currentChatTargetId).push({
     type: 'message',
     fromId: userId,
@@ -1175,7 +1334,7 @@ function closeChat() {
 
 // ─── ARKADAŞLIK İSTEKLERİ ───
 function sendFriendRequest(targetId, targetName, targetInitials, btnEl) {
-  const myInitials = document.querySelector('.profile-avatar').textContent;
+  const myInitials = document.getElementById('profile-avatar').textContent;
   db.ref('notifications/' + targetId).push({
     type: 'friend_request',
     fromId: userId,
@@ -1267,7 +1426,7 @@ function acceptFriend(notifId, fromId, fromName, fromInitials, cardEl) {
   db.ref('notifications/' + userId + '/' + notifId).update({ read: true });
   // Karşılıklı arkadaşlık kaydı
   db.ref('friends/' + userId + '/' + fromId).set({ name: fromName, initials: fromInitials || '?', since: firebase.database.ServerValue.TIMESTAMP });
-  const myInitials = document.querySelector('.profile-avatar').textContent;
+  const myInitials = document.getElementById('profile-avatar').textContent;
   db.ref('friends/' + fromId + '/' + userId).set({ name: state.userName, initials: myInitials, since: firebase.database.ServerValue.TIMESTAMP });
   // Karşı tarafa kabul bildirimi + tarayıcı bildirimi tetikle
   db.ref('notifications/' + fromId).push({
@@ -1330,8 +1489,13 @@ function renderFriendMap() {
         db.ref('adliyeler/' + a + '/' + fid).once('value', snap2 => {
           if (snap2.exists()) {
             const p = snap2.val();
-            if (!byAdliye[a]) byAdliye[a] = [];
-            byAdliye[a].push({ id: fid, name: p.name || friends[fid].name, initials: p.initials || friends[fid].initials || '?', status: p.status || 'Müsaitim', kahveUntil: p.kahveUntil });
+            // Süresi dolmuşsa gösterme ve sil
+            if (p.checkinUntil && Date.now() > p.checkinUntil) {
+              db.ref('adliyeler/' + a + '/' + fid).remove();
+            } else {
+              if (!byAdliye[a]) byAdliye[a] = [];
+              byAdliye[a].push({ id: fid, name: p.name || friends[fid].name, initials: p.initials || friends[fid].initials || '?', status: p.status || 'Müsaitim', kahveUntil: p.kahveUntil });
+            }
           }
           pending--;
           if (pending <= 0) renderMapCards(byAdliye, cont, friends);
