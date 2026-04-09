@@ -457,13 +457,54 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const storage = firebase.storage();
 
-// Her cihaza özgü ID (localStorage + cookie)
+// ─── KULLANICI KİMLİĞİ — sicil numarasından türetilir, cihazdan bağımsız ───
+// Sicil gelmeden önce geçici placeholder (sayfa yüklenince applyLogin override eder)
 function _get(k) { try { const v=localStorage.getItem(k); if(v) return v; } catch(e){} try { const m=document.cookie.match('(?:^|; )'+k+'=([^;]*)'); if(m) return decodeURIComponent(m[1]); } catch(e){} return null; }
 function _set(k,v) { try{localStorage.setItem(k,v);}catch(e){} try{const d=new Date();d.setFullYear(d.getFullYear()+1);document.cookie=k+'='+encodeURIComponent(v)+'; expires='+d.toUTCString()+'; path=/; SameSite=Lax';}catch(e){} }
-let userId = _get('durusma_uid');
-if (!userId) {
-  userId = 'user_' + Math.random().toString(36).substr(2, 9);
-  _set('durusma_uid', userId);
+let userId = _get('durusma_uid') || 'anon_' + Math.random().toString(36).substr(2, 6);
+
+// Sicil numarasından deterministik userId üret
+function makeUserIdFromSicil(sicil) {
+  return 'reg_' + sicil.replace(/[^a-zA-Z0-9]/g, '_');
+}
+
+// ─── ESKİ RASTGELE ID'DEN YENİ SİCİL-TABANLI ID'YE MİGRATION ───
+// İlk kez sicil-tabanlı sisteme geçişte, eski cihaza ait arkadaş/fotoğraf verilerini taşır
+function migrateUserData(oldId, newId) {
+  // Arkadaşları taşı
+  db.ref('friends/' + oldId).once('value', snap => {
+    const friends = snap.val();
+    if (friends) {
+      // Yeni ID'ye yaz
+      db.ref('friends/' + newId).update(friends);
+      // Her arkadaşın kaydındaki eski ID'yi yeni ID ile değiştir
+      Object.keys(friends).forEach(fid => {
+        db.ref('friends/' + fid + '/' + oldId).once('value', fsnap => {
+          if (fsnap.exists()) {
+            const fdata = fsnap.val();
+            db.ref('friends/' + fid + '/' + newId).set(fdata);
+            db.ref('friends/' + fid + '/' + oldId).remove();
+          }
+        });
+      });
+      // Eski kaydı sil
+      db.ref('friends/' + oldId).remove();
+    }
+  });
+  // Profil fotoğrafını taşı
+  db.ref('user_photos/' + oldId).once('value', snap => {
+    if (snap.val()) {
+      db.ref('user_photos/' + newId).set(snap.val());
+      db.ref('user_photos/' + oldId).remove();
+    }
+  });
+  // Bildirimleri taşı
+  db.ref('notifications/' + oldId).once('value', snap => {
+    if (snap.val()) {
+      db.ref('notifications/' + newId).update(snap.val());
+      db.ref('notifications/' + oldId).remove();
+    }
+  });
 }
 
 // ─── SABİTLER ───
@@ -541,6 +582,19 @@ let state = {
 function applyLogin(name, sicil, tel) {
   state.userName = name;
   state.userSicil = sicil;
+
+  // userId'yi sicilden türet — tüm cihazlarda aynı olsun
+  const newUserId = makeUserIdFromSicil(sicil);
+  const oldUserId  = _get('durusma_uid');
+
+  // Eski rastgele ID'den yeni sicil-tabanlı ID'ye tek seferlik migration
+  if (oldUserId && oldUserId !== newUserId && !oldUserId.startsWith('reg_')) {
+    migrateUserData(oldUserId, newUserId);
+  }
+
+  userId = newUserId;
+  _set('durusma_uid', userId);
+
   const initials = name.replace('Av.','').trim().split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
   document.getElementById('greeting').textContent = 'Merhaba, ' + (name.split(' ')[1] || name);
   document.getElementById('p-name').textContent = name;
@@ -624,26 +678,15 @@ function handlePicUpload(event) {
 }
 
 function restoreCheckin() {
-  const savedAdliye   = getFromStorage('durusma_checkin_adliye');
+  const savedAdliye = getFromStorage('durusma_checkin_adliye');
   const checkinActive = getFromStorage('durusma_checkin_active');
-  const checkinUntil  = parseInt(getFromStorage('durusma_checkin_until') || '0');
-
   if (!savedAdliye || checkinActive !== '1') return;
 
-  // Süre dolduysa otomatik çıkış yap
-  if (checkinUntil && Date.now() > checkinUntil) {
-    removeFromStorage('durusma_checkin_adliye');
-    removeFromStorage('durusma_checkin_active');
-    removeFromStorage('durusma_checkin_until');
-    db.ref('adliyeler/' + savedAdliye + '/' + userId).remove();
-    return;
-  }
-
-  state.checkedIn      = true;
-  state.currentAdliye  = savedAdliye;
+  state.checkedIn = true;
+  state.currentAdliye = savedAdliye;
   state.selectedAdliye = savedAdliye;
 
-  const myName     = state.userName || getFromStorage('durusma_name') || 'Avukat';
+  const myName = state.userName || getFromStorage('durusma_name') || 'Avukat';
   const myInitials = document.getElementById('profile-avatar').textContent || '?';
 
   document.getElementById('big-btn').classList.add('checked-in');
@@ -657,16 +700,15 @@ function restoreCheckin() {
   document.getElementById('pre-checkin-hint').style.display = 'none';
   document.getElementById('nearby-title').textContent = savedAdliye + ' — Buradakiler';
 
-  // Firebase'e tekrar yaz (sayfa yenilendiyse kaydı tazeliyoruz, süre uzatmıyoruz)
+  // Firebase'e tekrar kaydet (onDisconnect ile silinmiş olabilir)
   const ref = db.ref('adliyeler/' + savedAdliye + '/' + userId);
   ref.set({
     name: myName,
     initials: myInitials,
     status: state.selectedMood,
-    timestamp: firebase.database.ServerValue.TIMESTAMP,
-    checkinUntil: checkinUntil || (Date.now() + 8 * 60 * 60 * 1000)
+    timestamp: firebase.database.ServerValue.TIMESTAMP
   });
-  // onDisconnect YOK — tarayıcı kapansa da devam eder
+  ref.onDisconnect().remove();
 
   listenNearbyAvukats(savedAdliye);
 }
@@ -783,13 +825,28 @@ function goPage(page, tab) {
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
   document.getElementById('page-' + page).classList.add('active');
   if (tab) tab.classList.add('active');
-  // Aktif sayfayı kaydet — tarayıcı kapansa da kaldığı yerden açılsın
+  // Kaldığı sayfayı kaydet
   saveToStorage('durusma_last_page', page);
 }
 function goProfile() {
   goPage('profile');
   document.querySelectorAll('.nav-tab').forEach((t,i) => { if(i===2) t.classList.add('active'); else t.classList.remove('active'); });
   renderProfileFriends();
+}
+
+// ─── SON SAYFAYI GERİ YÜKLE ───
+function restoreLastPage() {
+  const lastPage = getFromStorage('durusma_last_page');
+  const validPages = ['home', 'cafe', 'profile'];
+  if (!lastPage || !validPages.includes(lastPage) || lastPage === 'home') return;
+  const tabs = document.querySelectorAll('.nav-tab');
+  const idx = { home: 0, cafe: 1, profile: 2 }[lastPage];
+  if (lastPage === 'profile') {
+    goProfile();
+  } else if (lastPage === 'cafe') {
+    goPage('cafe', tabs[idx]);
+    renderFriendMap();
+  }
 }
 
 // ─── PROFİL: ARKADAŞLAR BÖLÜMÜ ───
@@ -1000,22 +1057,19 @@ function confirmCheckin() {
   const myName = state.userName || getFromStorage('durusma_name') || 'Avukat';
   const myInitials = document.getElementById('profile-avatar').textContent || myName.replace('Av.','').trim().split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
 
-  // Firebase'e kaydet — onDisconnect KULLANMIYORUZ, tarayıcı kapansa da kalıcı
-  const checkinUntil = Date.now() + 8 * 60 * 60 * 1000; // 8 saat
+  // Firebase'e kaydet
   const ref = db.ref('adliyeler/' + state.currentAdliye + '/' + userId);
   ref.set({
     name: myName,
     initials: myInitials,
     status: state.selectedMood,
-    timestamp: firebase.database.ServerValue.TIMESTAMP,
-    checkinUntil: checkinUntil
+    timestamp: firebase.database.ServerValue.TIMESTAMP
   });
-  // onDisconnect KASTEN YOK — tarayıcı kapansa da kayıt devam eder
+  ref.onDisconnect().remove();
 
-  // Check-in durumunu localStorage'a kaydet
+  // Check-in durumunu localStorage'a kaydet (sayfa yenilenince geri dönmek için)
   saveToStorage('durusma_checkin_adliye', state.currentAdliye);
   saveToStorage('durusma_checkin_active', '1');
-  saveToStorage('durusma_checkin_until', String(checkinUntil));
 
   listenNearbyAvukats(state.currentAdliye);
 
@@ -1027,7 +1081,6 @@ function confirmCheckin() {
 function doCheckOut() {
   removeFromStorage('durusma_checkin_adliye');
   removeFromStorage('durusma_checkin_active');
-  removeFromStorage('durusma_checkin_until');
   if (state.currentAdliye) {
     db.ref('adliyeler/' + state.currentAdliye + '/' + userId).remove();
     db.ref('adliyeler/' + state.currentAdliye).off();
@@ -1137,27 +1190,7 @@ function restoreKahveTimer() {
   }
 }
 
-// ─── SON AÇIK SAYFAYI GERİ YÜKLE ───
-function restoreLastPage() {
-  const lastPage = getFromStorage('durusma_last_page');
-  // Geçerli sayfa isimleri: home, cafe, profile
-  const validPages = ['home', 'cafe', 'profile'];
-  if (!lastPage || !validPages.includes(lastPage)) return;
-
-  // İlgili nav tab'ı bul ve tıkla
-  const pageIndex = { home: 0, cafe: 1, profile: 2 };
-  const tabs = document.querySelectorAll('.nav-tab');
-  const idx = pageIndex[lastPage];
-
-  if (lastPage === 'profile') {
-    goProfile();
-  } else if (lastPage === 'cafe') {
-    goPage('cafe', tabs[idx]);
-    renderFriendMap();
-  } else {
-    goPage('home', tabs[idx]);
-  }
-}
+// ─── FIREBASE: CANLI LİSTE ───
 function listenNearbyAvukats(adliyeName) {
   const list = document.getElementById('nearby-list');
   list.innerHTML = '<div class="empty-state"><span class="empty-icon">⏳</span>Bağlanıyor...</div>';
@@ -1165,22 +1198,14 @@ function listenNearbyAvukats(adliyeName) {
     const data = snapshot.val();
     list.innerHTML = '';
     let hasOthers = false;
-    const now = Date.now();
     if (data) {
       Object.keys(data).forEach(key => {
         if (key === userId) return;
-        const p = data[key];
-
-        // Süresi dolmuş check-in'leri Firebase'den sil ve gösterme
-        if (p.checkinUntil && now > p.checkinUntil) {
-          db.ref('adliyeler/' + adliyeName + '/' + key).remove();
-          return;
-        }
-
         hasOthers = true;
+        const p = data[key];
         let badge = '';
         if (p.status === 'Kahveye Açığım') {
-          const remaining = p.kahveUntil ? Math.max(0, Math.floor((p.kahveUntil - now) / 60000)) : 45;
+          const remaining = p.kahveUntil ? Math.max(0, Math.floor((p.kahveUntil - Date.now()) / 60000)) : 45;
           badge = '<span class="person-badge badge-coffee">☕ ' + remaining + 'dk</span>';
         } else if (p.status === 'Müsaitim') badge = '<span class="person-badge badge-green">Müsait</span>';
         else if (p.status === 'Duruşmada') badge = '<span class="person-badge badge-red">Duruşmada</span>';
@@ -1245,8 +1270,14 @@ function toggleSetting(row) { const t = row.querySelector('.toggle'); if (t) t.c
 function doLogout() {
   if (state.checkedIn) doCheckOut();
   removeFromStorage('durusma_loggedin');
+  removeFromStorage('durusma_last_page');
+  // Ana sayfayı sıfırla
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-home').classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach((t,i) => { if(i===0) t.classList.add('active'); else t.classList.remove('active'); });
   document.getElementById('s-app').classList.remove('active');
   document.getElementById('s-landing').classList.add('active');
+  showLogin();
 }
 function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000); }
 function closeBanner() { document.getElementById('ios-banner').classList.remove('visible'); sessionStorage.setItem('ios-banner-dismissed','1'); }
@@ -1489,13 +1520,8 @@ function renderFriendMap() {
         db.ref('adliyeler/' + a + '/' + fid).once('value', snap2 => {
           if (snap2.exists()) {
             const p = snap2.val();
-            // Süresi dolmuşsa gösterme ve sil
-            if (p.checkinUntil && Date.now() > p.checkinUntil) {
-              db.ref('adliyeler/' + a + '/' + fid).remove();
-            } else {
-              if (!byAdliye[a]) byAdliye[a] = [];
-              byAdliye[a].push({ id: fid, name: p.name || friends[fid].name, initials: p.initials || friends[fid].initials || '?', status: p.status || 'Müsaitim', kahveUntil: p.kahveUntil });
-            }
+            if (!byAdliye[a]) byAdliye[a] = [];
+            byAdliye[a].push({ id: fid, name: p.name || friends[fid].name, initials: p.initials || friends[fid].initials || '?', status: p.status || 'Müsaitim', kahveUntil: p.kahveUntil });
           }
           pending--;
           if (pending <= 0) renderMapCards(byAdliye, cont, friends);
