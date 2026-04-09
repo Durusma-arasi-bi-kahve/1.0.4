@@ -457,54 +457,13 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const storage = firebase.storage();
 
-// ─── KULLANICI KİMLİĞİ — sicil numarasından türetilir, cihazdan bağımsız ───
-// Sicil gelmeden önce geçici placeholder (sayfa yüklenince applyLogin override eder)
+// Her cihaza özgü ID (localStorage + cookie)
 function _get(k) { try { const v=localStorage.getItem(k); if(v) return v; } catch(e){} try { const m=document.cookie.match('(?:^|; )'+k+'=([^;]*)'); if(m) return decodeURIComponent(m[1]); } catch(e){} return null; }
 function _set(k,v) { try{localStorage.setItem(k,v);}catch(e){} try{const d=new Date();d.setFullYear(d.getFullYear()+1);document.cookie=k+'='+encodeURIComponent(v)+'; expires='+d.toUTCString()+'; path=/; SameSite=Lax';}catch(e){} }
-let userId = _get('durusma_uid') || 'anon_' + Math.random().toString(36).substr(2, 6);
-
-// Sicil numarasından deterministik userId üret
-function makeUserIdFromSicil(sicil) {
-  return 'reg_' + sicil.replace(/[^a-zA-Z0-9]/g, '_');
-}
-
-// ─── ESKİ RASTGELE ID'DEN YENİ SİCİL-TABANLI ID'YE MİGRATION ───
-// İlk kez sicil-tabanlı sisteme geçişte, eski cihaza ait arkadaş/fotoğraf verilerini taşır
-function migrateUserData(oldId, newId) {
-  // Arkadaşları taşı
-  db.ref('friends/' + oldId).once('value', snap => {
-    const friends = snap.val();
-    if (friends) {
-      // Yeni ID'ye yaz
-      db.ref('friends/' + newId).update(friends);
-      // Her arkadaşın kaydındaki eski ID'yi yeni ID ile değiştir
-      Object.keys(friends).forEach(fid => {
-        db.ref('friends/' + fid + '/' + oldId).once('value', fsnap => {
-          if (fsnap.exists()) {
-            const fdata = fsnap.val();
-            db.ref('friends/' + fid + '/' + newId).set(fdata);
-            db.ref('friends/' + fid + '/' + oldId).remove();
-          }
-        });
-      });
-      // Eski kaydı sil
-      db.ref('friends/' + oldId).remove();
-    }
-  });
-  // Profil fotoğrafını taşı
-  db.ref('user_photos/' + oldId).once('value', snap => {
-    if (snap.val()) {
-      db.ref('user_photos/' + newId).set(snap.val());
-      db.ref('user_photos/' + oldId).remove();
-    }
-  });
-  // Bildirimleri taşı
-  db.ref('notifications/' + oldId).once('value', snap => {
-    if (snap.val()) {
-      db.ref('notifications/' + newId).update(snap.val());
-      db.ref('notifications/' + oldId).remove();
-    }
-  });
+let userId = _get('durusma_uid');
+if (!userId) {
+  userId = 'user_' + Math.random().toString(36).substr(2, 9);
+  _set('durusma_uid', userId);
 }
 
 // ─── SABİTLER ───
@@ -582,19 +541,6 @@ let state = {
 function applyLogin(name, sicil, tel) {
   state.userName = name;
   state.userSicil = sicil;
-
-  // userId'yi sicilden türet — tüm cihazlarda aynı olsun
-  const newUserId = makeUserIdFromSicil(sicil);
-  const oldUserId  = _get('durusma_uid');
-
-  // Eski rastgele ID'den yeni sicil-tabanlı ID'ye tek seferlik migration
-  if (oldUserId && oldUserId !== newUserId && !oldUserId.startsWith('reg_')) {
-    migrateUserData(oldUserId, newUserId);
-  }
-
-  userId = newUserId;
-  _set('durusma_uid', userId);
-
   const initials = name.replace('Av.','').trim().split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
   document.getElementById('greeting').textContent = 'Merhaba, ' + (name.split(' ')[1] || name);
   document.getElementById('p-name').textContent = name;
@@ -610,8 +556,6 @@ function applyLogin(name, sicil, tel) {
   restoreCheckin();
   // Kahve sayacını geri yükle
   restoreKahveTimer();
-  // Son açık sayfayı geri yükle
-  restoreLastPage();
 }
 
 // ─── PROFİL FOTOĞRAFI: Firebase Storage'dan yükle ───
@@ -678,15 +622,26 @@ function handlePicUpload(event) {
 }
 
 function restoreCheckin() {
-  const savedAdliye = getFromStorage('durusma_checkin_adliye');
+  const savedAdliye   = getFromStorage('durusma_checkin_adliye');
   const checkinActive = getFromStorage('durusma_checkin_active');
+  const checkinUntil  = parseInt(getFromStorage('durusma_checkin_until') || '0');
+
   if (!savedAdliye || checkinActive !== '1') return;
 
-  state.checkedIn = true;
-  state.currentAdliye = savedAdliye;
+  // Süresi dolduysa otomatik çıkış
+  if (checkinUntil && Date.now() > checkinUntil) {
+    removeFromStorage('durusma_checkin_adliye');
+    removeFromStorage('durusma_checkin_active');
+    removeFromStorage('durusma_checkin_until');
+    db.ref('adliyeler/' + savedAdliye + '/' + userId).remove();
+    return;
+  }
+
+  state.checkedIn      = true;
+  state.currentAdliye  = savedAdliye;
   state.selectedAdliye = savedAdliye;
 
-  const myName = state.userName || getFromStorage('durusma_name') || 'Avukat';
+  const myName     = state.userName || getFromStorage('durusma_name') || 'Avukat';
   const myInitials = document.getElementById('profile-avatar').textContent || '?';
 
   document.getElementById('big-btn').classList.add('checked-in');
@@ -700,15 +655,24 @@ function restoreCheckin() {
   document.getElementById('pre-checkin-hint').style.display = 'none';
   document.getElementById('nearby-title').textContent = savedAdliye + ' — Buradakiler';
 
-  // Firebase'e tekrar kaydet (onDisconnect ile silinmiş olabilir)
-  const ref = db.ref('adliyeler/' + savedAdliye + '/' + userId);
-  ref.set({
+  // Önce aynı isme ait eski/farklı-key kayıtları temizle
+  db.ref('adliyeler/' + savedAdliye).once('value', snap => {
+    const existing = snap.val() || {};
+    Object.keys(existing).forEach(key => {
+      if (key !== userId && existing[key].name === myName) {
+        db.ref('adliyeler/' + savedAdliye + '/' + key).remove();
+      }
+    });
+  });
+
+  // Firebase'e yaz — onDisconnect YOK, tarayıcı kapansa da devam eder
+  db.ref('adliyeler/' + savedAdliye + '/' + userId).set({
     name: myName,
     initials: myInitials,
     status: state.selectedMood,
-    timestamp: firebase.database.ServerValue.TIMESTAMP
+    timestamp: firebase.database.ServerValue.TIMESTAMP,
+    checkinUntil: checkinUntil || (Date.now() + 8 * 60 * 60 * 1000)
   });
-  ref.onDisconnect().remove();
 
   listenNearbyAvukats(savedAdliye);
 }
@@ -825,28 +789,11 @@ function goPage(page, tab) {
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
   document.getElementById('page-' + page).classList.add('active');
   if (tab) tab.classList.add('active');
-  // Kaldığı sayfayı kaydet
-  saveToStorage('durusma_last_page', page);
 }
 function goProfile() {
   goPage('profile');
   document.querySelectorAll('.nav-tab').forEach((t,i) => { if(i===2) t.classList.add('active'); else t.classList.remove('active'); });
   renderProfileFriends();
-}
-
-// ─── SON SAYFAYI GERİ YÜKLE ───
-function restoreLastPage() {
-  const lastPage = getFromStorage('durusma_last_page');
-  const validPages = ['home', 'cafe', 'profile'];
-  if (!lastPage || !validPages.includes(lastPage) || lastPage === 'home') return;
-  const tabs = document.querySelectorAll('.nav-tab');
-  const idx = { home: 0, cafe: 1, profile: 2 }[lastPage];
-  if (lastPage === 'profile') {
-    goProfile();
-  } else if (lastPage === 'cafe') {
-    goPage('cafe', tabs[idx]);
-    renderFriendMap();
-  }
 }
 
 // ─── PROFİL: ARKADAŞLAR BÖLÜMÜ ───
@@ -1053,27 +1000,41 @@ function confirmCheckin() {
   document.getElementById('pre-checkin-hint').style.display = 'none';
   document.getElementById('nearby-title').textContent = state.currentAdliye + ' — Buradakiler';
 
-  // Kullanıcı adını güvenli şekilde al
-  const myName = state.userName || getFromStorage('durusma_name') || 'Avukat';
+  const myName     = state.userName || getFromStorage('durusma_name') || 'Avukat';
   const myInitials = document.getElementById('profile-avatar').textContent || myName.replace('Av.','').trim().split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+  const checkinUntil = Date.now() + 8 * 60 * 60 * 1000;
 
-  // Firebase'e kaydet
+  // ── Önce bu adliyedeki aynı isme ait eski/farklı-key kayıtları sil ──
+  db.ref('adliyeler/' + state.currentAdliye).once('value', snap => {
+    const existing = snap.val() || {};
+    Object.keys(existing).forEach(key => {
+      if (key !== userId && existing[key].name === myName) {
+        db.ref('adliyeler/' + state.currentAdliye + '/' + key).remove();
+      }
+    });
+    // Diğer tüm adliyelerdeki eski kaydımızı da temizle
+    ADLIYELER.forEach(a => {
+      if (a !== state.currentAdliye) {
+        db.ref('adliyeler/' + a + '/' + userId).remove();
+      }
+    });
+  });
+
+  // Firebase'e kaydet — onDisconnect YOK, tarayıcı kapansa da devam eder
   const ref = db.ref('adliyeler/' + state.currentAdliye + '/' + userId);
   ref.set({
     name: myName,
     initials: myInitials,
     status: state.selectedMood,
-    timestamp: firebase.database.ServerValue.TIMESTAMP
+    timestamp: firebase.database.ServerValue.TIMESTAMP,
+    checkinUntil: checkinUntil
   });
-  ref.onDisconnect().remove();
 
-  // Check-in durumunu localStorage'a kaydet (sayfa yenilenince geri dönmek için)
   saveToStorage('durusma_checkin_adliye', state.currentAdliye);
   saveToStorage('durusma_checkin_active', '1');
+  saveToStorage('durusma_checkin_until', String(checkinUntil));
 
   listenNearbyAvukats(state.currentAdliye);
-
-  // Arkadaşlara check-in bildirimi gönder
   notifyFriendsCheckin(state.currentAdliye, myName, myInitials);
 }
 
@@ -1198,14 +1159,43 @@ function listenNearbyAvukats(adliyeName) {
     const data = snapshot.val();
     list.innerHTML = '';
     let hasOthers = false;
+    const now = Date.now();
+
     if (data) {
+      // ── Çift kayıt temizleme: aynı name'e sahip birden fazla key varsa
+      //    sadece en yeni timestamp'li olanı tut, gerisini Firebase'den sil ──
+      const byName = {}; // name → { key, timestamp }
       Object.keys(data).forEach(key => {
-        if (key === userId) return;
-        hasOthers = true;
         const p = data[key];
+        const ts = p.timestamp || 0;
+        if (!byName[p.name] || ts > byName[p.name].ts) {
+          // Daha eski olan kaydı sil
+          if (byName[p.name]) {
+            db.ref('adliyeler/' + adliyeName + '/' + byName[p.name].key).remove();
+          }
+          byName[p.name] = { key, ts };
+        } else {
+          // Bu kayıt daha eski, sil
+          db.ref('adliyeler/' + adliyeName + '/' + key).remove();
+        }
+      });
+
+      // Kalan temiz kayıtları render et
+      Object.values(byName).forEach(({ key }) => {
+        if (key === userId) return;
+        const p = data[key];
+        if (!p) return;
+
+        // checkinUntil süresi dolmuşsa sil ve gösterme
+        if (p.checkinUntil && now > p.checkinUntil) {
+          db.ref('adliyeler/' + adliyeName + '/' + key).remove();
+          return;
+        }
+
+        hasOthers = true;
         let badge = '';
         if (p.status === 'Kahveye Açığım') {
-          const remaining = p.kahveUntil ? Math.max(0, Math.floor((p.kahveUntil - Date.now()) / 60000)) : 45;
+          const remaining = p.kahveUntil ? Math.max(0, Math.floor((p.kahveUntil - now) / 60000)) : 45;
           badge = '<span class="person-badge badge-coffee">☕ ' + remaining + 'dk</span>';
         } else if (p.status === 'Müsaitim') badge = '<span class="person-badge badge-green">Müsait</span>';
         else if (p.status === 'Duruşmada') badge = '<span class="person-badge badge-red">Duruşmada</span>';
@@ -1213,12 +1203,11 @@ function listenNearbyAvukats(adliyeName) {
 
         const row = document.createElement('div');
         row.style.cssText = "background:var(--bg3); border:0.5px solid var(--border); border-radius:12px; padding:14px; margin-bottom:8px;";
-        // Arkadaşlık durumunu kontrol et
         db.ref('friends/' + userId + '/' + key).once('value', fsnap => {
           const isFriend = fsnap.exists();
           row.innerHTML = `
             <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
-              <div class="person-av">${p.initials}</div>
+              <div class="person-av">${p.initials || '?'}</div>
               <div class="person-info"><div class="person-name">${p.name}</div>
               <div class="person-role">${isFriend ? '🤝 Arkadaş' : '⚖️ Meslektaş'}</div></div>
               ${badge}
@@ -1270,14 +1259,8 @@ function toggleSetting(row) { const t = row.querySelector('.toggle'); if (t) t.c
 function doLogout() {
   if (state.checkedIn) doCheckOut();
   removeFromStorage('durusma_loggedin');
-  removeFromStorage('durusma_last_page');
-  // Ana sayfayı sıfırla
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-home').classList.add('active');
-  document.querySelectorAll('.nav-tab').forEach((t,i) => { if(i===0) t.classList.add('active'); else t.classList.remove('active'); });
   document.getElementById('s-app').classList.remove('active');
   document.getElementById('s-landing').classList.add('active');
-  showLogin();
 }
 function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000); }
 function closeBanner() { document.getElementById('ios-banner').classList.remove('visible'); sessionStorage.setItem('ios-banner-dismissed','1'); }
