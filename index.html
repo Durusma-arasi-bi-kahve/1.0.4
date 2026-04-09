@@ -439,7 +439,6 @@ html {
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 
 <script>
 // ─── FIREBASE YAPILANDIRMA ───
@@ -455,7 +454,6 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
-const storage = firebase.storage();
 
 // Her cihaza özgü ID (localStorage + cookie)
 function _get(k) { try { const v=localStorage.getItem(k); if(v) return v; } catch(e){} try { const m=document.cookie.match('(?:^|; )'+k+'=([^;]*)'); if(m) return decodeURIComponent(m[1]); } catch(e){} return null; }
@@ -583,65 +581,70 @@ function applyPhotoToUI(url) {
 function handlePicUpload(event) {
   const file = event.target.files[0];
   if (!file) return;
-  if (file.size > 5 * 1024 * 1024) { showToast('⚠️ Fotoğraf 5MB\'dan küçük olmalı'); return; }
+  if (file.size > 2 * 1024 * 1024) { showToast('⚠️ Fotoğraf 2MB\'dan küçük olmalı'); return; }
 
   const overlay = document.getElementById('upload-overlay');
-  overlay.textContent = '0%';
+  overlay.textContent = '⏳';
   overlay.classList.add('show');
 
-  const ext = file.name.split('.').pop() || 'jpg';
-  const storageRef = storage.ref('profile_photos/' + userId + '.' + ext);
-  const task = storageRef.put(file);
+  // Görseli Canvas üzerinden sıkıştır → küçük JPEG'e çevir → Base64 olarak DB'ye kaydet
+  const img = new Image();
+  const objectURL = URL.createObjectURL(file);
 
-  task.on('state_changed',
-    snap => {
-      const pct = Math.round(snap.bytesTransferred / snap.totalBytes * 100);
-      overlay.textContent = pct + '%';
-    },
-    err => {
-      overlay.classList.remove('show');
-      showToast('❌ Yükleme hatası: ' + err.message);
-      event.target.value = '';
-    },
-    () => {
-      task.snapshot.ref.getDownloadURL().then(url => {
+  img.onload = function() {
+    URL.revokeObjectURL(objectURL);
+
+    // Maksimum 300×300 px'e küçült
+    const MAX = 300;
+    let w = img.width, h = img.height;
+    if (w > h) { if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; } }
+    else        { if (h > MAX) { w = Math.round(w * MAX / h); h = MAX; } }
+
+    const canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+
+    // JPEG kalite 0.82 — genellikle ~30-80KB çıkar
+    const base64 = canvas.toDataURL('image/jpeg', 0.82);
+
+    // Realtime Database'e kaydet (Storage'a gerek yok, CORS sorunu yok)
+    db.ref('user_photos/' + userId).set(base64)
+      .then(() => {
         overlay.classList.remove('show');
-        // URL'yi DB'ye kaydet
-        db.ref('user_photos/' + userId).set(url);
-        // UI'ya uygula
-        applyPhotoToUI(url);
-        // Aktif check-in varsa oradaki kaydı da güncelle
+        applyPhotoToUI(base64);
         if (state.checkedIn && state.currentAdliye) {
-          db.ref('adliyeler/' + state.currentAdliye + '/' + userId + '/photoURL').set(url);
+          db.ref('adliyeler/' + state.currentAdliye + '/' + userId + '/photoURL').set(base64);
         }
         showToast('✅ Profil fotoğrafı güncellendi!');
+      })
+      .catch(err => {
+        overlay.classList.remove('show');
+        showToast('❌ Kaydedilemedi: ' + err.message);
       });
-      event.target.value = '';
-    }
-  );
+
+    event.target.value = '';
+  };
+
+  img.onerror = function() {
+    URL.revokeObjectURL(objectURL);
+    overlay.classList.remove('show');
+    showToast('❌ Görsel okunamadı.');
+    event.target.value = '';
+  };
+
+  img.src = objectURL;
 }
 
 function restoreCheckin() {
-  const savedAdliye   = getFromStorage('durusma_checkin_adliye');
+  const savedAdliye = getFromStorage('durusma_checkin_adliye');
   const checkinActive = getFromStorage('durusma_checkin_active');
-  const checkinUntil  = parseInt(getFromStorage('durusma_checkin_until') || '0');
-
   if (!savedAdliye || checkinActive !== '1') return;
 
-  // Süresi dolduysa otomatik çıkış
-  if (checkinUntil && Date.now() > checkinUntil) {
-    removeFromStorage('durusma_checkin_adliye');
-    removeFromStorage('durusma_checkin_active');
-    removeFromStorage('durusma_checkin_until');
-    db.ref('adliyeler/' + savedAdliye + '/' + userId).remove();
-    return;
-  }
-
-  state.checkedIn      = true;
-  state.currentAdliye  = savedAdliye;
+  state.checkedIn = true;
+  state.currentAdliye = savedAdliye;
   state.selectedAdliye = savedAdliye;
 
-  const myName     = state.userName || getFromStorage('durusma_name') || 'Avukat';
+  const myName = state.userName || getFromStorage('durusma_name') || 'Avukat';
   const myInitials = document.getElementById('profile-avatar').textContent || '?';
 
   document.getElementById('big-btn').classList.add('checked-in');
@@ -655,24 +658,15 @@ function restoreCheckin() {
   document.getElementById('pre-checkin-hint').style.display = 'none';
   document.getElementById('nearby-title').textContent = savedAdliye + ' — Buradakiler';
 
-  // Önce aynı isme ait eski/farklı-key kayıtları temizle
-  db.ref('adliyeler/' + savedAdliye).once('value', snap => {
-    const existing = snap.val() || {};
-    Object.keys(existing).forEach(key => {
-      if (key !== userId && existing[key].name === myName) {
-        db.ref('adliyeler/' + savedAdliye + '/' + key).remove();
-      }
-    });
-  });
-
-  // Firebase'e yaz — onDisconnect YOK, tarayıcı kapansa da devam eder
-  db.ref('adliyeler/' + savedAdliye + '/' + userId).set({
+  // Firebase'e tekrar kaydet (onDisconnect ile silinmiş olabilir)
+  const ref = db.ref('adliyeler/' + savedAdliye + '/' + userId);
+  ref.set({
     name: myName,
     initials: myInitials,
     status: state.selectedMood,
-    timestamp: firebase.database.ServerValue.TIMESTAMP,
-    checkinUntil: checkinUntil || (Date.now() + 8 * 60 * 60 * 1000)
+    timestamp: firebase.database.ServerValue.TIMESTAMP
   });
+  ref.onDisconnect().remove();
 
   listenNearbyAvukats(savedAdliye);
 }
@@ -1000,41 +994,27 @@ function confirmCheckin() {
   document.getElementById('pre-checkin-hint').style.display = 'none';
   document.getElementById('nearby-title').textContent = state.currentAdliye + ' — Buradakiler';
 
-  const myName     = state.userName || getFromStorage('durusma_name') || 'Avukat';
+  // Kullanıcı adını güvenli şekilde al
+  const myName = state.userName || getFromStorage('durusma_name') || 'Avukat';
   const myInitials = document.getElementById('profile-avatar').textContent || myName.replace('Av.','').trim().split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
-  const checkinUntil = Date.now() + 8 * 60 * 60 * 1000;
 
-  // ── Önce bu adliyedeki aynı isme ait eski/farklı-key kayıtları sil ──
-  db.ref('adliyeler/' + state.currentAdliye).once('value', snap => {
-    const existing = snap.val() || {};
-    Object.keys(existing).forEach(key => {
-      if (key !== userId && existing[key].name === myName) {
-        db.ref('adliyeler/' + state.currentAdliye + '/' + key).remove();
-      }
-    });
-    // Diğer tüm adliyelerdeki eski kaydımızı da temizle
-    ADLIYELER.forEach(a => {
-      if (a !== state.currentAdliye) {
-        db.ref('adliyeler/' + a + '/' + userId).remove();
-      }
-    });
-  });
-
-  // Firebase'e kaydet — onDisconnect YOK, tarayıcı kapansa da devam eder
+  // Firebase'e kaydet
   const ref = db.ref('adliyeler/' + state.currentAdliye + '/' + userId);
   ref.set({
     name: myName,
     initials: myInitials,
     status: state.selectedMood,
-    timestamp: firebase.database.ServerValue.TIMESTAMP,
-    checkinUntil: checkinUntil
+    timestamp: firebase.database.ServerValue.TIMESTAMP
   });
+  ref.onDisconnect().remove();
 
+  // Check-in durumunu localStorage'a kaydet (sayfa yenilenince geri dönmek için)
   saveToStorage('durusma_checkin_adliye', state.currentAdliye);
   saveToStorage('durusma_checkin_active', '1');
-  saveToStorage('durusma_checkin_until', String(checkinUntil));
 
   listenNearbyAvukats(state.currentAdliye);
+
+  // Arkadaşlara check-in bildirimi gönder
   notifyFriendsCheckin(state.currentAdliye, myName, myInitials);
 }
 
@@ -1159,43 +1139,14 @@ function listenNearbyAvukats(adliyeName) {
     const data = snapshot.val();
     list.innerHTML = '';
     let hasOthers = false;
-    const now = Date.now();
-
     if (data) {
-      // ── Çift kayıt temizleme: aynı name'e sahip birden fazla key varsa
-      //    sadece en yeni timestamp'li olanı tut, gerisini Firebase'den sil ──
-      const byName = {}; // name → { key, timestamp }
       Object.keys(data).forEach(key => {
-        const p = data[key];
-        const ts = p.timestamp || 0;
-        if (!byName[p.name] || ts > byName[p.name].ts) {
-          // Daha eski olan kaydı sil
-          if (byName[p.name]) {
-            db.ref('adliyeler/' + adliyeName + '/' + byName[p.name].key).remove();
-          }
-          byName[p.name] = { key, ts };
-        } else {
-          // Bu kayıt daha eski, sil
-          db.ref('adliyeler/' + adliyeName + '/' + key).remove();
-        }
-      });
-
-      // Kalan temiz kayıtları render et
-      Object.values(byName).forEach(({ key }) => {
         if (key === userId) return;
-        const p = data[key];
-        if (!p) return;
-
-        // checkinUntil süresi dolmuşsa sil ve gösterme
-        if (p.checkinUntil && now > p.checkinUntil) {
-          db.ref('adliyeler/' + adliyeName + '/' + key).remove();
-          return;
-        }
-
         hasOthers = true;
+        const p = data[key];
         let badge = '';
         if (p.status === 'Kahveye Açığım') {
-          const remaining = p.kahveUntil ? Math.max(0, Math.floor((p.kahveUntil - now) / 60000)) : 45;
+          const remaining = p.kahveUntil ? Math.max(0, Math.floor((p.kahveUntil - Date.now()) / 60000)) : 45;
           badge = '<span class="person-badge badge-coffee">☕ ' + remaining + 'dk</span>';
         } else if (p.status === 'Müsaitim') badge = '<span class="person-badge badge-green">Müsait</span>';
         else if (p.status === 'Duruşmada') badge = '<span class="person-badge badge-red">Duruşmada</span>';
@@ -1203,11 +1154,12 @@ function listenNearbyAvukats(adliyeName) {
 
         const row = document.createElement('div');
         row.style.cssText = "background:var(--bg3); border:0.5px solid var(--border); border-radius:12px; padding:14px; margin-bottom:8px;";
+        // Arkadaşlık durumunu kontrol et
         db.ref('friends/' + userId + '/' + key).once('value', fsnap => {
           const isFriend = fsnap.exists();
           row.innerHTML = `
             <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
-              <div class="person-av">${p.initials || '?'}</div>
+              <div class="person-av">${p.initials}</div>
               <div class="person-info"><div class="person-name">${p.name}</div>
               <div class="person-role">${isFriend ? '🤝 Arkadaş' : '⚖️ Meslektaş'}</div></div>
               ${badge}
