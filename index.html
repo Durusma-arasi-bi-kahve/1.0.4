@@ -126,7 +126,7 @@ html {
 .nearby-section{width:100%} .nearby-list{display:flex;flex-direction:column;gap:8px}
 .nearby-person{display:flex;align-items:center;gap:12px;padding:11px 14px;background:var(--bg3);border:0.5px solid var(--border);border-radius:12px;transition:border-color .2s}
 .nearby-person:hover{border-color:var(--border2)}
-.person-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0;background:var(--card);color:var(--gold);border:1px solid var(--gold)}
+.person-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0;background:var(--card);color:var(--gold);border:1px solid var(--gold);background-size:cover;background-position:center;overflow:hidden}
 .person-info{flex:1} .person-name{font-size:13px;color:var(--text);font-weight:500} .person-role{font-size:11px;color:var(--muted);margin-top:1px}
 .person-badge{font-size:10px;padding:3px 8px;border-radius:20px}
 .badge-green{background:rgba(90,175,90,.12);color:var(--green);border:0.5px solid rgba(90,175,90,.3)}
@@ -177,7 +177,7 @@ html {
 .map-adliye-name{font-family:'Playfair Display',serif;font-size:15px;color:var(--gold-light);}
 .map-adliye-count{font-size:11px;padding:3px 9px;border-radius:20px;background:rgba(90,175,90,.12);color:var(--green);border:0.5px solid rgba(90,175,90,.3);}
 .map-friend-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:0.5px solid var(--border);}
-.map-friend-av{width:30px;height:30px;border-radius:50%;background:var(--card);border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--gold);flex-shrink:0;}
+.map-friend-av{width:30px;height:30px;border-radius:50%;background:var(--card);border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--gold);flex-shrink:0;background-size:cover;background-position:center;overflow:hidden}
 .map-friend-info{flex:1;font-size:12px;color:var(--text);}
 .map-friend-status{font-size:10px;color:var(--muted);margin-top:1px;}
 .map-empty{text-align:center;padding:40px 20px;color:var(--muted2);font-size:13px;line-height:1.8;}
@@ -439,6 +439,7 @@ html {
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 
 <script>
 // ─── FIREBASE YAPILANDIRMA ───
@@ -454,6 +455,7 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
+const storage = firebase.storage();
 
 // Her cihaza özgü ID (localStorage + cookie)
 function _get(k) { try { const v=localStorage.getItem(k); if(v) return v; } catch(e){} try { const m=document.cookie.match('(?:^|; )'+k+'=([^;]*)'); if(m) return decodeURIComponent(m[1]); } catch(e){} return null; }
@@ -581,58 +583,42 @@ function applyPhotoToUI(url) {
 function handlePicUpload(event) {
   const file = event.target.files[0];
   if (!file) return;
-  if (file.size > 2 * 1024 * 1024) { showToast('⚠️ Fotoğraf 2MB\'dan küçük olmalı'); return; }
+  if (file.size > 5 * 1024 * 1024) { showToast('⚠️ Fotoğraf 5MB\'dan küçük olmalı'); return; }
 
   const overlay = document.getElementById('upload-overlay');
-  overlay.textContent = '⏳';
+  overlay.textContent = '0%';
   overlay.classList.add('show');
 
-  // Görseli Canvas üzerinden sıkıştır → küçük JPEG'e çevir → Base64 olarak DB'ye kaydet
-  const img = new Image();
-  const objectURL = URL.createObjectURL(file);
+  const ext = file.name.split('.').pop() || 'jpg';
+  const storageRef = storage.ref('profile_photos/' + userId + '.' + ext);
+  const task = storageRef.put(file);
 
-  img.onload = function() {
-    URL.revokeObjectURL(objectURL);
-
-    // Maksimum 300×300 px'e küçült
-    const MAX = 300;
-    let w = img.width, h = img.height;
-    if (w > h) { if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; } }
-    else        { if (h > MAX) { w = Math.round(w * MAX / h); h = MAX; } }
-
-    const canvas = document.createElement('canvas');
-    canvas.width = w; canvas.height = h;
-    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-
-    // JPEG kalite 0.82 — genellikle ~30-80KB çıkar
-    const base64 = canvas.toDataURL('image/jpeg', 0.82);
-
-    // Realtime Database'e kaydet (Storage'a gerek yok, CORS sorunu yok)
-    db.ref('user_photos/' + userId).set(base64)
-      .then(() => {
+  task.on('state_changed',
+    snap => {
+      const pct = Math.round(snap.bytesTransferred / snap.totalBytes * 100);
+      overlay.textContent = pct + '%';
+    },
+    err => {
+      overlay.classList.remove('show');
+      showToast('❌ Yükleme hatası: ' + err.message);
+      event.target.value = '';
+    },
+    () => {
+      task.snapshot.ref.getDownloadURL().then(url => {
         overlay.classList.remove('show');
-        applyPhotoToUI(base64);
+        // URL'yi DB'ye kaydet
+        db.ref('user_photos/' + userId).set(url);
+        // UI'ya uygula
+        applyPhotoToUI(url);
+        // Aktif check-in varsa oradaki kaydı da güncelle
         if (state.checkedIn && state.currentAdliye) {
-          db.ref('adliyeler/' + state.currentAdliye + '/' + userId + '/photoURL').set(base64);
+          db.ref('adliyeler/' + state.currentAdliye + '/' + userId + '/photoURL').set(url);
         }
         showToast('✅ Profil fotoğrafı güncellendi!');
-      })
-      .catch(err => {
-        overlay.classList.remove('show');
-        showToast('❌ Kaydedilemedi: ' + err.message);
       });
-
-    event.target.value = '';
-  };
-
-  img.onerror = function() {
-    URL.revokeObjectURL(objectURL);
-    overlay.classList.remove('show');
-    showToast('❌ Görsel okunamadı.');
-    event.target.value = '';
-  };
-
-  img.src = objectURL;
+      event.target.value = '';
+    }
+  );
 }
 
 function restoreCheckin() {
@@ -1154,12 +1140,22 @@ function listenNearbyAvukats(adliyeName) {
 
         const row = document.createElement('div');
         row.style.cssText = "background:var(--bg3); border:0.5px solid var(--border); border-radius:12px; padding:14px; margin-bottom:8px;";
-        // Arkadaşlık durumunu kontrol et
-        db.ref('friends/' + userId + '/' + key).once('value', fsnap => {
+
+        // Arkadaşlık durumu + fotoğraf paralel çek
+        Promise.all([
+          db.ref('friends/' + userId + '/' + key).once('value'),
+          db.ref('user_photos/' + key).once('value')
+        ]).then(([fsnap, psnap]) => {
           const isFriend = fsnap.exists();
+          const photoURL  = psnap.val() || null;
+          const avStyle   = photoURL
+            ? `style="background-image:url('${photoURL}');color:transparent;"`
+            : '';
+          const avText = photoURL ? '' : (p.initials || '?');
+
           row.innerHTML = `
             <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
-              <div class="person-av">${p.initials}</div>
+              <div class="person-av" ${avStyle}>${avText}</div>
               <div class="person-info"><div class="person-name">${p.name}</div>
               <div class="person-role">${isFriend ? '🤝 Arkadaş' : '⚖️ Meslektaş'}</div></div>
               ${badge}
@@ -1447,8 +1443,20 @@ function renderFriendMap() {
     const byAdliye = {}; // { adliyeAdi: [{ friendId, name, initials, status, kahveUntil }] }
 
     const friendIds = Object.keys(friends);
-    let pending = friendIds.length;
+    let pending = friendIds.length * ADLIYELER.length;
 
+    // Önce tüm arkadaşların fotoğraflarını çek
+    const photoCache = {};
+    let photoPending = friendIds.length;
+    friendIds.forEach(fid => {
+      db.ref('user_photos/' + fid).once('value', psnap => {
+        photoCache[fid] = psnap.val() || null;
+        photoPending--;
+        if (photoPending === 0) fetchCheckins();
+      });
+    });
+
+    function fetchCheckins() {
     friendIds.forEach(fid => {
       // O arkadaşın check-in yaptığı adliyeyi bul
       ADLIYELER.forEach(a => {
@@ -1456,15 +1464,23 @@ function renderFriendMap() {
           if (snap2.exists()) {
             const p = snap2.val();
             if (!byAdliye[a]) byAdliye[a] = [];
-            byAdliye[a].push({ id: fid, name: p.name || friends[fid].name, initials: p.initials || friends[fid].initials || '?', status: p.status || 'Müsaitim', kahveUntil: p.kahveUntil });
+            byAdliye[a].push({
+              id: fid,
+              name: p.name || friends[fid].name,
+              initials: p.initials || friends[fid].initials || '?',
+              status: p.status || 'Müsaitim',
+              kahveUntil: p.kahveUntil,
+              photoURL: photoCache[fid] || null
+            });
           }
           pending--;
           if (pending <= 0) renderMapCards(byAdliye, cont, friends);
         });
       });
     });
+    }
 
-    // Hiç adliye yoksa timeout ile tamamla
+    // Hiç arkadaş yoksa direkt tamamla
     if (friendIds.length === 0) renderMapCards({}, cont, friends);
   });
 }
@@ -1493,7 +1509,7 @@ function renderMapCards(byAdliye, cont, friends) {
             ? '<span style="font-size:10px;color:var(--yellow);">🟡 Kalemde</span>'
             : '<span style="font-size:10px;color:var(--green);">🟢 Müsait</span>';
           return `<div class="map-friend-row">
-            <div class="map-friend-av">${p.initials}</div>
+            <div class="map-friend-av" ${p.photoURL ? `style="background-image:url('${p.photoURL}');color:transparent;"` : ''}>${p.photoURL ? '' : p.initials}</div>
             <div class="map-friend-info">
               <div>${p.name}</div>
               <div class="map-friend-status">${statusBadge}</div>
