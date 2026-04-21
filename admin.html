@@ -161,6 +161,9 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
   .user-actions { width: 100%; }
   .stats-row { gap: 8px; }
 }
+
+.admin-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1px solid var(--gold); }
+
 </style>
 </head>
 <body>
@@ -401,7 +404,7 @@ function renderList(type, filter = '') {
       <div class="user-card" id="card-${id}">
         <div class="user-avatar">${initials}</div>
         <div class="user-info">
-          <div class="user-name">${escHtml(r.name || '—')} <span class="user-status status-${type === 'pending' ? 'pending' : type === 'approved' ? 'approved' : 'rejected'}">${type === 'pending' ? 'Bekliyor' : type === 'approved' ? 'Onaylı' : 'Reddedildi'}</span></div>
+          <div style="display:flex; align-items:center; gap:10px;">${r.photoURL ? `<img src="${r.photoURL}" class="admin-avatar">` : ""}<div class="user-name">${escHtml(r.name || '—')} <span class="user-status status-${type === 'pending' ? 'pending' : type === 'approved' ? 'approved' : 'rejected'}">${type === 'pending' ? 'Bekliyor' : type === 'approved' ? 'Onaylı' : 'Reddedildi'}</span></div>
           
         <div style="margin-top:8px; display:flex; gap:8px; align-items:center;">
            ${kvkkBadge}

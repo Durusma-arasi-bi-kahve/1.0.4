@@ -252,12 +252,20 @@ html {
   body{background:#070503}
 }
 
+/* KVKK & Avatar Styles */
 .kvkk-container { display: flex; align-items: flex-start; gap: 10px; margin: 15px 0; text-align: left; }
 .kvkk-checkbox { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--gold); cursor: pointer; }
 .kvkk-label { font-size: 12px; color: var(--muted); line-height: 1.5; }
 .kvkk-link { color: var(--gold); text-decoration: underline; cursor: pointer; font-weight: 500; }
 .kvkk-modal-body { max-height: 60vh; overflow-y: auto; font-size: 13px; color: var(--text); line-height: 1.6; padding-right: 10px; margin-bottom: 20px; }
 .kvkk-modal-body h4 { color: var(--gold-light); margin: 15px 0 5px; font-size: 14px; }
+.user-avatar { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold); }
+.user-avatar-placeholder { width: 50px; height: 50px; border-radius: 50%; background: var(--bg3); display: flex; align-items: center; justify-content: center; font-size: 24px; border: 2px solid var(--border); }
+.friend-card { background: var(--card); border: 0.5px solid var(--border); border-radius: 12px; padding: 12px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; }
+.friend-actions { margin-left: auto; display: flex; gap: 8px; }
+.btn-sm { padding: 6px 10px; font-size: 11px; border-radius: 6px; cursor: pointer; border: none; font-weight: 600; transition: 0.2s; }
+.btn-msg { background: var(--gold); color: var(--bg); }
+.btn-del { background: rgba(192,80,80,0.1); color: var(--red); border: 0.5px solid var(--red); }
 
 </style>
 </head>
@@ -298,7 +306,7 @@ html {
             <span class="kvkk-link" onclick="openKvkkModal()">KVKK Aydınlatma Metni</span>'ni okudum ve verilerimin işlenmesini onaylıyorum.
           </label>
         </div>
-    <button class="btn-primary" onclick="doRegister()">Kayıt Talebi Gönder →</button>
+<button class="btn-primary" onclick="doRegister()">Kayıt Talebi Gönder →</button>
       <div class="login-note" style="cursor:pointer;color:var(--gold);margin-top:16px;" onclick="showLogin()">Zaten hesabınız var mı? <u>Giriş Yapın</u></div>
     </div>
 
@@ -759,13 +767,64 @@ function acceptKvkk() {
   closeKvkkModal();
 }
 
-function doRegister() {
+function removeFriend(friendId) {
+    if(!confirm('Bu kişiyi arkadaş listenizden silmek istediğinize emin misiniz?')) return;
+    const myUid = auth.currentUser.uid;
+    db.ref('friends/' + myUid + '/' + friendId).remove()
+    .then(() => {
+        showToast('Arkadaş listenizden çıkarıldı.');
+        renderFriends();
+    });
+}
 
+function renderFriends() {
+    const myUid = auth.currentUser.uid;
+    const listDiv = document.getElementById('arkadaslar-list'); // Assuming this ID exists or we add it
+    if(!listDiv) return;
+    
+    db.ref('friends/' + myUid).once('value', snapshot => {
+        const friends = snapshot.val();
+        if(!friends) {
+            listDiv.innerHTML = '<div style="text-align:center; padding:40px; color:var(--muted);">Henüz arkadaşınız bulunmuyor.</div>';
+            return;
+        }
+        
+        let html = '';
+        const friendIds = Object.keys(friends);
+        let count = 0;
+        
+        friendIds.forEach(fid => {
+            db.ref('users/' + fid).once('value', uSnap => {
+                const u = uSnap.val();
+                if(u) {
+                    const avatar = u.photoURL ? `<img src="${u.photoURL}" class="user-avatar">` : `<div class="user-avatar-placeholder">⚖️</div>`;
+                    html += `
+                    <div class="friend-card">
+                        ${avatar}
+                        <div>
+                            <div style="font-weight:600; color:var(--gold-light);">${u.name}</div>
+                            <div style="font-size:11px; color:var(--muted);">Baro Sicil: ${u.sicil}</div>
+                        </div>
+                        <div class="friend-actions">
+                            <button class="btn-sm btn-msg" onclick="openChat('${fid}', '${u.name}')">Mesaj Yaz</button>
+                            <button class="btn-sm btn-del" onclick="removeFriend('${fid}')">Sil</button>
+                        </div>
+                    </div>`;
+                }
+                count++;
+                if(count === friendIds.length) listDiv.innerHTML = html;
+            });
+        });
+    });
+}
+
+function doRegister() {
   const consent = document.getElementById('kvkk-consent').checked;
   if(!consent) {
     document.querySelector('.kvkk-container').style.border = "1px solid var(--red)";
     return showToast('Lütfen KVKK metnini onaylayın.');
   }
+
   const name  = document.getElementById('reg-name').value.trim();
   const sicil = document.getElementById('reg-sicil').value.trim();
   const tel   = document.getElementById('reg-tel').value.trim();
@@ -1825,12 +1884,20 @@ function removeFromStorage(key) {
 .btn-add { background: var(--bg2); border: 0.5px solid var(--gold); color: var(--gold); }
 .btn-msg { background: var(--gold); border: none; color: var(--bg); }
 
+/* KVKK & Avatar Styles */
 .kvkk-container { display: flex; align-items: flex-start; gap: 10px; margin: 15px 0; text-align: left; }
 .kvkk-checkbox { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--gold); cursor: pointer; }
 .kvkk-label { font-size: 12px; color: var(--muted); line-height: 1.5; }
 .kvkk-link { color: var(--gold); text-decoration: underline; cursor: pointer; font-weight: 500; }
 .kvkk-modal-body { max-height: 60vh; overflow-y: auto; font-size: 13px; color: var(--text); line-height: 1.6; padding-right: 10px; margin-bottom: 20px; }
 .kvkk-modal-body h4 { color: var(--gold-light); margin: 15px 0 5px; font-size: 14px; }
+.user-avatar { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold); }
+.user-avatar-placeholder { width: 50px; height: 50px; border-radius: 50%; background: var(--bg3); display: flex; align-items: center; justify-content: center; font-size: 24px; border: 2px solid var(--border); }
+.friend-card { background: var(--card); border: 0.5px solid var(--border); border-radius: 12px; padding: 12px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; }
+.friend-actions { margin-left: auto; display: flex; gap: 8px; }
+.btn-sm { padding: 6px 10px; font-size: 11px; border-radius: 6px; cursor: pointer; border: none; font-weight: 600; transition: 0.2s; }
+.btn-msg { background: var(--gold); color: var(--bg); }
+.btn-del { background: rgba(192,80,80,0.1); color: var(--red); border: 0.5px solid var(--red); }
 
 </style>
 
