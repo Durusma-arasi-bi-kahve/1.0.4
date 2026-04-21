@@ -81,6 +81,29 @@ html {
 .btn-primary:hover{opacity:.9} .btn-primary:active{transform:scale(.98);opacity:.85}
 .login-note { font-size:11px; color:var(--muted2); text-align:center; margin-top:14px; line-height:1.5; }
 
+/* KVKK onay kutusu */
+.kvkk-row { display:flex; align-items:flex-start; gap:10px; margin-bottom:16px; margin-top:4px; }
+.kvkk-checkbox { width:18px; height:18px; min-width:18px; border-radius:4px; border:1.5px solid var(--border2); background:var(--bg3); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .15s; flex-shrink:0; margin-top:1px; }
+.kvkk-checkbox.checked { background:var(--gold); border-color:var(--gold); }
+.kvkk-checkbox.checked::after { content:'✓'; font-size:11px; color:var(--bg); font-weight:700; }
+.kvkk-label { font-size:12px; color:var(--muted); line-height:1.6; }
+.kvkk-link { color:var(--gold); text-decoration:underline; cursor:pointer; }
+
+/* KVKK tam metin modal */
+.kvkk-modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.75); z-index:9000; align-items:flex-end; justify-content:center; padding:0; }
+.kvkk-modal-overlay.open { display:flex; }
+.kvkk-modal { background:var(--bg2); border:.5px solid var(--border2); border-radius:20px 20px 0 0; width:100%; max-width:480px; max-height:88vh; display:flex; flex-direction:column; animation:modal-in .3s ease; }
+.kvkk-modal-head { display:flex; align-items:center; justify-content:space-between; padding:20px 24px 16px; border-bottom:.5px solid var(--border); flex-shrink:0; }
+.kvkk-modal-title { font-family:'Playfair Display',serif; font-size:17px; color:var(--gold-light); }
+.kvkk-modal-close { width:30px; height:30px; border-radius:50%; background:var(--bg3); border:.5px solid var(--border); display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--muted); font-size:16px; }
+.kvkk-modal-body { flex:1; overflow-y:auto; padding:20px 24px; -webkit-overflow-scrolling:touch; }
+.kvkk-modal-body h3 { font-family:'Playfair Display',serif; font-size:14px; color:var(--gold-light); margin:16px 0 6px; }
+.kvkk-modal-body h3:first-child { margin-top:0; }
+.kvkk-modal-body p { font-size:12px; color:var(--muted); line-height:1.8; margin-bottom:10px; }
+.kvkk-modal-body ul { font-size:12px; color:var(--muted); line-height:1.8; padding-left:16px; margin-bottom:10px; }
+.kvkk-modal-foot { padding:16px 24px; border-top:.5px solid var(--border); flex-shrink:0; }
+.kvkk-accept-btn { width:100%; background:var(--gold); border:none; border-radius:10px; padding:12px; font-family:'DM Sans',sans-serif; font-size:14px; font-weight:500; color:var(--bg); cursor:pointer; -webkit-appearance:none; }
+
 /* APP SHELL */
 #s-app { flex-direction:column; max-width:480px; margin:0 auto; width:100%; }
 .app-header { display:flex; align-items:center; justify-content:space-between; padding:16px 20px 12px; padding-top:calc(16px + env(safe-area-inset-top)); border-bottom:0.5px solid var(--border); background:var(--bg); position:sticky; top:0; z-index:100; }
@@ -283,6 +306,13 @@ html {
       <input class="field-input" type="text" id="reg-sicil" placeholder="Sicil numaranız">
       <div class="field-label">Telefon</div>
       <input class="field-input" type="tel" id="reg-tel" placeholder="05** *** ** **">
+      <!-- KVKK Onay -->
+      <div class="kvkk-row">
+        <div class="kvkk-checkbox" id="kvkk-box" onclick="toggleKvkk()"></div>
+        <div class="kvkk-label">
+          <span class="kvkk-link" onclick="openKvkk()">Kişisel Verilerin Korunması Kanunu (KVKK) Aydınlatma Metni</span>'ni okudum ve kişisel verilerimin işlenmesine onay veriyorum.
+        </div>
+      </div>
       <button class="btn-primary" onclick="doRegister()">Kayıt Talebi Gönder →</button>
       <div class="login-note" style="cursor:pointer;color:var(--gold);margin-top:16px;" onclick="showLogin()">Zaten hesabınız var mı? <u>Giriş Yapın</u></div>
     </div>
@@ -428,6 +458,69 @@ html {
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- ═══ KVKK AYDINLATMA METNİ MODALı ═══ -->
+<div class="kvkk-modal-overlay" id="kvkk-modal">
+  <div class="kvkk-modal">
+    <div class="kvkk-modal-head">
+      <div class="kvkk-modal-title">KVKK Aydınlatma Metni</div>
+      <div class="kvkk-modal-close" onclick="closeKvkk()">✕</div>
+    </div>
+    <div class="kvkk-modal-body">
+
+      <h3>1. Veri Sorumlusu</h3>
+      <p>Duruşma Arası uygulaması kapsamında kişisel verileriniz, 6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") çerçevesinde veri sorumlusu sıfatıyla işlenmektedir.</p>
+
+      <h3>2. İşlenen Kişisel Veriler</h3>
+      <p>Aşağıdaki kişisel verileriniz işlenmektedir:</p>
+      <ul>
+        <li>Ad ve soyad</li>
+        <li>Baro sicil numarası</li>
+        <li>Telefon numarası</li>
+        <li>Profil fotoğrafı (isteğe bağlı)</li>
+        <li>Adliye konum bilgisi (check-in yapıldığında)</li>
+        <li>Uygulama içi mesajlaşma içerikleri</li>
+      </ul>
+
+      <h3>3. Kişisel Verilerin İşlenme Amaçları</h3>
+      <p>Kişisel verileriniz aşağıdaki amaçlarla işlenmektedir:</p>
+      <ul>
+        <li>Üyelik kaydının oluşturulması ve doğrulanması</li>
+        <li>Aynı adliyedeki meslektaşların birbirini görebilmesi</li>
+        <li>Uygulama içi iletişimin sağlanması</li>
+        <li>Hizmet güvenliğinin ve bütünlüğünün korunması</li>
+      </ul>
+
+      <h3>4. Kişisel Verilerin Aktarılması</h3>
+      <p>Kişisel verileriniz; yalnızca teknik altyapı hizmeti kapsamında <strong style="color:var(--gold-light)">Google Firebase</strong> platformunda güvenli biçimde saklanmaktadır. Firebase verileri Google'ın Avrupa veri merkezlerinde şifreli olarak tutulmaktadır. Üçüncü taraflarla ticari amaçla paylaşılmamaktadır.</p>
+
+      <h3>5. Verilerin Saklanma Süresi</h3>
+      <p>Kişisel verileriniz, üyeliğinizin aktif olduğu süre boyunca saklanır. Hesabınızın silinmesini talep etmeniz hâlinde verileriniz en geç 30 gün içinde kalıcı olarak silinir.</p>
+
+      <h3>6. Veri Güvenliği</h3>
+      <p>Verileriniz Firebase Realtime Database'de saklanmakta olup Google'ın güvenlik altyapısı ile korunmaktadır. Uygulama yalnızca yetkili kullanıcılara erişim izni vermektedir. Profil fotoğrafları şifreli bağlantı (HTTPS) üzerinden iletilmektedir.</p>
+
+      <h3>7. KVKK Kapsamındaki Haklarınız</h3>
+      <p>KVKK'nın 11. maddesi uyarınca aşağıdaki haklara sahipsiniz:</p>
+      <ul>
+        <li>Kişisel verilerinizin işlenip işlenmediğini öğrenme</li>
+        <li>İşlenmişse buna ilişkin bilgi talep etme</li>
+        <li>İşlenme amacını ve amacına uygun kullanılıp kullanılmadığını öğrenme</li>
+        <li>Eksik veya yanlış işlenmiş verilerin düzeltilmesini isteme</li>
+        <li>Verilerin silinmesini veya yok edilmesini isteme</li>
+        <li>İşleme itiraz etme</li>
+      </ul>
+      <p>Haklarınızı kullanmak için uygulama üzerinden veya yönetici ile iletişime geçebilirsiniz.</p>
+
+      <h3>8. Onay</h3>
+      <p>Kayıt formunu doldurarak bu aydınlatma metnini okuduğunuzu ve kişisel verilerinizin yukarıda belirtilen amaçlar doğrultusunda işlenmesine açık rıza verdiğinizi kabul etmiş olursunuz.</p>
+
+    </div>
+    <div class="kvkk-modal-foot">
+      <button class="kvkk-accept-btn" onclick="acceptKvkk()">Okudum, Onaylıyorum ✓</button>
+    </div>
+  </div>
+</div>
 
 <div class="ios-banner" id="ios-banner">
   <div class="ios-banner-icon">☕</div>
@@ -736,11 +829,41 @@ function showPending() {
 }
 
 // ─── KAYIT OL ───
+// ─── KVKK ───
+let kvkkChecked = false;
+
+function toggleKvkk() {
+  kvkkChecked = !kvkkChecked;
+  const box = document.getElementById('kvkk-box');
+  box.classList.toggle('checked', kvkkChecked);
+}
+function openKvkk() {
+  document.getElementById('kvkk-modal').classList.add('open');
+}
+function closeKvkk() {
+  document.getElementById('kvkk-modal').classList.remove('open');
+}
+function acceptKvkk() {
+  kvkkChecked = true;
+  document.getElementById('kvkk-box').classList.add('checked');
+  closeKvkk();
+  showToast('✅ KVKK onayı verildi.');
+}
+
 function doRegister() {
   const name  = document.getElementById('reg-name').value.trim();
   const sicil = document.getElementById('reg-sicil').value.trim();
   const tel   = document.getElementById('reg-tel').value.trim();
   if (!name || !sicil || !tel) { showToast('⚠️ Tüm alanları doldurun'); return; }
+  if (!kvkkChecked) {
+    // Kutuyu vurgula
+    const box = document.getElementById('kvkk-box');
+    box.style.borderColor = 'var(--red)';
+    box.style.boxShadow   = '0 0 0 3px rgba(192,80,80,.2)';
+    setTimeout(() => { box.style.borderColor=''; box.style.boxShadow=''; }, 2000);
+    showToast('⚠️ Lütfen KVKK metnini onaylayın');
+    return;
+  }
 
   // Sicil no'yu kayıt kimliği olarak kullan (boşluk/slash temizle)
   const regId = 'reg_' + sicil.replace(/[^a-zA-Z0-9]/g,'_');
@@ -748,6 +871,8 @@ function doRegister() {
   db.ref('kayit_talepleri/' + regId).set({
     name, sicil, tel,
     status: 'bekliyor',
+    kvkkOnay: true,
+    kvkkOnayTarihi: firebase.database.ServerValue.TIMESTAMP,
     requestedAt: firebase.database.ServerValue.TIMESTAMP
   }).then(() => {
     saveToStorage('durusma_reg_id', regId);

@@ -404,6 +404,7 @@ function renderList(type, filter = '') {
           <div class="user-name">${escHtml(r.name || '—')} <span class="user-status status-${type === 'pending' ? 'pending' : type === 'approved' ? 'approved' : 'rejected'}">${type === 'pending' ? 'Bekliyor' : type === 'approved' ? 'Onaylı' : 'Reddedildi'}</span></div>
           <div class="user-meta">
             🪪 Sicil: <strong>${escHtml(r.sicil || '—')}</strong> &nbsp;·&nbsp; 📞 ${escHtml(r.tel || '—')}
+            &nbsp;·&nbsp; ${r.kvkkOnay ? '<span style="color:var(--green);font-size:11px;">✓ KVKK Onaylı</span>' : '<span style="color:var(--red);font-size:11px;">✗ KVKK Onaysız</span>'}
           </div>
           <div class="req-date">📅 ${dateStr}</div>
         </div>
