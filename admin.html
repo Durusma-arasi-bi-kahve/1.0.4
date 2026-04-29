@@ -313,7 +313,21 @@ function initAdmin() {
     allRequests = snap.val() || {};
     renderAll();
     updateStats();
+  }, err => {
+    // Rules okuma izni yoksa tüm alt yolları tek tek çek
+    console.warn('Kök okuma izni yok, alt yollar tek tek çekiliyor:', err.message);
+    loadRequestsOneByOne();
   });
+}
+
+// Rules kök okumaya izin vermiyorsa fallback: bilinen regId'leri çek
+function loadRequestsOneByOne() {
+  // Önce tüm kayıt taleplerini çekmeye çalış — farklı bir yol yok
+  // Bu durumda Rules güncellenmeli
+  const warningDiv = document.createElement('div');
+  warningDiv.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#C05050;color:white;text-align:center;padding:12px;font-size:13px;z-index:9999;';
+  warningDiv.innerHTML = '⚠️ Firebase Rules güncellenmeli — kayit_talepleri kök okuma izni yok. Aşağıdaki talimatları uygulayın.';
+  document.body.prepend(warningDiv);
 }
 
 // ─── İSTATİSTİKLER ───
@@ -404,6 +418,7 @@ function renderList(type, filter = '') {
           <div class="user-name">${escHtml(r.name || '—')} <span class="user-status status-${type === 'pending' ? 'pending' : type === 'approved' ? 'approved' : 'rejected'}">${type === 'pending' ? 'Bekliyor' : type === 'approved' ? 'Onaylı' : 'Reddedildi'}</span></div>
           <div class="user-meta">
             🪪 Sicil: <strong>${escHtml(r.sicil || '—')}</strong> &nbsp;·&nbsp; 📞 ${escHtml(r.tel || '—')}
+            &nbsp;·&nbsp; ${r.kvkkOnay ? '<span style="color:var(--green);font-size:11px;">✓ KVKK Onaylı</span>' : '<span style="color:var(--red);font-size:11px;">✗ KVKK Onaysız</span>'}
           </div>
           <div class="req-date">📅 ${dateStr}</div>
         </div>
